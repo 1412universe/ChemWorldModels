@@ -1,7 +1,7 @@
 """
 快换模块设备驱动。
 
-协议：opcua_gn1.3.7.csv「快换模块」（前缀 QuickChange_）。
+协议：opcua_gn1.4.0.csv「快换模块」（前缀 QuickChange_）。
 
 对外仅暴露 execute_command，执行顺序为：
     清 CompleteFB → 写参数 → QuickChange_CmdType → QuickChange_CmdTrig=1
@@ -28,7 +28,7 @@ from unilabos.utils.log import logger
 
 DEFAULT_CSV_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "opcua_gn1.3.7.csv",
+    "opcua_gn1.4.0.csv",
 )
 
 

@@ -38,7 +38,7 @@ from unilabos.registry.decorators import action, device, not_action
 from unilabos.devices.workstation.GN.gn_station_base import GNStationClient
 from unilabos.devices.workstation.GN import rotary_stack
 
-DEFAULT_CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "opcua_gn1.3.6.csv")
+DEFAULT_CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "opcua_gn1.4.0.csv")
 
 ITEM_PLATE = "plate"    # 孔板/板位
 ITEM_BOTTLE = "bottle"  # 瓶位

@@ -509,32 +509,37 @@ def logger() -> _LoggerFacade:
     return sys.modules["unilabos.utils.log"].logger
 
 
+_WM_ACTION_FILES = (
+    "uniopcua.py",
+    "universal_driver.py",
+    "base_opcua_client.py",
+    "gn_plc_client.py",
+    "gn_station_base.py",
+)
+
+
 def _module_path(root: str, rel: str) -> str:
-    """GN 三件套（基类 / PLC / OPC 客户端）从仓库 GN/ 取，其余仍从 Uni-Lab-OS 取。"""
+    """驱动、OPC 节点类型和 UniversalDriver 都从仓库 wm_action/ 取。"""
     from . import config as cfg
 
     base = os.path.basename(rel)
     gn = cfg.repo_gn_dir()
-    if gn and base in ("base_opcua_client.py", "gn_plc_client.py", "gn_station_base.py"):
+    if gn and base in _WM_ACTION_FILES:
         alt = os.path.join(gn, base)
         if os.path.isfile(alt):
             return alt
-    return os.path.join(root, rel)
+    return os.path.join(root or "", rel)
 
 
 def driver_module(rel_filename: str, verbose: bool = False) -> types.ModuleType:
-    """按文件名加载 GN 目录下的驱动模块（如 "gn_locking_mechanism.py"）。
-
-    有仓库 GN/ 时用那一份，这样现场改过的驱动会直接被真机运行调用。
-    """
+    """按文件名加载 wm_action 下的驱动模块（如 "gn_locking_mechanism.py"）。"""
     from . import config as cfg
 
-    root = cfg.unilabos_root()
-    if not root:
-        raise RuntimeError("未找到 Uni-Lab-OS 仓库根；请设置环境变量 UNILABOS_ROOT")
-    install(root, verbose=verbose)
+    gn = cfg.repo_gn_dir() or cfg.gn_dir()
+    if not gn:
+        raise RuntimeError("未找到 wm_action 驱动目录")
+    install(gn, verbose=verbose)
     modname = "unilabos.devices.workstation.GN." + rel_filename[:-3]
-    gn = cfg.gn_dir(root)
     path = os.path.join(gn, rel_filename) if gn else ""
     loaded = sys.modules.get(modname)
     # 已经装进解释器的必须就是这份文件。否则（例如先装过 Uni-Lab-OS 副本）

@@ -77,11 +77,11 @@ def unilabos_root() -> Optional[str]:
 
 
 def repo_gn_dir() -> Optional[str]:
-    """仓库根下的 GN/：现场维护的驱动就在这里，真机下发必须用这一份。"""
+    """仓库根下的 wm_action/：现场维护的驱动就在这里，真机下发必须用这一份。"""
     here = os.path.dirname(os.path.abspath(__file__))          # .../wm_backend/app/gn_adapter
     wm_backend = os.path.dirname(os.path.dirname(here))
     parent = os.path.dirname(wm_backend)
-    d = os.path.join(parent, "GN")
+    d = os.path.join(parent, "wm_action")
     marker = os.path.join(d, "gn_station_base.py")
     plc = os.path.join(d, "gn_plc_client.py")
     if os.path.isfile(marker) and os.path.isfile(plc):
@@ -90,7 +90,7 @@ def repo_gn_dir() -> Optional[str]:
 
 
 def gn_dir(root: Optional[str] = None) -> Optional[str]:
-    """驱动源码目录。优先仓库 GN/，没有时才退回 Uni-Lab-OS 里的副本。"""
+    """驱动源码目录。优先仓库 wm_action/，没有时才退回 Uni-Lab-OS 里的副本。"""
     live = repo_gn_dir()
     if live:
         return live
@@ -199,7 +199,7 @@ def summary() -> dict:
         "gn_dir": gn_dir(root),
         "node_csv": csv_path,
         "node_csv_source": ("env:GN_NODE_CSV" if _env("GN_NODE_CSV")
-                            else "GN/opcua_gn1.4.0.csv" if csv_path and repo_gn_dir()
+                            else "wm_action/opcua_gn1.4.0.csv" if csv_path and repo_gn_dir()
                             and os.path.abspath(csv_path) == os.path.abspath(
                                 os.path.join(repo_gn_dir() or "", "opcua_gn1.4.0.csv"))
                             else "1.4.0（本适配器生成）" if csv_path == pref

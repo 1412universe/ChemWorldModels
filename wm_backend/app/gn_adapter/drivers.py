@@ -24,10 +24,9 @@ from . import sim_plc
 # ----------------------------------------------------------------------
 # device_id → (文件名, 类名, 构造参数名, 说明)
 # ----------------------------------------------------------------------
-# 构造参数名：数组里写的是「用来接收 1.3.9 节点表 CSV 的形参名」。
+# 构造参数名：数组里写的是「用来接收节点表 CSV 的形参名」。
 #   驱动之间不统一 —— 有的叫 csv_path，有的叫 xlsx_path（名字骗人，实际接的是 CSV）。
-#   rotary_stack / robotic_arm 的默认值指向 opcua_gn1.3.6.csv，**仓库里没有这个文件**，
-#   所以必须显式覆盖，否则它们的节点注册表为空、动作全找不到节点。
+#   各驱动默认表已统一为 wm_action/opcua_gn1.4.0.csv；station 仍显式传入同一份。
 # ----------------------------------------------------------------------
 DEVICE_SPECS: Dict[str, Dict[str, Any]] = {
     "gn_locking_mechanism": {
@@ -184,11 +183,9 @@ def load(force: bool = False) -> DriverCatalog:
         if _cache is not None and not force:
             return _cache
 
-        root = cfg.unilabos_root()
+        root = cfg.repo_gn_dir() or cfg.gn_dir()
         if not root:
-            raise RuntimeError(
-                "未找到 Uni-Lab-OS 仓库根（需要 <root>/unilabos/devices/workstation/GN/"
-                "gn_station_base.py）。请设置环境变量 UNILABOS_ROOT 指向仓库根。")
+            raise RuntimeError("未找到 wm_action 驱动目录（需要 gn_station_base.py 与 gn_plc_client.py）。")
 
         shim_info = shim.install(root)
         # 换掉上游那个「一切返回 True」的 _SimulatedPlc —— 否则仿真档每个动作都会

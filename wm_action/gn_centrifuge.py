@@ -1,7 +1,7 @@
 """
 离心机 设备驱动
 
-协议：opcua_gn1.3.9.csv「离心机」（前缀 Centrifuge_）。
+协议：opcua_gn1.4.0.csv「离心机」（前缀 Centrifuge_）。
 
 对外仅暴露 execute_command（Centrifuge_CmdType + 写参）；测试流程 yaml 预设供本地调试。
 
@@ -37,7 +37,7 @@ from unilabos.devices.workstation.GN.gn_station_base import GNStationClient
 from unilabos.devices.workstation.GN.base_opcua_client import OpcUaNode
 from unilabos.device_comms.opcua_client.node.uniopcua import NodeType, DataType
 
-DEFAULT_CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "opcua_gn1.3.9.csv")
+DEFAULT_CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "opcua_gn1.4.0.csv")
 
 # 与 PRCXI transfer_liquid 共享：两次 cmd11 去皮后的重量差（水，1g≈1mL≈1000μL）
 BALANCE_DELTA_CACHE_PATH = os.path.join(

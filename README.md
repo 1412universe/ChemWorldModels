@@ -12,13 +12,12 @@ AI 驱动的化学世界模型 —— 面向光热催化（OCM 甲烷偶联）�
 |------|------|
 | `wm_backend/` | FastAPI 后端 + Web 前端：AI 推演引擎、工作流编辑器、surrogate（XGBoost）训练与消融实验 |
 | `wm_model/`   | 贝叶斯优化（UCB/BO）、产率校准、反应动力学、Pd(111) DFT 数据导出 |
-| `GN/`        | GN 510 工站设备驱动与 OPC UA 通信：机械臂、离心、液体处理、烘箱、锁紧机构等 |
+| `wm_action/` | GN 510 工站设备驱动与 OPC UA 通信：机械臂、离心、液体处理、烘箱、锁紧机构等 |
 | `scripts/`   | Materials Project / OQMD 数据获取 |
-| `docs/`      | 世界模型定义与方法定位 |
 
 ## 硬件对接协议
 
-GN 工站 OPC UA 节点表对标 **`opcua_gn1.4.0.csv`**（见 `GN/` 目录），配套 PLC/机器人 Modbus TCP 协议 1.2。
+GN 工站 OPC UA 节点表对标 **`opcua_gn1.4.0.csv`**（见 `wm_action/` 目录），配套 PLC/机器人 Modbus TCP 协议 1.2。
 
 ## 快速启动
 
