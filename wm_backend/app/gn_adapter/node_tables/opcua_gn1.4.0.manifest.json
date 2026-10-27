@@ -1,0 +1,49 @@
+{
+  "authoritative_source": "OPC_UA协议1.4.0(2).xlsx",
+  "authoritative_md5": "1c12db10fae0f0a88c9b1d6f3d99d59c",
+  "generated_by": "scripts/gen_gn_node_table.py",
+  "points_total": 240,
+  "node_csv": "/Users/fenglongli/Downloads/unilabWorld/wm_backend/app/gn_adapter/node_tables/opcua_gn1.4.0.csv",
+  "csv_encoding": "utf-8",
+  "driver_enum_note": "驱动 DataType[...] 为大小写敏感枚举精确匹配；成员含 BOOLEAN 但**没有 BOOL / REAL**",
+  "replaces": "opcua_gn1.3.9.csv",
+  "added_vs_legacy": [
+    "Lock_AngleFB",
+    "Lock_FinalTorqueSet",
+    "Lock_PreTorqueLimit",
+    "Lock_PreTurnsSet",
+    "Lock_ScrewResult",
+    "Lock_TorqueFB",
+    "Tare_the_scale",
+    "scale_weight"
+  ],
+  "removed_vs_legacy": [
+    "Centrifuge_Temperature_feedback",
+    "Robot_Protective_stop_st",
+    "Solid_Remove_static"
+  ],
+  "dtype_spelling_fixed": [
+    {
+      "node": "scale_weight",
+      "proto": "REAL",
+      "driver": "FLOAT"
+    },
+    {
+      "node": "OPEN_DOOR",
+      "proto": "bool",
+      "driver": "BOOLEAN"
+    },
+    {
+      "node": "COHSE_DOOR",
+      "proto": "bool",
+      "driver": "BOOLEAN"
+    }
+  ],
+  "dtype_filled_from_blank": [
+    {
+      "node": "Oven_TimeMinuteSet",
+      "dtype": "INT16",
+      "why": "1.4.0 表内 H 列留空；驱动对 VARIABLE 节点强制要求数据类型（留空整行被跳过），参照同模块 Oven_TimeMinuteFB / Oven_TimeSecondSet 等均为 Int16 补齐"
+    }
+  ]
+}

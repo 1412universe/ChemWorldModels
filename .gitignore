@@ -1,0 +1,74 @@
+# ===== OS / Editor =====
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# ===== Local caches =====
+.lark-slides/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+*.pyo
+
+# ===== VASP pseudopotentials (copyrighted, do NOT publish) =====
+POTCAR
+POTCAR.*
+*/POTCAR
+*/POTCAR.*
+psudopotential.rar
+
+# ===== VASP / OpenMPI source & binary archives (huge, not source code) =====
+VASP/*.tar
+VASP/*.tgz
+VASP/*.zip
+VASP/*.rar
+VASP/vasp.6.4.1.tgz
+VASP/openmpi-5.0.8.tar
+VASP/vaspkit*
+
+# ===== Lab instrument proprietary software =====
+510实验室9320V4.0版本协议/
+VASP/
+OCM_DFT_batch/
+Uni-Lab-OS/
+neb_results/
+data/
+*.pptx
+
+# ===== Tarballs / archives =====
+*.tar.gz
+*.tgz
+*.tar
+*.zip
+*.rar
+
+# ===== VASP large regenerable outputs (keep inputs + small results) =====
+CHGCAR*
+WAVECAR*
+CHG
+AECCAR*
+PCDAT
+TMPCAR
+vasprun.xml
+*.cube
+*.vasp
+
+# ===== Visual Studio / C# build artifacts =====
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.pidb
+*.cache
+
+# ===== Env / secrets =====
+.env
+.env.*
+*.key
+*.pem
+
+# ===== Sync tool temp files =====
+.README.md.*

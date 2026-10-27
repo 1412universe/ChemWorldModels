@@ -1,0 +1,14 @@
+SYSTEM = Pd(111) adsorption
+ENCUT = 400
+PREC = Accurate
+ISMEAR = 0
+SIGMA = 0.05
+EDIFF = 1e-6
+EDIFFG = -0.02
+IBRION = 2
+NSW = 50
+ISIF = 2
+ISPIN = 2
+LREAL = Auto
+LWAVE = .FALSE.
+LCHARG = .FALSE.

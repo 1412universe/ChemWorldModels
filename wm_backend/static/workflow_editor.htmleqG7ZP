@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>工作流编辑器 — Uni-Lab OS 工作流编排</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236366f1'/%3E%3Cpath d='M9 16h5m4 0h5M14 10v12' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='9' cy='16' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='16' r='3' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/app.css?v=20261014b">
+<link rel="stylesheet" href="assets/wfed.css?v=20261014b">
+</head>
+<body class="page-wfed">
+
+<nav class="topnav">
+  <span class="brand">🧩 工作流编辑器 · Uni-Lab OS</span>
+  <a href="index.html" data-icon="📊">总览-510</a>
+  <a href="overview_photo.html" data-icon="☀️">总览-光催化闭环设计</a>
+  <a href="workflow_editor.html" class="active" data-icon="🛠️">工作流编辑器</a>
+</nav>
+
+<div id="app">
+  <div id="wfed-bar">
+    <div class="wf-name-wrap">
+      <label>工作流名称</label>
+      <input id="wf-name" type="text" placeholder="例如：金纳米颗粒合成流程" value="未命名工作流" />
+    </div>
+    <div class="wf-stats" id="wf-stats">节点 0 · 连线 0</div>
+    <div class="wf-btns">
+      <button id="btn-new" title="清空画布，新建工作流">🆕 新建</button>
+      <div class="btn-group">
+        <button id="btn-open">📂 打开</button>
+        <div class="open-menu hidden" id="open-menu">
+          <div class="om-title">已保存的工作流</div>
+          <div id="om-list" class="om-list scrollbar"></div>
+          <div class="om-title">导入 JSON 文件</div>
+          <label class="om-file">选择文件…<input id="wf-file" type="file" accept=".json,application/json" /></label>
+          <div class="om-title">从 AI 生成加载</div>
+          <div class="om-ai">
+            <input id="om-ai-cond" type="text" placeholder="工艺条件，如：合成金纳米颗粒" />
+            <button id="om-ai-run">生成并载入</button>
+          </div>
+        </div>
+      </div>
+      <button id="btn-save" class="primary">💾 保存</button>
+      <span class="vsep"></span>
+      <button id="btn-validate" title="校验：环 / 孤立节点 / 同设备并行冲突 / 工艺规则">✅ 校验</button>
+      <button id="btn-autolayout" title="按依赖分层自动布局（并行分支并列）">🧭 自动布局</button>
+      <button id="btn-fit" title="缩放至适应画布">⤢ 适应</button>
+      <span class="vsep"></span>
+      <button id="btn-dryrun" class="run" title="按 Uni-Lab OS 调度语义试运行（不接硬件）">▶ 试运行</button>
+      <button id="btn-stoprun" class="stop" style="display:none">■ 停止</button>
+      <span id="wf-share" title="画布实际占屏幕总面积的比例">画布 —</span>
+      <button id="btn-export" class="exp primary">⬇ 导出 Uni-Lab 工作流</button>
+    </div>
+  </div>
+
+  <div id="wfed-main">
+    <!-- 左栏：真实节点库（OPC UA 1.4.0） -->
+    <aside id="wfed-lib">
+      <div class="lib-head">
+        <input id="lib-search" type="text" placeholder="搜索设备 / 动作 / 指令号…" />
+        <span class="lib-src" title="数据来源">OPC UA 1.4.0</span>
+        <div class="lib-filter">
+          <button data-filter="all" class="on">全部</button>
+          <button data-filter="real" title="仅显示真实工作流中用到的动作">真实用过</button>
+          <button data-filter="cmd">有指令号</button>
+        </div>
+      </div>
+      <div id="lib-groups" class="lib-groups scrollbar"></div>
+      <div class="lib-tip">🖱️ 拖拽到画布放置，或点「＋」追加；<b>右端口 → 左端口</b> 连线。<br/>多个节点头同时指向同一个节点 = 并行汇合。</div>
+      <button class="lib-toggle" id="lib-toggle" title="折叠 / 展开节点库">◀</button>
+    </aside>
+
+    <!-- 中栏：画布（≈屏幕面积 80%） -->
+    <div id="wfed-canvas-wrap">
+      <div id="wfed-grid"></div>
+      <svg id="wfed-svg" width="100%" height="100%"><defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b9db8"/>
+        </marker>
+        <marker id="arr-par" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#0d9488"/>
+        </marker>
+        <marker id="arr-mat" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
+        </marker>
+      </defs></svg>
+      <div id="wfed-canvas"></div>
+      <div id="wfed-marquee"></div>
+      <div id="wfed-empty">将左侧节点拖入画布，编排 Uni-Lab OS 可执行工作流<br/>
+        节点间从 <b>右端口 → 左端口</b> 拖线建立依赖；<b>依赖不同的节点会并行执行</b>（同一设备自动串行）</div>
+
+      <div id="wfed-minimap"><span class="mm-tag">迷你地图</span></div>
+
+      <div id="wfed-legend">
+        <div class="lg-line"><span class="lg-sw" style="background:#8b9db8"></span>流程依赖（先做 → 后做）</div>
+        <div class="lg-line"><span class="lg-sw" style="background:#0d9488"></span>并行入口 / 汇合（可同时跑）</div>
+        <div class="lg-line"><span class="lg-sw" style="background:#d97706"></span>参数传递</div>
+        <div class="lg-line"><span class="lg-dot" style="background:#ca8a04"></span>就绪　<span class="lg-dot" style="background:#2563eb"></span>执行中　<span class="lg-dot" style="background:#16a34a"></span>成功　<span class="lg-dot" style="background:#dc2626"></span>失败</div>
+      </div>
+
+      <div id="wfed-zoomctl">
+        <button id="zoom-out" title="缩小">−</button>
+        <span id="wfed-zoomhint">100%</span>
+        <button id="zoom-in" title="放大">＋</button>
+        <button id="zoom-fit" title="适应画布">⤢</button>
+        <button id="zoom-reset" title="重置视图（双击空白同效）">⟲</button>
+      </div>
+
+      <!-- 运行抽屉：覆盖在画布上，不压缩画布面积 -->
+      <div id="wfed-run">
+        <div class="run-head">
+          <span class="rh-title" id="run-title">试运行（dry-run）</span>
+          <span class="rh-sub" id="run-sub">未运行</span>
+          <div class="rh-btns">
+            <button id="run-close">收起</button>
+          </div>
+        </div>
+        <div class="run-body">
+          <div class="run-lanes" id="run-lanes"></div>
+          <div class="run-side">
+            <div class="run-legend" id="run-legend"></div>
+            <div class="run-events scrollbar" id="run-events"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右栏：属性面板 -->
+    <aside id="wfed-props">
+      <div class="props-body">
+        <div class="props-empty" id="props-empty">点击画布中的节点 / 连线<br/>在右侧按「中文名 + 单位 + 范围」编辑其真实参数<br/><br/>双击节点可快速重命名步骤说明</div>
+        <div id="props-panel" class="hidden"></div>
+      </div>
+      <button class="lib-toggle" id="prop-toggle" style="left:-11px;right:auto" title="折叠 / 展开属性面板">▶</button>
+    </aside>
+  </div>
+</div>
+
+<script>
+window.PAGE_CONFIG={"page":"wfed","theme":"gn"};
+window.WFED_MODE = (new URLSearchParams(location.search)).get('mode') || 'dry';
+</script>
+<script src="assets/gn_node_library.js?v=20261014b"></script>
+<script src="assets/app_workflow.js?v=20261014b"></script>
+<script src="assets/wfrun.js?v=20261014b"></script>
+</body>
+</html>

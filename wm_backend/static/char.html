@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>金四面体/MOF · AI 世界模型 — 表征分析</title>
+<link rel="stylesheet" href="assets/app.css?v=20261008p7">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+</head>
+<body class="page-char">
+
+<div id="app">
+  <main id="center">
+    <canvas id="lab" class="lab-2d-hidden"></canvas>
+    <div id="lab-3d" class="lab-3d-container"></div>
+    <div id="lab-hint">🖱️ 点击任意设备查看规格与参数 · 点 ▶ 运行 让 AI 在设备间自主实验</div>
+    <div id="dev-modal" class="hidden">
+      <div class="dm-card">
+        <button id="dm-close" title="关闭">✕</button>
+        <div class="dm-head">
+          <div class="dm-ico" id="dm-ico">🔬</div>
+          <div class="dm-titles"><div class="dm-name" id="dm-name">设备</div><div class="dm-zone" id="dm-zone"></div></div>
+        </div>
+        <div class="dm-desc" id="dm-desc"></div>
+        <div class="dm-sec" id="dm-params-sec" style="display:none"><div class="dm-lab">参数设置（点击设备直接调整 · 直接改变 AI 执行条件）</div><div class="dm-params" id="dm-params"></div><div class="dp-note">提示：拖动滑块 / 下拉即可修改，下方「当前操作」与「实时读数」会同步更新；点「▶ 让 AI 按此条件执行」把设定带入下一轮实验。</div><div class="dm-exec"><button id="dm-exec">▶ 让 AI 按此条件执行</button></div></div>
+        <div class="dm-sec"><div class="dm-lab">当前操作</div><div class="dm-op" id="dm-op"></div></div>
+        <div class="dm-sec"><div class="dm-lab">实时读数</div><div class="dm-read" id="dm-read"></div></div>
+        <div class="dm-sec"><div class="dm-lab">设备规格范围</div><div class="dm-spec" id="dm-spec"></div></div>
+      </div>
+    <div id="panel-modal" class="hidden">
+      <div class="pm-card">
+        <button id="pm-close" title="关闭">✕</button>
+        <div class="pm-head" id="pm-title"></div>
+        <div class="pm-body scrollbar" id="pm-body"></div>
+      </div>
+    </div>
+    <div id="recipe-panel">
+      <div class="rp-head" id="rp-head">📋 配方方案 <span id="rp-toggle">▾</span></div>
+      <div class="rp-body scrollbar" id="rp-body"></div>
+    </div>
+    </div>
+  </main>
+
+  <aside id="right">
+    <h2><span class="dot"></span> AI Agent 实时推演</h2>
+    <div id="chat" class="scrollbar"></div>
+    <div id="cand-card">
+      <div class="name" id="cand-name">等待启动…</div>
+      <table>
+        <tr><td>金属 / 载体</td><td class="val" id="cand-metal">—</td></tr>
+        <tr><td>真实产率 (实测)</td><td class="val" id="cand-meas">—</td></tr>
+        <tr><td>世界模型预测</td><td class="val" id="cand-pred">—</td></tr>
+        <tr><td>真实选择性</td><td class="val" id="cand-sel">—</td></tr>
+        <tr><td>机理</td><td class="val" id="cand-mech">—</td></tr>
+      </table>
+      <div class="princ" id="cand-princ">—</div>
+      <div class="spectro">
+        <div class="sp"><div class="sp-l">UV-Vis 吸收边</div><div class="sp-v" id="sp-uv">—</div></div>
+        <div class="sp"><div class="sp-l">PL 发射峰</div><div class="sp-v" id="sp-pl">—</div></div>
+        <div class="sp"><div class="sp-l">EPR g 值</div><div class="sp-v" id="sp-epr">—</div></div>
+        <div class="sp"><div class="sp-l">XRD 物相</div><div class="sp-v" id="sp-xrd">—</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <footer id="bottom">
+    <div class="chart-wrap"><div class="ttl">金四面体产率 (μmol·g⁻¹·h⁻¹) · 预测 vs 真实</div><div class="chart-box"><canvas id="yield-chart"></canvas></div></div>
+    <div class="chart-wrap"><div class="ttl">C2 选择性 (%)</div><div class="chart-box"><canvas id="sel-chart"></canvas></div></div>
+    <div id="neb-canvas"><div class="ttl" id="neb-title" style="margin-bottom:4px">金四面体形成路径能垒（示意）</div><canvas id="neb-chart" style="width:100%;height:calc(100% - 20px)"></canvas></div>
+    <div class="chart-wrap"><div class="ttl" id="band-title">能带结构 vs NHE (eV)</div><div class="chart-box"><canvas id="band-chart"></canvas></div></div>
+    <div class="chart-wrap"><div class="ttl" id="volcano-title">金四面体活性双描述符火山</div><div class="chart-box"><canvas id="volcano-chart"></canvas></div></div>
+  </footer>
+</div>
+
+<!-- 真实文献数据库（金四面体/MOF，265 篇，按 DOI 关联 design_principles） -->
+
+<script>window.PAGE_CONFIG={"page": "char", "devices": ["centrifuge", "quick", "lock", "robot", "tube", "oven", "vacuum"], "cols": 4, "fullLab": false, "runWorldModel": false, "showFooter": false, "use3d": true};</script>
+<script src="assets/shell.js?v=20261008p7"></script>
+<script src="assets/data.js?v=20261008p7"></script>
+<script src="assets/world3d.js?v=20261008p7"></script>
+<script type="module" src="assets/app.js?v=20261008p7"></script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+
+<div id="app">
+  <header>
+    <h1><span class="em">🧪</span> 金四面体/MOF · AI 世界模型工作室</h1>
+    <span class="tag real">真实文献库 · 265 篇</span>
+    <span class="tag" id="iter-tag">迭代 #0</span>
+    <span class="tag sim" id="ts-tag">⏱ ×10,000</span>
+    <span class="tag sim" id="sim-clock">🌐 模拟 0s</span>
+    <span class="tag sim" id="data-mode-tag">🧪 数据：始终真实</span>
+    <div class="spacer"></div>
+    <div class="ctrl">
+      <button id="btn-neb">⚛ NEB 路径</button>
+      <button id="btn-play" class="primary">▶ 运行</button>
+      <button id="btn-step">⏭ 单步</button>
+      <button id="btn-exp-csv" class="exp">⬇ 配方CSV</button>
+      <button id="btn-exp-json" class="exp">⬇ 配方JSON</button>
+      <button id="btn-exp-unilab" class="exp primary">⬇ Uni-Lab OS</button>
+      <button id="btn-char">🔬 表征 &amp; 理论</button>
+      <button id="btn-react">🎯 反应体系 / 可靠性</button>
+      <button id="btn-reaction" class="exp">⚗ 反应：金四面体</button>
+      <span id="oer-target-wrap" style="display:none">
+        <button id="btn-mof-target" class="exp">🎯 MOF 应用目标：催化</button>
+      </span>
+      <label class="lbl">时间倍率</label>
+      <input id="ts-input" type="number" min="1" step="1" value="10000" />
+      <span class="presets">
+        <button class="tsp" data-v="1">1×</button>
+        <button class="tsp" data-v="100">100×</button>
+        <button class="tsp" data-v="1000">1k×</button>
+        <button class="tsp" data-v="10000">10k×</button>
+        <button class="tsp" data-v="100000">100k×</button>
+      </span>
+      <label class="lbl" style="margin-left:10px;">🧠 7B策略接管</label>
+      <input id="use7b" type="checkbox" checked title="每次选取候选时咨询本地 Qwen2.5-7B（无后端或取消勾选时自动回退确定性逻辑）。模型只读数据库、不生成/修改文献。" />
+      <label class="lbl" style="margin-left:10px;">🧪 实验数据</label>
+      <select id="data-mode" title="选择本轮是否使用真实实验数据，以及何时从模拟切换到真实">
+        <option value="real">始终真实</option>
+        <option value="hybrid">混合：N 次后真实</option>
+        <option value="sim">纯模拟</option>
+      </select>
+      <span id="real-after-wrap" style="display:none;gap:4px;align-items:center">
+        <label class="lbl">N=</label>
+        <input id="real-after" type="number" min="1" step="1" value="5" style="width:52px" />
+      </span>
+    </div>
+  </header>
+
+  <aside id="left" class="scrollbar">
+    <h2>世界模型闭环</h2>
+    <div class="stage" data-stage="0"><div class="num">1</div><div class="body"><div class="t">文献学习</div><div class="d">检索知识库，抽取设计原则</div></div></div>
+    <div class="loop-arrow">↓</div>
+    <div class="stage" data-stage="1"><div class="num">2</div><div class="body"><div class="t">虚拟合成与表征</div><div class="d">称量 · 马弗炉焙烧催化剂</div></div></div>
+    <div class="loop-arrow">↓</div>
+    <div class="stage" data-stage="2"><div class="num">3</div><div class="body"><div class="t">真实实验反馈</div><div class="d">灯 + 反应器 · 气相色谱 · 表征</div></div></div>
+    <div class="loop-arrow">↻</div>
+    <div class="stage" data-stage="3"><div class="num">4</div><div class="body"><div class="t">强化 / 主动学习</div><div class="d">AI 控制中心更新世界模型</div></div></div>
+    <div id="best-box">
+      <div class="lbl">当前最优催化剂</div>
+      <div class="v" id="best-name">—</div>
+      <div class="sub" id="best-metrics">金四面体产率 — · 选择性 —</div>
+    </div>
+    <div id="err-box">世界模型预测误差　MAE：<b id="mae">—</b>　·　相对 rMAE：<b id="rmae">—</b></div>
+    <div id="kb-meta">参考知识库：加载中…</div>
+    <div id="constraint-box">
+      <div class="lbl" style="margin-top:14px;color:var(--accent);font-weight:700">🔬 物理 / 化学约束校验</div>
+      <div id="constraint-list"><div class="cdim">运行后显示当前候选的约束校验…</div></div>
+    </div>
+  </aside>
+
+  <main id="center">
+    <canvas id="lab"></canvas>
+    <div id="lab-hint">🖱️ 点击任意设备查看规格与参数 · 点 ▶ 运行 让 AI 在设备间自主实验</div>
+    <div id="dev-modal" class="hidden">
+      <div class="dm-card">
+        <button id="dm-close" title="关闭">✕</button>
+        <div class="dm-head">
+          <div class="dm-ico" id="dm-ico">🔬</div>
+          <div class="dm-titles"><div class="dm-name" id="dm-name">设备</div><div class="dm-zone" id="dm-zone"></div></div>
+        </div>
+        <div class="dm-desc" id="dm-desc"></div>
+        <div class="dm-sec" id="dm-params-sec" style="display:none"><div class="dm-lab">参数设置（点击设备直接调整 · 直接改变 AI 执行条件）</div><div class="dm-params" id="dm-params"></div><div class="dp-note">提示：拖动滑块 / 下拉即可修改，下方「当前操作」与「实时读数」会同步更新；点「▶ 让 AI 按此条件执行」把设定带入下一轮实验。</div><div class="dm-exec"><button id="dm-exec">▶ 让 AI 按此条件执行</button></div></div>
+        <div class="dm-sec"><div class="dm-lab">当前操作</div><div class="dm-op" id="dm-op"></div></div>
+        <div class="dm-sec"><div class="dm-lab">实时读数</div><div class="dm-read" id="dm-read"></div></div>
+        <div class="dm-sec"><div class="dm-lab">设备规格范围</div><div class="dm-spec" id="dm-spec"></div></div>
+      </div>
+    <div id="panel-modal" class="hidden">
+      <div class="pm-card">
+        <button id="pm-close" title="关闭">✕</button>
+        <div class="pm-head" id="pm-title"></div>
+        <div class="pm-body scrollbar" id="pm-body"></div>
+      </div>
+    </div>
+    <div id="recipe-panel">
+      <div class="rp-head" id="rp-head">📋 配方方案 <span id="rp-toggle">▾</span></div>
+      <div class="rp-body scrollbar" id="rp-body"></div>
+    </div>
+    </div>
+  </main>
+
+  <aside id="right">
+    <h2><span class="dot"></span> AI Agent 实时推演</h2>
+    <div id="chat" class="scrollbar"></div>
+    <div id="cand-card">
+      <div class="name" id="cand-name">等待启动…</div>
+      <table>
+        <tr><td>金属 / 载体</td><td class="val" id="cand-metal">—</td></tr>
+        <tr><td>真实产率 (实测)</td><td class="val" id="cand-meas">—</td></tr>
+        <tr><td>世界模型预测</td><td class="val" id="cand-pred">—</td></tr>
+        <tr><td>真实选择性</td><td class="val" id="cand-sel">—</td></tr>
+        <tr><td>机理</td><td class="val" id="cand-mech">—</td></tr>
+      </table>
+      <div class="princ" id="cand-princ">—</div>
+      <div class="spectro">
+        <div class="sp"><div class="sp-l">UV-Vis 吸收边</div><div class="sp-v" id="sp-uv">—</div></div>
+        <div class="sp"><div class="sp-l">PL 发射峰</div><div class="sp-v" id="sp-pl">—</div></div>
+        <div class="sp"><div class="sp-l">EPR g 值</div><div class="sp-v" id="sp-epr">—</div></div>
+        <div class="sp"><div class="sp-l">XRD 物相</div><div class="sp-v" id="sp-xrd">—</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <footer id="bottom">
+    <div class="chart-wrap"><div class="ttl">金四面体产率 (μmol·g⁻¹·h⁻¹) · 预测 vs 真实</div><div class="chart-box"><canvas id="yield-chart"></canvas></div></div>
+    <div class="chart-wrap"><div class="ttl">C2 选择性 (%)</div><div class="chart-box"><canvas id="sel-chart"></canvas></div></div>
+    <div id="neb-canvas"><div class="ttl" id="neb-title" style="margin-bottom:4px">金四面体形成路径能垒（示意）</div><canvas id="neb-chart" style="width:100%;height:calc(100% - 20px)"></canvas></div>
+    <div class="chart-wrap"><div class="ttl" id="band-title">能带结构 vs NHE (eV)</div><div class="chart-box"><canvas id="band-chart"></canvas></div></div>
+    <div class="chart-wrap"><div class="ttl" id="volcano-title">金四面体活性双描述符火山</div><div class="chart-box"><canvas id="volcano-chart"></canvas></div></div>
+  </footer>
+</div>
+
+<!-- 真实文献数据库（金四面体/MOF，265 篇，按 DOI 关联 design_principles） -->
+<script>
