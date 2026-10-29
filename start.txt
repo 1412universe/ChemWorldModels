@@ -1,0 +1,17 @@
+# 更新到 GitHub（工作流编辑器：参数隔离 + 切换列表不误增条目）
+# 在仓库根目录执行：
+
+cd /Users/fenglongli/Downloads/ChemWorldModel
+
+git add wm_backend/static/assets/app_workflow.js \
+        wm_backend/static/workflow_editor.html \
+        start.txt
+
+git commit -m "$(cat <<'EOF'
+Keep workflow list switches from inventing extra draft rows.
+
+Also isolate param edits to the selected node so same-type nodes no longer share inputs.
+EOF
+)"
+
+git push origin main

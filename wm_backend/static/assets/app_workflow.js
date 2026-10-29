@@ -1331,7 +1331,7 @@
     });
 
     // --- 参数控件 ---
-    bindParamInputs(panel, n);
+    bindParamInputs(panel);
     // --- PRCXI 板位点选器 ---
     bindDeckSection(panel, n);
     if (keep && keep.pk) {
@@ -1916,8 +1916,21 @@
     return h;
   }
 
-  function bindParamInputs(panel, n) {
+  /** 属性栏当前正在编辑的节点：每次提交现查，避免叠监听闭包串改其它节点。 */
+  function propEditNode() {
+    if (!state.selected || state.selected.type === 'edge') return null;
+    if (selCount() > 1) return null;
+    return findNode(state.selected.id);
+  }
+
+  function bindParamInputs(panel) {
+    // panel 生命周期内只挂一层委托；重绘属性栏不再叠加监听。
+    if (panel.dataset.paramBound === '1') return;
+    panel.dataset.paramBound = '1';
+
     function commit(k, val) {
+      var n = propEditNode();
+      if (!n) return;
       var a = actionOfNode(n);
       var sch = (a && a.params && a.params[k]) || {};
       var nv = val;
@@ -1969,7 +1982,10 @@
     panel.addEventListener('change', function (ev) {
       var t = ev.target, pk = t.dataset.pk;
       if (t.dataset.pkDefault) {
-        var k = t.dataset.pkDefault, a = actionOfNode(n);
+        var k = t.dataset.pkDefault;
+        var n = propEditNode();
+        if (!n) return;
+        var a = actionOfNode(n);
         var d = (a && a.params && a.params[k] && a.params[k].default);
         commit(k, d); renderNodeProps(panel); return;
       }
@@ -3613,6 +3629,9 @@
       state._syncing = false;
     }
   }
+  function tplInList(id) {
+    return !!(id && tplList.some(function (t) { return t.id === id; }));
+  }
   function scheduleTemplateSync() {
     if (state._syncing) return;
     if (tplSyncTimer) clearTimeout(tplSyncTimer);
@@ -3629,7 +3648,8 @@
         var prevName = tplCache[cur] ? (tplCache[cur].name || '') : '';
         if (prevData !== JSON.stringify(linked.data) || prevName !== (linked.name || '')) {
           cacheTemplate(linked);
-          scheduleTplPut(cur);
+          // Only push to server if already listed — avoid inventing a new left-list row from a scratch draft.
+          if (tplInList(cur)) scheduleTplPut(cur);
         }
       }
     }, 360);
@@ -3716,9 +3736,9 @@
     var cur = wfUuid(state.wf);
     if (!tid || tid === cur) return;
     var gen = ++tplSwitchGen;
-    var curHas = (state.wf.data.nodes || []).some(function (n) { return !n._embed; }) ||
-      (state.wf.data.embeds || []).length;
-    var saveFirst = (!tplRemoved[cur] && (state.tplRegistered || curHas))
+    // Persist only if current already sits in the left list. Don't create a brand-new
+    // list row just because we're leaving a scratch / draft edit.
+    var saveFirst = (cur && !tplRemoved[cur] && tplInList(cur))
       ? putTemplate(collectLinked()) : Promise.resolve();
     saveFirst.then(function () {
       if (gen !== tplSwitchGen) return;
