@@ -8,7 +8,7 @@ import numpy as np
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-WM = "/Users/fenglongli/Downloads/ChemWorld/wm_backend"
+WM = "/Users/fenglongli/Downloads/ChemWorldModel/wm_backend"
 sys.path.insert(0, WM)
 os.chdir(WM)
 from app import services, llm, evaluation
@@ -148,7 +148,7 @@ with ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:
 print(f"[ablation] all models done in {time.time()-tB:.1f}s", flush=True)
 
 # ---- 读本地7B ----
-prev = "/Users/fenglongli/Downloads/ChemWorld/data/ablation_7b_vs_ucb.json"
+prev = "/Users/fenglongli/Downloads/ChemWorldModel/data/ablation_7b_vs_ucb.json"
 if os.path.exists(prev):
     with open(prev) as f: prevj = json.load(f)
     if prevj.get("7b"): results["7B(local)"] = prevj["7b"]
@@ -177,7 +177,7 @@ else:
 print(f"\n[ablation] verdict: {verdict}", flush=True)
 
 # ---- 落盘 ----
-OUT = "/Users/fenglongli/Downloads/ChemWorld/data"
+OUT = "/Users/fenglongli/Downloads/ChemWorldModel/data"
 out = {"config": {"seed": SEED, "n_iters": N_ITERS, "pool_size": len(pool), "gbest": gbest,
                    "models": [m["name"] for m in MODELS], "workers": MAX_WORKERS},
        "results": results, "verdict": verdict,

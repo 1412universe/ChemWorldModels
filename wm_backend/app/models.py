@@ -95,7 +95,7 @@ class ChatReq(BaseModel):
 
 
 class WorkflowReq(BaseModel):
-    """Uni-Lab OS 工作流生成请求：前端把 AI 理论最优条件 POST 给后端，
+    """CWM-Lab 工作流生成请求：前端把 AI 理论最优条件 POST 给后端，
     后端调用 unilab-workflow-builder skill 的 prcxi_factory.py 生成合规工作流 JSON。"""
     cond: dict                    # AI 理论最优条件 {T, R, I, G, reaction}
     reaction: str = "CH4"         # 'CH4' | 'OER'

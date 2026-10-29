@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-并行工作流运行内核（Uni-Lab OS Edge 调度语义的轻量移植）
+并行工作流运行内核（CWM-Lab Edge 调度语义的轻量移植）
 
 设计目标
 --------
-1. **语义对齐** `Uni-Lab-OS/unilabos/app/scheduler/`：
+1. **语义对齐** `CWM-Lab/unilabos/app/scheduler/`：
    - `dag_state.py`：`_pending_parents` 入度表 → `ready_nodes()`（入度为 0 即可执行；
      多个节点同时就绪 = 天然并行）；`mark_finished()` 从子节点依赖表摘除 → 级联放出后继；
      `_detect_cycle()` DFS 环检测。
@@ -16,7 +16,7 @@
    依赖 ROS/messages 栈，本轻量副本没有该运行时）。
 
 3. **dry-run 优先**：默认按动作语义估算耗时并模拟执行，产出可观看的并行时间轴；
-   real 模式由 `UniLabOSDispatcher`（`app/gn_adapter/`）接到 Uni-Lab-OS 的 GN 驱动上，
+   real 模式由 `UniLabOSDispatcher`（`app/gn_adapter/`）接到 CWM-Lab 的 GN 驱动上，
    直接进程内 OPC UA 驱动 510 工站硬件。
 
 real 模式的三档（`UniLabOSDispatcher`）
@@ -211,7 +211,7 @@ def estimate_duration(node: Dict[str, Any]) -> float:
 class Dispatcher:
     """执行适配器接口。
 
-    real 模式：实现 `run_node(node, ctx)`，把节点下发到 Uni-Lab OS 并阻塞到完成，
+    real 模式：实现 `run_node(node, ctx)`，把节点下发到 CWM-Lab 并阻塞到完成，
     返回 (ok: bool, info: dict)。可复用 `build_job_start_payload()` 构造 job_start 载荷，
     经 hostlink / ws_client 的 MessageProcessor._handle_job_start 下发。
     """
@@ -287,12 +287,12 @@ class DryRunDispatcher(Dispatcher):
 
 
 class UniLabOSDispatcher(Dispatcher):
-    """GN 510 真机适配器 —— 后端直接跑 Uni-Lab-OS 的 GN 驱动。
+    """GN 510 真机适配器 —— 后端直接跑 CWM-Lab 的 GN 驱动。
 
     与旧版注释里「经 hostlink / ws_client 下发 job_start」的思路不同：
     GN 驱动的硬件访问**全部走 OPC UA**（`GnPlcClient`，按 URL 单例的整站共享会话），
-    与 Uni-Lab-OS 的网络层（ROS2 / hostlink）无关。因此这里**直接进程内调用驱动**，
-    少一跳网络、也不需要在 wm_backend 之外再起一个 Uni-Lab-OS 服务。
+    与 CWM-Lab 的网络层（ROS2 / hostlink）无关。因此这里**直接进程内调用驱动**，
+    少一跳网络、也不需要在 wm_backend 之外再起一个 CWM-Lab 服务。
 
     三档语义（`action_mode` × `allow_real`）：
 
@@ -354,7 +354,7 @@ class UniLabOSDispatcher(Dispatcher):
 def build_job_start_payload(job_id: str, task_id: str, workflow_id: str, node_id: str,
                             device_id: str, action_name: str, action_type: str,
                             action_args: Any, always_free: bool = False) -> Dict[str, Any]:
-    """构造与 Uni-Lab OS 云端 `job_start` 同形状的执行载荷。
+    """构造与 CWM-Lab 云端 `job_start` 同形状的执行载荷。
 
     对齐 `unilabos/app/scheduler/dispatch.py::build_job_start_payload`，字段名逐一对齐，
     这样 real 适配器可以直接复用而无需改协议。`always_free=True` 表示该动作不占设备排队锁。

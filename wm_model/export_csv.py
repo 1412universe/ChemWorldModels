@@ -1,7 +1,11 @@
 """导出24点排产CSV（UTF-8 BOM，Excel可直接打开）。"""
+from pathlib import Path
+_ROOT = Path(__file__).resolve().parent.parent
+_DATA = _ROOT / "data"
+_WM = Path(__file__).resolve().parent
 import json, csv
 
-R = json.load(open("/Users/fenglongli/Downloads/unilabWorld/wm_model/_bo_result.json"))
+R = json.load(open(_WM / "_bo_result.json"))
 points = R["points"]
 
 
@@ -20,7 +24,7 @@ def lock(step):
     return "CH4/O2/Ar/光强/温度全锁"
 
 
-out = "/Users/fenglongli/Downloads/unilabWorld/data/排产24点_世界模型BO.csv"
+out = str(_DATA / "排产24点_世界模型BO.csv")
 with open(out, "w", newline="", encoding="utf-8-sig") as f:
     w = csv.writer(f)
     w.writerow(["实验#", "催化剂", "组内", "步进", "CH4(mL/min)", "O2(mL/min)",

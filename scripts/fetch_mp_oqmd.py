@@ -36,8 +36,8 @@ fetch_mp_oqmd.py
   # 2) 真实拉取（需先设置 MP_API_KEY）
   export MP_API_KEY=你的key
   python fetch_mp_oqmd.py \
-      --pool /Users/fenglongli/Downloads/ChemWorld/data/catalysts_v6.json \
-      --out  /Users/fenglongli/Downloads/ChemWorld/data/mp_oqmd_cache.json
+      --pool /Users/fenglongli/Downloads/ChemWorldModel/data/catalysts_v6.json \
+      --out  /Users/fenglongli/Downloads/ChemWorldModel/data/mp_oqmd_cache.json
 
   # 3) 仅 MP、跳过 OQMD
   python fetch_mp_oqmd.py --pool ... --out ... --no-oqmd
@@ -284,7 +284,7 @@ def run(pool_path, out_path, use_oqmd=True, delay=0.2):
 # ----------------------------------------------------------------------------
 # 自检（不联网）
 # ----------------------------------------------------------------------------
-def selftest(out_path="/Users/fenglongli/Downloads/ChemWorld/data/mp_oqmd_cache.json"):
+def selftest(out_path="/Users/fenglongli/Downloads/ChemWorldModel/data/mp_oqmd_cache.json"):
     mock_mp = {
         "data": [
             {"material_id": "mp-2657", "formula_pretty": "TiO2",
@@ -309,8 +309,8 @@ def selftest(out_path="/Users/fenglongli/Downloads/ChemWorld/data/mp_oqmd_cache.
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="拉取 MP/OQMD DFT 描述符到世界模型缓存")
-    ap.add_argument("--pool", default="/Users/fenglongli/Downloads/ChemWorld/data/catalysts_v6.json")
-    ap.add_argument("--out", default="/Users/fenglongli/Downloads/ChemWorld/data/mp_oqmd_cache.json")
+    ap.add_argument("--pool", default="/Users/fenglongli/Downloads/ChemWorldModel/data/catalysts_v6.json")
+    ap.add_argument("--out", default="/Users/fenglongli/Downloads/ChemWorldModel/data/mp_oqmd_cache.json")
     ap.add_argument("--no-oqmd", action="store_true", help="跳过 OQMD")
     ap.add_argument("--selftest", action="store_true", help="用 mock 响应验证逻辑（不联网）")
     ap.add_argument("--delay", type=float, default=0.2)

@@ -18,7 +18,7 @@
      （三工艺 aus / autet / mof，各位的 name / group / content / temp / enabled）
      · 注意 app.js 的 ``pos`` 就是板位号 T（同一套编号），只是它渲染成**列优先**；
        本模块按驱动器物理方向输出 ``gridCol`` / ``gridRow``（行主序）
-  ③ 真实占用 —— **真实工作流 JSON**（Uni-Lab-OS GN 目录）里 PRCXI 节点
+  ③ 真实占用 —— **真实工作流 JSON**（CWM-Lab GN 目录）里 PRCXI 节点
      ``source_slots`` / ``target_slots`` / ``tip_rack_slots`` 与
      ``sources`` / ``targets`` / ``tip_racks`` 的成对关系（同一节点内 slot 与资源名一一对应）
      → 得到「板位号 → 资源实例」的实测证据（含出现次数）
@@ -34,7 +34,7 @@ import re
 from typing import Any, Dict, List, Optional
 
 # ---------------------------------------------------------------------------
-# 1. 板位几何（源自 PRCXI9300Deck；此处为字面量快照，避免依赖 Uni-Lab-OS 在场）
+# 1. 板位几何（源自 PRCXI9300Deck；此处为字面量快照，避免依赖 CWM-Lab 在场）
 # ---------------------------------------------------------------------------
 DECK_MODEL = "PRCXI9300Deck"
 ROWS = 4
@@ -186,7 +186,7 @@ def kind_of(name: str) -> Dict[str, str]:
 #    由真实工作流聚合（每台 PRCXI 节点内 slot 与资源名一一对应）：
 #      transfer_liquid / titration_liquid : source_slots↔sources, target_slots↔targets,
 #                                           tip_rack_slots↔tip_racks
-#    可调用 refresh_from_workflows() 用现网工作流重算（需 Uni-Lab-OS 仓库在场）。
+#    可调用 refresh_from_workflows() 用现网工作流重算（需 CWM-Lab 仓库在场）。
 # ---------------------------------------------------------------------------
 _OCC_EVIDENCE: Dict[int, List[Any]] = {
     1:  [],
@@ -228,9 +228,9 @@ def _occ_table() -> Dict[int, List[Dict[str, Any]]]:
 
 
 def _guess_workflow_dir() -> Optional[str]:
-    """探测真实工作流 JSON 目录（Uni-Lab-OS GN 工站）。
+    """探测真实工作流 JSON 目录（CWM-Lab GN 工站）。
 
-    同一份仓库在本机有两处副本（独立 clone 与 unilabWorld 下的完整仓），
+    同一份仓库在本机有两处副本（独立 clone 与 ChemWorldModel 下的完整仓），
     两者的工作流 JSON 集合**不同**（独立 clone 多 5 份历史工作流）。
     这里取**含 JSON 最多的那一个**，与 scripts/gen_gn_node_library.py 的口径一致。
     """
@@ -240,7 +240,7 @@ def _guess_workflow_dir() -> Optional[str]:
         roots.append(env)
     roots += [
         "/Users/fenglongli/Downloads/Uni-Lab-OS",
-        "/Users/fenglongli/Downloads/unilabWorld/Uni-Lab-OS",
+        "/Users/fenglongli/Downloads/ChemWorldModel/Uni-Lab-OS",
     ]
     best, best_n = None, -1
     for r in roots:
@@ -260,7 +260,7 @@ def refresh_from_workflows() -> Dict[str, Any]:
     """
     d = _guess_workflow_dir()
     if not d:
-        return {"ok": False, "error": "未找到 Uni-Lab-OS GN 工作流目录"}
+        return {"ok": False, "error": "未找到 CWM-Lab GN 工作流目录"}
     pairs = [("sources", "source_slots"), ("targets", "target_slots"),
              ("tip_racks", "tip_rack_slots")]
     agg: Dict[int, Dict[str, int]] = {}

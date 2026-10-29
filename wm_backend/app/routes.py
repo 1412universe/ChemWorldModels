@@ -27,7 +27,7 @@ from . import inference_log
 from .models import (CandidateReq, NextReq, PredictResp, ExportReq, ExportResp,
                      SimReq, SimResp, EvaluateReq, AcquisitionReq, ChatReq,
                      WorkflowReq, WorkflowResp)
-from .data import REALDATA_DIR
+from .data import REALDATA_DIR, DATA_DIR as _WM_DATA_DIR
 
 router = APIRouter()
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "static")
@@ -466,7 +466,7 @@ def overview_photo_html():
 @router.get("/workflow_editor")
 @router.get("/workflow_editor.html")
 def workflow_editor_html():
-    """可视化工作流编辑器：拖拽编排 Uni-Lab OS 可执行工作流（兼容 unilab_workflow.json）。"""
+    """可视化工作流编辑器：拖拽编排 CWM-Lab 可执行工作流（兼容 unilab_workflow.json）。"""
     return FileResponse(os.path.join(STATIC_DIR, "workflow_editor.html"))
 
 
@@ -716,9 +716,9 @@ def workflow_template_delete(tid: str):
 
 
 # ============================================================
-# 工作流运行（并行调度）：dry-run 立即可跑，real 走 Uni-Lab OS 适配器接口
+# 工作流运行（并行调度）：dry-run 立即可跑，real 走 CWM-Lab 适配器接口
 #   - 依赖推进 / 设备资源锁 / 并发下发 均在 app/workflow_runtime.py 内实现，
-#     语义对齐 Uni-Lab-OS：scheduler/dag_state.py（入度表 + 级联放出）与
+#     语义对齐 CWM-Lab：scheduler/dag_state.py（入度表 + 级联放出）与
 #     workflow/resource_lock_key.py（device / named_resource 锁键）。
 #   - mode="dry"  : DryRunDispatcher 按估算耗时压缩播放（默认 60×）
 #   - mode="real" : UniLabOSDispatcher，接口已就位，需接线 ROS2 / HTTP 后可用
@@ -789,7 +789,7 @@ def workflow_run(req: dict):
          opcua_url: str}                       # 覆盖 GN_OPCUA_URL
 
     dry（默认）：按估算耗时压缩播放，用于验证并行结构与设备占用。
-    real       ：走 UniLabOSDispatcher → Uni-Lab-OS 的 GN 驱动。
+    real       ：走 UniLabOSDispatcher → CWM-Lab 的 GN 驱动。
                  **默认 action_mode=simulate**：驱动代码全跑，但不打开 OPC 会话，
                  用来验证「节点 → 驱动动作」的接线；要真动硬件必须再传
                  `action_mode:"real"` 且 `allow_real:true`（或环境变量 GN_ALLOW_REAL=1）。
@@ -1537,9 +1537,10 @@ def ollama_models():
 import subprocess
 import openpyxl as _openpyxl
 
-DATA_DIR = "/Users/fenglongli/Downloads/unilabWorld/data"
+import sys as _sys
+DATA_DIR = str(_WM_DATA_DIR)
 BO_SCRIPT = os.path.join(DATA_DIR, "run_bo.py")
-PYTHON_BIN = "/Users/fenglongli/uni-lab-os/bin/python3"
+PYTHON_BIN = _sys.executable
 
 @router.post("/api/bo/run")
 def bo_run():

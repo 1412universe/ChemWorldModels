@@ -3,7 +3,7 @@
 
 为什么放在 wm_backend 而不是上游仓库
 ------------------------------------
-上游 `Uni-Lab-OS/unilabos/devices/workstation/GN/` 没有液冷驱动文件；
+上游 `CWM-Lab/unilabos/devices/workstation/GN/` 没有液冷驱动文件；
 但 1.4.0 点位表里它是一个**完整、正规的 PLC 模块**（17 个点位，全 INT16）：
 
     指令握手（与锁紧/烘箱完全同构）

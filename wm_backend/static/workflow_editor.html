@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>工作流编辑器 — Uni-Lab OS 工作流编排</title>
+<title>工作流编辑器 — CWM-Lab 工作流编排</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236366f1'/%3E%3Cpath d='M9 16h5m4 0h5M14 10v12' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='9' cy='16' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='16' r='3' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/app.css?v=20261014l">
 <link rel="stylesheet" href="assets/wfed.css?v=20261029i">
@@ -11,7 +11,7 @@
 <body class="page-wfed">
 
 <nav class="topnav">
-  <span class="brand">🧩 工作流编辑器 · Uni-Lab OS</span>
+  <span class="brand">🧩 工作流编辑器 · CWM-Lab</span>
   <a href="index.html" data-icon="📊">总览-510</a>
   <a href="overview_photo.html" data-icon="☀️">总览-光催化闭环设计</a>
   <a href="workflow_editor.html" class="active" data-icon="🛠️">工作流编辑器</a>
@@ -52,11 +52,11 @@
             placeholder='{"target_lab_uuid":"…","name":"…","data":{"nodes":[…],"edges":[…]}}'></textarea>
           <div class="imp-row">
             <button id="import-parse" class="imp-btn">解析并预览</button>
-            <button id="import-sample" class="imp-btn ghost" title="载入内置的 Uni-Lab OS 真实工作流样例">载入示例</button>
+            <button id="import-sample" class="imp-btn ghost" title="载入内置的 CWM-Lab 真实工作流样例">载入示例</button>
             <button id="import-clear" class="imp-btn ghost">清空</button>
           </div>
           <div class="imp-fmt">
-            兼容：<b>本编辑器导出</b> · <b>Uni-Lab OS 原生</b> unilab_workflow.json ·
+            兼容：<b>本编辑器导出</b> · <b>CWM-Lab 原生</b> unilab_workflow.json ·
             裸 <code>{nodes, edges}</code> · <b>节点数组</b> <code>[…]</code>
           </div>
           <div id="import-preview" class="imp-preview hidden"></div>
@@ -75,10 +75,10 @@
       <button id="btn-autolayout" title="按依赖分层自动布局（并行分支并列）">🧭 自动布局</button>
       <button id="btn-fit" title="缩放至适应画布">⤢ 适应</button>
       <span class="vsep"></span>
-      <button id="btn-dryrun" class="run" title="按 Uni-Lab OS 调度语义试运行（不接硬件）">▶ 试运行</button>
+      <button id="btn-dryrun" class="run" title="按 CWM-Lab 调度语义试运行（不接硬件）">▶ 试运行</button>
       <button id="btn-stoprun" class="stop" style="display:none" title="终止本次运行，未完成的节点不再执行">✕ 取消</button>
       <span id="wf-share" title="画布实际占屏幕总面积的比例">画布 —</span>
-      <button id="btn-export" class="exp primary">⬇ 导出 Uni-Lab 工作流</button>
+      <button id="btn-export" class="exp primary">⬇ 导出 CWM-Lab 工作流</button>
     </div>
   </div>
 
@@ -124,7 +124,7 @@
       </defs></svg>
       <div id="wfed-canvas"></div>
       <div id="wfed-marquee"></div>
-      <div id="wfed-empty">将左侧节点拖入画布，编排 Uni-Lab OS 可执行工作流<br/>
+      <div id="wfed-empty">将左侧节点拖入画布，编排 CWM-Lab 可执行工作流<br/>
         节点间从 <b>右端口 → 左端口</b> 拖线建立依赖；<b>依赖不同的节点会并行执行</b>（同一设备自动串行）</div>
 
       <!-- 拖放导入：把 .json 拖到画布任意位置即可（松手前只做高亮，不拦截其它拖拽） -->
@@ -132,7 +132,7 @@
         <div class="wd-card">
           <span class="wd-ico">📥</span>
           <b>松开即导入工作流</b>
-          <span class="wd-sub">支持本编辑器导出 / Uni-Lab OS 原生 unilab_workflow.json</span>
+          <span class="wd-sub">支持本编辑器导出 / CWM-Lab 原生 unilab_workflow.json</span>
         </div>
       </div>
 

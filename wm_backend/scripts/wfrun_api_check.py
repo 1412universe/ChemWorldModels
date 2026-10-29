@@ -16,7 +16,7 @@ import urllib.request
 import urllib.error
 
 BASE = "http://127.0.0.1:8000"
-SAMPLE = "/Users/fenglongli/Downloads/unilabWorld/wm_backend/static/assets/unilab_workflow.sample.json"
+SAMPLE = "/Users/fenglongli/Downloads/ChemWorldModel/wm_backend/static/assets/unilab_workflow.sample.json"
 
 
 def post(path, body):

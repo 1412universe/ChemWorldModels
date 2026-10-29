@@ -12,7 +12,7 @@
 import sys, os, json, time, random
 import numpy as np
 
-WM = "/Users/fenglongli/Downloads/ChemWorld/wm_backend"
+WM = "/Users/fenglongli/Downloads/ChemWorldModel/wm_backend"
 sys.path.insert(0, WM)
 os.chdir(WM)
 from app import services, evaluation
@@ -125,7 +125,7 @@ print(f"\n[gp-bo] === SUMMARY ===\nGP-BO: cumReg={m_gp['cumulative_regret']:.0f}
       f"UCB:   cumReg={m_ucb['cumulative_regret']:.0f} topk={m_ucb['topk_recall']} 1stHit={m_ucb['first_hit']}\n"
       f"delta_cum(+=GPbetter)={d_cum:.0f}\nverdict: {verdict}", flush=True)
 
-OUT = "/Users/fenglongli/Downloads/ChemWorld/data"
+OUT = "/Users/fenglongli/Downloads/ChemWorldModel/data"
 out = {"config": {"seed": SEED, "n_iters": N_ITERS, "pool_size": len(pool), "gbest": gbest,
                    "gp_kernel": "Matern(nu=2.5)+Constant", "gp_alpha": 1e-6,
                    "ground_truth": "fixed simulate(noise=None)"},

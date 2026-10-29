@@ -1596,7 +1596,7 @@ const DEVICES=[
     op:'喷涂 5 mL 催化剂墨水（膜厚 ~2 μm）',
     specs:[{k:'雾化方式',v:'超声 / 气动'},{k:'膜厚',v:'0.1–10 μm'},{k:'基底',v:'FTO / 石英 / 硅'}],
     readings:[{k:'喷涂量',unit:'mL',min:0,max:20,val:5},{k:'膜厚',unit:'μm',min:0.1,max:10,val:2}]},
-  /* ——— 510 实验室 GN 工站设备（Uni-Lab OS 可执行，键加 gn_ 前缀避免与光催化键冲突）——— */
+  /* ——— 510 实验室 GN 工站设备（CWM-Lab 可执行，键加 gn_ 前缀避免与光催化键冲突）——— */
   {key:'gn_system', name:'GN 系统总控', x:0.015,y:0.04,w:0.175,h:0.17, color:'#0f766e', type:'system', zone:'ctrl', icon:'🛡️',
     desc:'510 工站 GN 系统级控制：上电初始化就绪（System_IsReady）、复位触发/完成、停止触发；为 1 时可下发指令，为 0 代表回原点故障。',
     op:'GN 整站复位 / 停止，读取就绪状态',
@@ -1671,7 +1671,7 @@ const PAGE_GROUPS = [
   {label:'☀️ 光催化 · 反应与气体',  keys:['gasfeed','lamp','reactor','icebath','irlamb']},
   {label:'📊 光催化 · 表征',        keys:['xrd','uvvis','atr','fluor','lifetime','drifts','gc','ms','bet','tem','synch','photocurr','xps']},
   {label:'🧪 光催化 · 后处理',      keys:['centrifuge','oven']},
-  {label:'🏭 510 GN 合成产线 · Uni-Lab', keys:['gn_system','gn_stack','gn_liquid','gn_solid','gn_tube','gn_quick','gn_centrifuge','gn_lock','gn_oven','gn_vacuum','gn_robot']}
+  {label:'🏭 510 GN 合成产线 · CWM-Lab', keys:['gn_system','gn_stack','gn_liquid','gn_solid','gn_tube','gn_quick','gn_centrifuge','gn_lock','gn_oven','gn_vacuum','gn_robot']}
 ];
 const PAGE_FLOORS = [
   {no:1, label:'1F · 前段 · 知识 / 合成', sides:['L','R'], groups:[0,1]},
@@ -4805,7 +4805,7 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
 })();
 
 /* =========================================================================
-   ⬇ Uni-Lab OS 工作流导出（510 GN 产线）
+   ⬇ CWM-Lab 工作流导出（510 GN 产线）
    与 GN 总览页一致：调后端 /api/generate-workflow（unilab-workflow-builder
    skill，prcxi_factory.py），把当前 AI 最优条件编译为可在 510 GN 工站
    执行的 OPC UA 工作流 JSON。工艺规则（设备首尾复位 / 9320 协议包裹）由后端固化。
@@ -4842,7 +4842,7 @@ async function exportUniLabWorkflow(){
     if(!data.ok) throw new Error(data.error || '后端生成失败');
     const wf = data.workflow;
     downloadFile('unilab_workflow.json', JSON.stringify(wf,null,2), 'application/json;charset=utf-8');
-    let msg='⬇ 已导出 Uni-Lab OS 工作流 <b>'+data.node_count+'</b> 节点 / <b>'+data.edge_count+'</b> 连线（unilab_workflow.json，可下发 510 GN 工站执行）。';
+    let msg='⬇ 已导出 CWM-Lab 工作流 <b>'+data.node_count+'</b> 节点 / <b>'+data.edge_count+'</b> 连线（unilab_workflow.json，可下发 510 GN 工站执行）。';
     msg+=' 由后端 <b>unilab-workflow-builder skill</b>（prcxi_factory.py）生成，工艺规则固化（设备首尾复位 / 9320 协议包裹）。';
     msg+=' '+data.summary;
     log('ok', msg);

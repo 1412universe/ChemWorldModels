@@ -28,8 +28,9 @@ from typing import Any, Optional
 
 logger = logging.getLogger("wm.inferlog")
 
-# 数据目录固定指向 ChemWorld/data，所有日志产物落在 data/log 子目录
-DATA_DIR = "/Users/fenglongli/Downloads/ChemWorld/data"
+# 数据目录指向项目 data/，所有日志产物落在 data/log 子目录
+from .data import DATA_DIR as _DATA_PATH
+DATA_DIR = str(_DATA_PATH)
 LOG_DIR = os.path.join(DATA_DIR, "log")
 os.makedirs(LOG_DIR, exist_ok=True)
 

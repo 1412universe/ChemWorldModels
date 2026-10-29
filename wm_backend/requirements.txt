@@ -9,7 +9,7 @@ scikit-learn
 openpyxl
 
 # --- GN 510 工站后端适配器（app/gn_adapter）--------------------------------
-# Uni-Lab-OS 的 GN 驱动直接 import 这些库访问 OPC UA。
+# CWM-Lab 的 GN 驱动直接 import 这些库访问 OPC UA。
 # 注意 opcua 是 python-opcua（freeopcua），不是 asyncua —— 驱动用的是
 # `from opcua import Client, ua` 这套同步 API。
 opcua==0.98.13

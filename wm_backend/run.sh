@@ -26,7 +26,7 @@ echo "访问：http://127.0.0.1:8000"
 # ---------------------------------------------------------------------------
 # GN 510 工站后端适配器（app/gn_adapter）——可选环境变量
 #
-#   UNILABOS_ROOT     Uni-Lab-OS 仓库根（不设则自动探测 ~/Downloads/Uni-Lab-OS 等）
+#   UNILABOS_ROOT     CWM-Lab 仓库根（不设则自动探测 ~/Downloads/Uni-Lab-OS 等）
 #   GN_OPCUA_URL      OPC UA 端点，默认 opc.tcp://192.168.6.6:4840
 #   GN_ACTION_MODE    驱动档：simulate（默认，OPC 读写空成功、不碰硬件）
 #                              | real（真实 OPC 会话）

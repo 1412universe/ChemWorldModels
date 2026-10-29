@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""平台侧 shim：让 Uni-Lab-OS 的 GN 驱动**原样 import** 就能在 wm_backend 里跑。
+"""平台侧 shim：让 CWM-Lab 的 GN 驱动**原样 import** 就能在 wm_backend 里跑。
 
 为什么需要
 ----------
@@ -25,7 +25,7 @@ GN 驱动（`unilabos/devices/workstation/GN/*.py`）只依赖平台的三样东
       unilabos.config.config          → BasicConfig.action_mode（驱动据此决定是否连硬件）
       unilabos.devices.workstation.workstation_base → WorkstationBase 桩
 
-  真实文件（从 Uni-Lab-OS 原样加载，不复制）
+  真实文件（从 CWM-Lab 原样加载，不复制）
       unilabos.device_comms.opcua_client.node.uniopcua   （DataType / NodeType / Variable …）
       unilabos.device_comms.universal_driver             （UniversalDriver / …）
       unilabos.devices.workstation.GN.base_opcua_client
@@ -33,7 +33,7 @@ GN 驱动（`unilabos/devices/workstation/GN/*.py`）只依赖平台的三样东
       unilabos.devices.workstation.GN.gn_station_base
       unilabos.devices.workstation.GN.<各驱动>
 
-这样驱动文件一个字都不用改，仍然是 Uni-Lab-OS 里的那一份真源码 ——
+这样驱动文件一个字都不用改，仍然是 CWM-Lab 里的那一份真源码 ——
 上游更新驱动，这里 `load()` 一次即生效。
 """
 from __future__ import annotations
@@ -542,7 +542,7 @@ def driver_module(rel_filename: str, verbose: bool = False) -> types.ModuleType:
     modname = "unilabos.devices.workstation.GN." + rel_filename[:-3]
     path = os.path.join(gn, rel_filename) if gn else ""
     loaded = sys.modules.get(modname)
-    # 已经装进解释器的必须就是这份文件。否则（例如先装过 Uni-Lab-OS 副本）
+    # 已经装进解释器的必须就是这份文件。否则（例如先装过 CWM-Lab 副本）
     # 卸掉再从 GN/ 重载，避免真机跑到旧驱动上。
     if loaded is not None:
         origin = os.path.abspath(getattr(loaded, "__file__", "") or "")

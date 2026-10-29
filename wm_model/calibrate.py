@@ -1,6 +1,10 @@
 """
 用主表实测数据标定微动力学模型参数
 """
+from pathlib import Path
+_ROOT = Path(__file__).resolve().parent.parent
+_DATA = _ROOT / "data"
+_WM = Path(__file__).resolve().parent
 import numpy as np
 from scipy.optimize import minimize
 from scipy.integrate import odeint
@@ -67,7 +71,7 @@ def simulate(elec_neg, work_func, p, c_CH4=0.5, c_O2=0.15):
     return x, sC2, sC2H6, sC2H4
 
 # 读主表实测
-wb = openpyxl.load_workbook('/Users/fenglongli/Downloads/unilabWorld/data/OCM_master.xlsx')
+wb = openpyxl.load_workbook(str(_DATA / "OCM_master.xlsx"))
 ws = wb['主表']
 exp = defaultdict(list)
 for row in ws.iter_rows(min_row=2, values_only=True):

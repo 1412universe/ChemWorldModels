@@ -14,7 +14,7 @@ import sys, os, json, time, random
 import numpy as np
 import urllib.request
 
-WM = "/Users/fenglongli/Downloads/ChemWorld/wm_backend"
+WM = "/Users/fenglongli/Downloads/ChemWorldModel/wm_backend"
 sys.path.insert(0, WM)
 os.chdir(WM)
 
@@ -181,7 +181,7 @@ for mc in MODELS:
     print(f"[ablation] {mc['name']} done {time.time()-tB:.1f}s  succ={st_m['success']} fb={st_m['fallback']}", flush=True)
 
 # ---- 读本地 7B 已有结果 ----
-prev = "/Users/fenglongli/Downloads/ChemWorld/data/ablation_7b_vs_ucb.json"
+prev = "/Users/fenglongli/Downloads/ChemWorldModel/data/ablation_7b_vs_ucb.json"
 m_7b = None
 if os.path.exists(prev):
     with open(prev) as f:
@@ -217,7 +217,7 @@ else:
 print(f"\n[ablation] verdict: {verdict}", flush=True)
 
 # ---- 落盘 ----
-OUT = "/Users/fenglongli/Downloads/ChemWorld/data"
+OUT = "/Users/fenglongli/Downloads/ChemWorldModel/data"
 out = {"config": {"seed": SEED, "n_iters": N_ITERS, "topk": TOPK, "pool_size": len(pool),
                    "ground_truth": "simulate(noise=None) fixed", "gbest": gbest,
                    "models": [m["name"] for m in MODELS]},

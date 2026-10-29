@@ -4,7 +4,7 @@
    · 节点库：window.GN_NODE_LIBRARY（真实 GN 设备驱动 + 真实工作流
      + OPC_UA协议1.4.0.xlsx 权威元数据：动作表 / 参数中文名 / 单位 /
      范围 / 说明 / 互锁）
-   · 数据模型：完全兼容 Uni-Lab OS unilab_workflow.json
+   · 数据模型：完全兼容 CWM-Lab unilab_workflow.json
      {target_lab_uuid, name, data:{workflow_uuid, workflow_name, nodes, edges}}
    · 交互：节点库拖入 / 拖动 / 端口连线 / 平移缩放 / 网格吸附 /
      对齐辅助线 / 框选多选 / 撤销重做 / 复制粘贴 / 自动布局 /
@@ -2311,7 +2311,7 @@
   }
 
   // ---------- 自动布局（rank 分层 + 折行分带） ----------
-  // 参考 Uni-Lab-OS/frontend/src/lib/workflowGraphLayout.ts 的 rank + ranksPerBand：
+  // 参考 CWM-Lab/frontend/src/lib/workflowGraphLayout.ts 的 rank + ranksPerBand：
   // 单纯按 rank 从左到右排，长链工作流会拉成一条几千像素的横线，
   // 适应画布后缩放到 40%~50%，字全糊了。所以这里把 rank 折成若干「带」，
   // 并让相邻带反向排列（蛇形），使一段连续流程在视觉上首尾相接。
@@ -3886,7 +3886,7 @@
   }
 
   function openWorkflow(wf) {
-    if (!wf || !wf.data || !Array.isArray(wf.data.nodes)) { note('err', '文件格式不对', '未找到 data.nodes 数组。请选择由本编辑器导出的 Uni-Lab 工作流 JSON。'); return; }
+    if (!wf || !wf.data || !Array.isArray(wf.data.nodes)) { note('err', '文件格式不对', '未找到 data.nodes 数组。请选择由本编辑器导出的 CWM-Lab 工作流 JSON。'); return; }
     clearNotes();
     state.dirty = false;
     state.wf = wf;
@@ -4011,20 +4011,20 @@
   }
   // ---------- 导入工作流 ----------
   // 为什么单独做一套：原先「导入 JSON」只是「打开」下拉里一个裸 <input file>，
-  //   · 只认本编辑器导出的 data.nodes —— 导入真实 Uni-Lab OS 工作流直接报「格式不对」
+  //   · 只认本编辑器导出的 data.nodes —— 导入真实 CWM-Lab 工作流直接报「格式不对」
   //   · 解析失败只说「解析失败」，不说哪不对
   //   · 只能整体覆盖画布，没有「追加」选项
   //   · 没有与 1.4.0 节点库的匹配体检，未知设备/动作会静默变成一个看不懂的节点
   // 现在：文件 / 粘贴 / 拖到画布 三个入口 → 先出**导入预览**（来源格式 + 设备清单 +
   // 与节点库的匹配情况 + 环 / 孤立节点 + 自动修复项），再选「替换画布 / 追加到当前画布」。
   var FMT_LABEL = {
-    editor: '本编辑器导出', unilab: 'Uni-Lab OS 原生',
+    editor: '本编辑器导出', unilab: 'CWM-Lab 原生',
     bare: '裸 nodes/edges', nodes: '节点数组'
   };
   var pendingImport = null;      // 最近一次解析结果 {wf, fmt, fixes, info}
 
   /** 把多种来源的 JSON 归一成编辑器内部格式。
-   *  兼容 ① 本编辑器导出 / Uni-Lab OS 原生 {name,data:{nodes,edges}}
+   *  兼容 ① 本编辑器导出 / CWM-Lab 原生 {name,data:{nodes,edges}}
    *       ② 裸 {nodes,edges}  ③ 节点数组 […]  ④ 后端接口包装 {ok,workflow}
    *  返回 {wf, fmt, fixes[]}；fixes 记录为了让它能跑而自动补的东西（会显示给用户）。 */
   function normWorkflow(raw) {

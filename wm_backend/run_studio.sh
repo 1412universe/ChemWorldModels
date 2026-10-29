@@ -12,7 +12,7 @@
 #
 # 说明：
 #  - Ollama 用我们配好的 OLLAMA_MODELS 指向 ChemWorld 副本
-#    (/Users/fenglongli/Downloads/ChemWorld/models/qwen2.5-7b)；
+#    (/Users/fenglongli/Downloads/ChemWorldModel/models/qwen2.5-7b)；
 #    若你本机 Ollama.app 已在跑（默认 store 也含 qwen2.5:7b），脚本会直接复用，不冲突。
 #  - 后端以 python3 main.py 前台运行（Ctrl+C 停止）；Ollama 后台常驻。
 # ============================================================
@@ -36,7 +36,7 @@ else
   echo "[run_studio] 未找到专用 venv，退回系统 python3（$PY）；若报缺依赖请先：pip install -r requirements.txt"
 fi
 
-OLLAMA_MODELS_DIR="/Users/fenglongli/Downloads/ChemWorld/models/qwen2.5-7b"
+OLLAMA_MODELS_DIR="/Users/fenglongli/Downloads/ChemWorldModel/models/qwen2.5-7b"
 export OLLAMA_MODELS="$OLLAMA_MODELS_DIR"
 # 模型常驻内存：避免每轮 /api/next 之间模型被卸载、下次重新加载（冷加载是 7B 超时的主要来源之一）
 export OLLAMA_KEEP_ALIVE=-1

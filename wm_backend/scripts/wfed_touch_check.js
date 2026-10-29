@@ -17,7 +17,7 @@ const fs = require('fs');
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const BASE = 'http://127.0.0.1:8000';
-const SAMPLE = '/Users/fenglongli/Downloads/unilabWorld/wm_backend/static/assets/unilab_workflow.sample.json';
+const SAMPLE = '/Users/fenglongli/Downloads/ChemWorldModel/wm_backend/static/assets/unilab_workflow.sample.json';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 (async () => {
@@ -958,7 +958,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     return out;
   }, BASE_WF, fs.readFileSync(SAMPLE, 'utf8'));
   T('本编辑器导出 → 识别为 editor', f2.editor === 'editor', f2.editor);
-  T('Uni-Lab OS 原生 → 识别为 unilab', f2.unilab === 'unilab', f2.unilab);
+  T('CWM-Lab 原生 → 识别为 unilab', f2.unilab === 'unilab', f2.unilab);
   T('裸 {nodes,edges} → 识别为 bare', f2.bare === 'bare', f2.bare);
   T('节点数组 → 识别为 nodes', f2.arr === 'nodes', f2.arr);
   T('原生导出缺 workflow_uuid 会被补上并记入修复项',

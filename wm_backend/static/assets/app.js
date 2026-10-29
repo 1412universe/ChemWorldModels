@@ -1764,8 +1764,8 @@ function exportRecipesJSON(){
 }
 
 /* =========================================================
-   Uni-Lab OS 工作流导出（与 @skill:unilab-workflow-builder 完全一致）
-   把 unilabWorld 的 **AI 理论最优方案** 转成可直接导入 unilab 平台执行真实工站
+   CWM-Lab 工作流导出（与 @skill:unilab-workflow-builder 完全一致）
+   把 CWM-Lab 的 **AI 理论最优方案** 转成可直接导入 unilab 平台执行真实工站
    （PRCXI 9320 + 机械臂 + 固体加样 + 堆栈 + 离心/快换/锁紧/烘箱/真空）的线性工作流：
      {target_lab_uuid, name, data:{nodes, edges}}
    数据来源（任务③纠正后的正确逻辑）：不再读取手动滑块 / USER_RECIPES 快照，
@@ -2290,7 +2290,7 @@ function emitReplenish(state, needU, intent){
     nRun() ];
 }
 // —— 积木：滴注（按 27/批 拆分，对齐 81次滴注 = 3×27；create→titration×批→run）——
-//     源/目标槽位全部取自当前工艺的真实 9320 台面布局，写进 footer 便于在 Uni-Lab 里核对。
+//     源/目标槽位全部取自当前工艺的真实 9320 台面布局，写进 footer 便于在 CWM-Lab 里核对。
 function emitDripInjection(state, intent){
   const per=27, total=intent.injections.total, vol=intent.injections.vol;
   const batches=Math.max(1, Math.ceil(total/per));
@@ -2450,7 +2450,7 @@ async function exportUniLabWorkflow(){
     if(!data.ok) throw new Error(data.error || '后端生成失败');
     const wf = data.workflow;
     downloadFile('unilab_workflow.json', JSON.stringify(wf,null,2), 'application/json;charset=utf-8');
-    let msg='⬇ 已导出 Uni-Lab OS 工作流 <b>'+data.node_count+'</b> 节点 / <b>'+data.edge_count+'</b> 连线（unilab_workflow.json，数据源：'+source+'）。';
+    let msg='⬇ 已导出 CWM-Lab 工作流 <b>'+data.node_count+'</b> 节点 / <b>'+data.edge_count+'</b> 连线（unilab_workflow.json，数据源：'+source+'）。';
     msg+=' 由后端 <b>unilab-workflow-builder skill</b>（prcxi_factory.py）生成，工艺规则固化（设备首尾复位 / 9320 协议包裹）。';
     msg+=' '+data.summary;
     log('ok', msg);
@@ -3407,7 +3407,7 @@ function renderReadings(d){
 }
 /* —— 真实台面物料分布面板：9320 / 离心管液体处理系统 16 板位（数据源同 DECKS）——
    4 列 × 4 行按 PPT 实际坐标排布（列优先），切换工艺即切换整套真实物料分布，
-   并同步决定「导出 Uni-Lab 工作流」时的槽位推理。 */
+   并同步决定「导出 CWM-Lab 工作流」时的槽位推理。 */
 const DECK_OF_DEVICE = {liquid:'prcxi', tube:'tube'};
 const DECK_GROUP_LABEL = {trough:'储液槽', deepWell:'深孔板', tip:'枪头位', transfer:'中转位',
   spare:'备用/空位', waste:'废液槽', trash:'垃圾桶', reader:'酶标板', sonic:'超声混匀'};

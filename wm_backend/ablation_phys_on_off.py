@@ -14,7 +14,7 @@ XGBoost 残差缓存（预训练、相对 pf 独立）照用；故 OFF 关掉的
 import sys, os, json, time, random
 import numpy as np
 
-WM = "/Users/fenglongli/Downloads/ChemWorld/wm_backend"
+WM = "/Users/fenglongli/Downloads/ChemWorldModel/wm_backend"
 sys.path.insert(0, WM)
 os.chdir(WM)
 
@@ -136,7 +136,7 @@ print(json.dumps({"on": m_on, "off": m_off,
                  indent=2, ensure_ascii=False), flush=True)
 
 # ---- 落盘 ----
-OUT = "/Users/fenglongli/Downloads/ChemWorld/data"
+OUT = "/Users/fenglongli/Downloads/ChemWorldModel/data"
 out = {
     "config": {"seed": SEED, "n_iters": N_ITERS, "topk": TOPK, "pool_size": len(pool),
                "ground_truth": "ON simulate (fixed); OFF only disables pf in acquisition predict"},

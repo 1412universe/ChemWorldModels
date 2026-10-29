@@ -5,7 +5,7 @@
 
     GN_OPCUA_URL        OPC UA 端点（整站共享一个会话）
                         默认 opc.tcp://192.168.6.6:4840
-    UNILABOS_ROOT       Uni-Lab-OS 仓库根目录（含 unilabos/ 包）。
+    UNILABOS_ROOT       CWM-Lab 仓库根目录（含 unilabos/ 包）。
                         不设则按候选路径自动探测。
     GN_ACTION_MODE      驱动层动作档：simulate | real
                         simulate → 驱动内部用 _SimulatedPlc，OPC 读写空成功，
@@ -33,7 +33,7 @@ DEFAULT_OPCUA_URL = "opc.tcp://192.168.6.6:4840"
 
 # GN 目录相对 root 的位置
 _GN_REL = os.path.join("unilabos", "devices", "workstation", "GN")
-# 用于判定「这个目录确实是 Uni-Lab-OS 根」
+# 用于判定「这个目录确实是 CWM-Lab 根」
 _GN_MARKER = os.path.join(_GN_REL, "gn_station_base.py")
 
 
@@ -55,14 +55,14 @@ def opcua_url() -> str:
 
 
 def unilabos_root() -> Optional[str]:
-    """定位 Uni-Lab-OS 仓库根（含 unilabos/devices/workstation/GN/gn_station_base.py）。"""
+    """定位 CWM-Lab 仓库根（含 unilabos/devices/workstation/GN/gn_station_base.py）。"""
     cands: List[str] = []
     env = _env("UNILABOS_ROOT")
     if env:
         cands.append(env)
     here = os.path.dirname(os.path.abspath(__file__))          # .../wm_backend/app/gn_adapter
     wm_backend = os.path.dirname(os.path.dirname(here))        # .../wm_backend
-    parent = os.path.dirname(wm_backend)                       # .../unilabWorld
+    parent = os.path.dirname(wm_backend)                       # .../ChemWorldModel
     cands += [
         os.path.join(parent, "Uni-Lab-OS"),
         os.path.join(os.path.dirname(parent), "Uni-Lab-OS"),
@@ -90,7 +90,7 @@ def repo_gn_dir() -> Optional[str]:
 
 
 def gn_dir(root: Optional[str] = None) -> Optional[str]:
-    """驱动源码目录。优先仓库 wm_action/，没有时才退回 Uni-Lab-OS 里的副本。"""
+    """驱动源码目录。优先仓库 wm_action/，没有时才退回 CWM-Lab 里的副本。"""
     live = repo_gn_dir()
     if live:
         return live
@@ -105,7 +105,7 @@ def preferred_node_csv() -> str:
     """本适配器优先使用的节点表：**由 1.4.0「点位表」生成的那一份**。
 
     由 `scripts/gen_gn_node_table.py` 产出，放在 wm_backend 自己的目录里，
-    **不改上游 Uni-Lab-OS 仓库**。选取理由（一切冲突以 1.4.0 为准）：
+    **不改上游 CWM-Lab 仓库**。选取理由（一切冲突以 1.4.0 为准）：
 
       · 仓库自带的 `opcua_gn1.3.9.csv` 与 1.4.0 有 11 处冲突：
         8 个 1.4.0 新点位它没有（驱动根本注册不到），

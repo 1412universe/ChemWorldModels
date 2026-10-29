@@ -11,7 +11,7 @@
       → _find_nodes()                   # 按 NodeId 去服务端找，写进 _node_registry
       → get_node_value / set_node_value # 只有注册过的名字才认
 
-Uni-Lab-OS 仓库里带的是 `opcua_gn1.3.9.csv`，与用户指定的权威 1.4.0 表有 **11 处冲突**：
+CWM-Lab 仓库里带的是 `opcua_gn1.3.9.csv`，与用户指定的权威 1.4.0 表有 **11 处冲突**：
 
   【A】协议有、1.3.9 表没有（8 个）—— 驱动根本注册不到，工作流写了名字也读不动
       锁紧模块  Lock_AngleFB / Lock_FinalTorqueSet / Lock_PreTorqueLimit
@@ -22,7 +22,7 @@ Uni-Lab-OS 仓库里带的是 `opcua_gn1.3.9.csv`，与用户指定的权威 1.4
   （已核对：这 11 个名字在 61 个驱动 .py 里**零引用**，所以换表不会让驱动代码跑崩。）
 
 按「一切冲突以 1.4.0 为准」，这里从 1.4.0 重新生成节点表，写到 wm_backend 自己的目录，
-**不改上游 Uni-Lab-OS 仓库**，再由 `config.node_csv_path()` 指过来。
+**不改上游 CWM-Lab 仓库**，再由 `config.node_csv_path()` 指过来。
 
 两处必须做的「拼写归一」（不做就会静默丢点，且日志只给一行 warning）
 --------------------------------------------------------------------

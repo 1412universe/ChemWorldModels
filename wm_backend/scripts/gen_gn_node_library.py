@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-从 Uni-Lab-OS GN 工作台真实资产 + OPC UA 协议 1.4.0 提炼「工作流编辑器」节点库。
+从 CWM-Lab GN 工作台真实资产 + OPC UA 协议 1.4.0 提炼「工作流编辑器」节点库。
 
 数据源（均为真实可执行来源）：
   1) 9 个真实工作流 JSON  （/Users/fenglongli/Downloads/Uni-Lab-OS/unilabos/devices/workstation/GN/*.json）
@@ -9,7 +9,7 @@
   3) **OPC_UA协议1.4.0(2).xlsx「点位表」** → scripts/gn_opcua_points.py
      —— 提供**逐模块的 240 个协议点位清单**（点位名 / NodeId / 数据类型 / 读写 / 说明），
         是每个驱动 `protocolNodes` 计数与 `points` 明细的唯一权威来源。
-        （旧实现数的是 Uni-Lab-OS 里的 `opcua_gn1.3.9.csv` 前缀，属 1.3.9 旧清单，
+        （旧实现数的是 CWM-Lab 里的 `opcua_gn1.3.9.csv` 前缀，属 1.3.9 旧清单，
          且会漏掉 `scale_weight`、`OPEN_DOOR`、`Cooling_CmdType` 这类不按前缀命名的点位，
          还会把 `Liquid_Cooling_*` 错算到 PRCXI('Liquid_') 头上 —— 已废弃。）
   4) **OPC_UA协议1.4.0(2).xlsx** → scripts/gn_opcua_140.py
@@ -32,9 +32,9 @@ OUT  = os.path.join(os.path.dirname(__file__), '..', 'static', 'assets', 'gn_nod
 
 
 def _pick_workflow_dir():
-    """工作流 JSON 目录：同机有两份 Uni-Lab-OS 副本，取含 JSON 最多的那个。"""
+    """工作流 JSON 目录：同机有两份 CWM-Lab 副本，取含 JSON 最多的那个。"""
     cands = [BASE,
-             '/Users/fenglongli/Downloads/unilabWorld/Uni-Lab-OS/unilabos/devices/workstation/GN']
+             '/Users/fenglongli/Downloads/Uni-Lab-OS/unilabos/devices/workstation/GN']
     best, best_n = BASE, -1
     for d in cands:
         if not os.path.isdir(d):
@@ -814,7 +814,7 @@ def build():
         'lockInterlocks': P140.LOCK_INTERLOCKS,
         'actionsTable': {k: {str(a): b for a, b in v.items()} for k, v in P140.ACTIONS.items()},
         'actionsDeviation': P140.ACTIONS_DEVIATION,
-        'source': ('Uni-Lab-OS/unilabos/devices/workstation/GN（真实驱动 + 真实工作流）'
+        'source': ('CWM-Lab/unilabos/devices/workstation/GN（真实驱动 + 真实工作流）'
                    '＋ OPC_UA协议1.4.0(2).xlsx（最权威最新：240 个协议点位 / 动作表 / '
                    '参数中文名 / 单位 / 范围 / 互锁）'),
         'devices': devices,
@@ -823,7 +823,7 @@ def build():
         'workflowDir': base,
     }
     js = ('// 由 scripts/gen_gn_node_library.py 生成，勿手改；'
-          '数据源自 Uni-Lab-OS GN 真实资产 + OPC_UA协议1.4.0(2).xlsx「点位表」。\n')
+          '数据源自 CWM-Lab GN 真实资产 + OPC_UA协议1.4.0(2).xlsx「点位表」。\n')
     js += 'window.GN_NODE_LIBRARY = ' + json.dumps(lib, ensure_ascii=False, indent=1) + ';\n'
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, 'w', encoding='utf-8') as f:

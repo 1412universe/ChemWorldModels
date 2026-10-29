@@ -2,6 +2,7 @@
 """纯 BO 闭环：扫离散网格，列出还能推翻当前最优的实验，用来证明网格里没有更好的点。"""
 
 import math
+from pathlib import Path
 import os
 import re
 import statistics as st
@@ -12,8 +13,9 @@ import openpyxl
 
 KAPPA = 1.96
 CH4_RANK_MAX = 100.0
-MASTER = "/Users/fenglongli/Downloads/unilabWorld/data/OCM_master.xlsx"
-GAS = "/Users/fenglongli/Downloads/unilabWorld/data/gas-solid_reactions_314（每个时间段的六行代表了间隔26min的时间）.xlsx"
+_DATA = Path(__file__).resolve().parents[2] / "data"
+MASTER = str(_DATA / "OCM_master.xlsx")
+GAS = str(_DATA / "gas-solid_reactions_314（每个时间段的六行代表了间隔26min的时间）.xlsx")
 MAX_ROUNDS = 36
 PROOF_MASS = 5
 GRID_GAS_STEP = 5.0

@@ -5,7 +5,7 @@
 `gn_opcua_points.py`，供 `gen_gn_node_library.py` 生成节点库时使用。
 
 为什么要单独抽：
-  节点库的 `protocolNodes`（每个驱动有多少个 OPC UA 点位）原先是从 Uni-Lab-OS 仓库里
+  节点库的 `protocolNodes`（每个驱动有多少个 OPC UA 点位）原先是从 CWM-Lab 仓库里
   的 `opcua_gn1.3.9.csv` 数出来的 —— 那是 1.3.9 的旧清单，且与「用户指定的最权威
   1.4.0 表」不是同一份数据。同一张表的 G/H/I/J 列还给出了每个点位的中文名、
   数据类型、读写方向和取值说明，是「驱动节点信息」的权威来源，之前完全没被用上。

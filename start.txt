@@ -1,17 +1,61 @@
-# 更新到 GitHub（工作流编辑器：参数隔离 + 切换列表不误增条目）
+# 更新到 GitHub（数据路径对齐 ChemWorldModel + 品牌文案改为 CWM-Lab）
 # 在仓库根目录执行：
 
 cd /Users/fenglongli/Downloads/ChemWorldModel
 
-git add wm_backend/static/assets/app_workflow.js \
-        wm_backend/static/workflow_editor.html \
-        start.txt
+git add \
+  start.txt \
+  wm_model/bo_recommend.py \
+  wm_model/bo_worldmodel.py \
+  wm_model/build_support_desc.py \
+  wm_model/calibrate.py \
+  wm_model/export_csv.py \
+  wm_model/write_bo_sheet.py \
+  wm_backend/app/bo_closed_loop.py \
+  wm_backend/app/inference_log.py \
+  wm_backend/app/routes.py \
+  wm_backend/app/unilab_generator.py \
+  wm_backend/app/workflow_runtime.py \
+  wm_backend/app/models.py \
+  wm_backend/app/gn_adapter/config.py \
+  wm_backend/app/gn_adapter/prcxi_deck.py \
+  wm_backend/app/gn_adapter/drivers.py \
+  wm_backend/app/gn_adapter/shim.py \
+  wm_backend/app/gn_adapter/__init__.py \
+  wm_backend/app/gn_adapter/liquid_cooling.py \
+  wm_backend/app/gn_adapter/node_tables/opcua_gn1.4.0.manifest.json \
+  wm_backend/static/workflow_editor.html \
+  wm_backend/static/datalog.html \
+  wm_backend/static/assets/app.js \
+  wm_backend/static/assets/app_photo.js \
+  wm_backend/static/assets/app_workflow.js \
+  wm_backend/static/assets/shell.js \
+  wm_backend/static/assets/skeleton.html \
+  wm_backend/static/assets/gn_node_library.js \
+  wm_backend/static/assets/unilab_workflow.sample.json \
+  wm_backend/scripts/gen_gn_node_library.py \
+  wm_backend/scripts/gen_gn_node_table.py \
+  wm_backend/scripts/gen_gn_opcua_points.py \
+  wm_backend/scripts/wfrun_api_check.py \
+  wm_backend/scripts/wfed_visual_check.js \
+  wm_backend/scripts/wfed_deck_check.js \
+  wm_backend/scripts/wfed_touch_check.js \
+  wm_backend/run.sh \
+  wm_backend/run_studio.sh \
+  wm_backend/requirements.txt \
+  wm_backend/ablation_*.py \
+  wm_action/start \
+  wm_action/liquid_handling/liquid_handler_abstract.py \
+  scripts/fetch_mp_oqmd.py
 
 git commit -m "$(cat <<'EOF'
-Keep workflow list switches from inventing extra draft rows.
+Point BO data paths at ChemWorldModel and rebrand Uni-Lab OS as CWM-Lab.
 
-Also isolate param edits to the selected node so same-type nodes no longer share inputs.
+Resolve OCM_master and related sheets from the project data/ directory so pure BO no longer looks under unilabWorld.
 EOF
 )"
 
 git push origin main
+
+# 说明：data/ 目录在 .gitignore 中。本机已同步改过 data/run_bo.py
+#（相对路径指向本仓库 data/OCM_master.xlsx），但不会进 Git。

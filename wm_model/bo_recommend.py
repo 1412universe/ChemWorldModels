@@ -7,6 +7,10 @@ BO 推荐：金属 × 载体 二维贝叶斯优化
 - 采集：UCB = mu_y + kappa*sigma_y，并叠加选择性项；贪心选 Top4 且强制载体/金属分散
 - 条件：每个催化剂 6 组，单变量步进（基线 + CH4×2 + O2×2 + Ar×1），温度/光强锁定
 """
+from pathlib import Path
+_ROOT = Path(__file__).resolve().parent.parent
+_DATA = _ROOT / "data"
+_WM = Path(__file__).resolve().parent
 import numpy as np
 import openpyxl
 from sklearn.gaussian_process import GaussianProcessRegressor
@@ -14,7 +18,7 @@ from sklearn.gaussian_process.kernels import RBF, ConstantKernel, WhiteKernel
 from sklearn.preprocessing import StandardScaler
 from collections import defaultdict
 
-XLSX = "/Users/fenglongli/Downloads/unilabWorld/data/OCM_master.xlsx"
+XLSX = str(_DATA / "OCM_master.xlsx")
 
 # ---------- 1. 金属描述符（金属描述符 sheet） ----------
 METALS = {
@@ -147,5 +151,5 @@ for i, d in enumerate(chosen, 1):
 # 保存给写表脚本
 import json
 out = dict(anchors=len(A), chosen=chosen)
-with open('/Users/fenglongli/Downloads/unilabWorld/wm_model/_bo_result.json', 'w') as f:
+with open(_WM / "_bo_result.json", "w") as f:
     json.dump(out, f, ensure_ascii=False, indent=2, default=float)

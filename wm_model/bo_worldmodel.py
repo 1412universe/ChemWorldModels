@@ -3,6 +3,10 @@
 用实测锚点 Ridge 校准 log10(产率) 与 sel_C2；实测点覆盖实测均值，未测组合用模型预测。
 选 Top4（金属硬去重、载体软分散），并对每种催化剂6组条件做世界模型条件推演。
 """
+from pathlib import Path
+_ROOT = Path(__file__).resolve().parent.parent
+_DATA = _ROOT / "data"
+_WM = Path(__file__).resolve().parent
 import json
 import numpy as np
 import openpyxl
@@ -11,7 +15,7 @@ from sklearn.preprocessing import StandardScaler
 from collections import defaultdict
 import wm_kinetics as wm
 
-XLSX = "/Users/fenglongli/Downloads/unilabWorld/data/OCM_master.xlsx"
+XLSX = str(_DATA / "OCM_master.xlsx")
 
 METALS = {
     'Pt': (2.28, 5.65), 'Pd': (2.20, 5.60), 'Au': (2.54, 5.10),
@@ -189,7 +193,7 @@ for d in chosen:
         ))
         exp_no += 1
 
-with open('/Users/fenglongli/Downloads/unilabWorld/wm_model/_bo_result.json', 'w') as f:
+with open(_WM / "_bo_result.json", "w") as f:
     json.dump(dict(anchors=len(Xrows), chosen=chosen, points=points),
               f, ensure_ascii=False, indent=2, default=float)
 

@@ -15,7 +15,7 @@ const fs = require('fs');
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const BASE = 'http://127.0.0.1:8000';
-const SAMPLE = '/Users/fenglongli/Downloads/unilabWorld/wm_backend/static/assets/unilab_workflow.sample.json';
+const SAMPLE = '/Users/fenglongli/Downloads/ChemWorldModel/wm_backend/static/assets/unilab_workflow.sample.json';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 (async () => {

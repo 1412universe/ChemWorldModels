@@ -1,4 +1,4 @@
-// 由 scripts/gen_gn_node_library.py 生成，勿手改；数据源自 Uni-Lab-OS GN 真实资产 + OPC_UA协议1.4.0(2).xlsx「点位表」。
+// 由 scripts/gen_gn_node_library.py 生成，勿手改；数据源自 CWM-Lab GN 真实资产 + OPC_UA协议1.4.0(2).xlsx「点位表」。
 window.GN_NODE_LIBRARY = {
  "version": "20261014.1",
  "protocol": {
@@ -293,7 +293,7 @@ window.GN_NODE_LIBRARY = {
    }
   }
  },
- "source": "Uni-Lab-OS/unilabos/devices/workstation/GN（真实驱动 + 真实工作流）＋ OPC_UA协议1.4.0(2).xlsx（最权威最新：240 个协议点位 / 动作表 / 参数中文名 / 单位 / 范围 / 互锁）",
+ "source": "CWM-Lab/unilabos/devices/workstation/GN（真实驱动 + 真实工作流）＋ OPC_UA协议1.4.0(2).xlsx（最权威最新：240 个协议点位 / 动作表 / 参数中文名 / 单位 / 范围 / 互锁）",
  "devices": [
   {
    "id": "gn_locking_mechanism",

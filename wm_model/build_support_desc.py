@@ -1,8 +1,12 @@
+from pathlib import Path
+_ROOT = Path(__file__).resolve().parent.parent
+_DATA = _ROOT / "data"
+_WM = Path(__file__).resolve().parent
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
-SRC = "/Users/fenglongli/Downloads/unilabWorld/data/OCM_master.xlsx"
+SRC = str(_DATA / "OCM_master.xlsx")
 
 wb = openpyxl.load_workbook(SRC)
 if "载体描述符" in wb.sheetnames:

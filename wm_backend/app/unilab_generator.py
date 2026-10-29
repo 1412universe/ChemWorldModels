@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Uni-Lab OS 工作流生成入口。
+CWM-Lab 工作流生成入口。
 
 不再在前端 app.js 里自维护一套「物料分布推理式 planner」——那个版本与
 unilab-workflow-builder skill 的 prcxi_factory.py 容易出现两份不一致的实现。
@@ -147,7 +147,7 @@ def _wrap_prcxi_runs(chain):
 
 def generate_workflow(cond):
     """
-    根据 AI 理论最优条件 cond 生成合规 Uni-Lab OS 工作流 JSON。
+    根据 AI 理论最优条件 cond 生成合规 CWM-Lab 工作流 JSON。
 
     cond: dict, 包含 T / R / I / G / reaction('CH4'|'OER')
     返回: dict, 完整 workflow JSON（含 target_lab_uuid, name, data:{nodes,edges}）
@@ -219,7 +219,7 @@ def generate_workflow(cond):
     chain = _wrap_prcxi_runs(chain)
 
     # —— 组装 ——
-    name = 'unilabWorld AI方案(推理式) · 金四面体'
+    name = 'CWM-Lab AI方案(推理式) · 金四面体'
     if is_oer:
         name += ' · OER'
     wf = pf.build_workflow(chain, TARGET_LAB_UUID, name)

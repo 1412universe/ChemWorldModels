@@ -1,11 +1,15 @@
 """从 _bo_result.json（世界模型BO）渲染「BO推荐」sheet：Top4 + 24点推演。"""
+from pathlib import Path
+_ROOT = Path(__file__).resolve().parent.parent
+_DATA = _ROOT / "data"
+_WM = Path(__file__).resolve().parent
 import json
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
-XLSX = "/Users/fenglongli/Downloads/unilabWorld/data/OCM_master.xlsx"
-R = json.load(open("/Users/fenglongli/Downloads/unilabWorld/wm_model/_bo_result.json"))
+XLSX = str(_DATA / "OCM_master.xlsx")
+R = json.load(open(_WM / "_bo_result.json"))
 chosen, points = R["chosen"], R["points"]
 
 REASON = {

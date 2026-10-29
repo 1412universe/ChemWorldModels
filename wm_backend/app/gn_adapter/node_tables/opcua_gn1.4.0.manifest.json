@@ -3,7 +3,7 @@
   "authoritative_md5": "1c12db10fae0f0a88c9b1d6f3d99d59c",
   "generated_by": "scripts/gen_gn_node_table.py",
   "points_total": 240,
-  "node_csv": "/Users/fenglongli/Downloads/unilabWorld/wm_backend/app/gn_adapter/node_tables/opcua_gn1.4.0.csv",
+  "node_csv": "/Users/fenglongli/Downloads/ChemWorldModel/wm_backend/app/gn_adapter/node_tables/opcua_gn1.4.0.csv",
   "csv_encoding": "utf-8",
   "driver_enum_note": "驱动 DataType[...] 为大小写敏感枚举精确匹配；成员含 BOOLEAN 但**没有 BOOL / REAL**",
   "replaces": "opcua_gn1.3.9.csv",

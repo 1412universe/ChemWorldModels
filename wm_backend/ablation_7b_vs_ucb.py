@@ -13,7 +13,7 @@
 import sys, os, json, time, random
 import numpy as np
 
-WM = "/Users/fenglongli/Downloads/ChemWorld/wm_backend"
+WM = "/Users/fenglongli/Downloads/ChemWorldModel/wm_backend"
 sys.path.insert(0, WM)
 os.chdir(WM)
 
@@ -171,7 +171,7 @@ print(json.dumps({"ucb": m_ucb, "7b": m_7b, "delta_simple_regret(+=7Bbetter)": d
                   "verdict": verdict}, indent=2, ensure_ascii=False), flush=True)
 
 # ---- 落盘 ----
-OUT = "/Users/fenglongli/Downloads/ChemWorld/data"
+OUT = "/Users/fenglongli/Downloads/ChemWorldModel/data"
 out = {
     "config": {"seed": SEED, "n_iters": N_ITERS, "timeout_7b": TIMEOUT_7B, "topk": TOPK, "pool_size": len(pool)},
     "ground_truth": {"best_Y": gbest, "note": "simulator-in-the-loop: true_for=simulate(noise=None), not real experiment"},
