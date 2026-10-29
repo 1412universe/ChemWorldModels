@@ -451,6 +451,11 @@
     }
     d.appendChild(body);
 
+    if (n.type !== 'Group') {
+      var dis = el('span', 'wfnode-dis' + (n.disabled ? ' on' : ''), n.disabled ? '↻' : '⊘');
+      dis.title = n.disabled ? '启用此节点' : '禁用此节点（运行时跳过）';
+      d.appendChild(dis);
+    }
     d.appendChild(el('span', 'wfnode-del', '✕'));
     d.appendChild(el('span', 'st-dot', ''));
     d.appendChild(el('span', 'lockflag', '设备占用'));
@@ -2577,7 +2582,7 @@
       var node = tgt.closest ? tgt.closest('.wfnode') : null;
       if (node && portEl && portEl.classList.contains('out')) { beginLink(node.dataset.uuid); return 'link'; }
       if (node) {
-        if (tgt.classList.contains('wfnode-del')) return 'none';
+        if (tgt.classList.contains('wfnode-del') || tgt.classList.contains('wfnode-dis')) return 'none';
         // 点在节点文字上时留给浏览器选中、复制，不开始拖动；仍然选中并展开属性栏
         if (tgt.closest && tgt.closest('.n-title, .n-sub, .wfnode-prow')) {
           selectNode(node.dataset.uuid, !!(ev.ctrlKey || ev.metaKey));
@@ -2764,43 +2769,10 @@
       if (ev.pointerId in touches) endTouch(ev);
     });
 
-    function closeNodeMenu() {
-      var old = document.getElementById('wf-node-menu');
-      if (old) old.remove();
-    }
-    function showNodeMenu(ev, n) {
-      closeNodeMenu();
-      var menu = el('div', 'wf-node-menu');
-      menu.id = 'wf-node-menu';
-      menu.innerHTML = '<button type="button">' + (n.disabled ? '启用此节点' : '禁用此节点') + '</button>';
-      menu.style.left = Math.min(ev.clientX, window.innerWidth - 160) + 'px';
-      menu.style.top = Math.min(ev.clientY, window.innerHeight - 48) + 'px';
-      document.body.appendChild(menu);
-      menu.querySelector('button').addEventListener('click', function () {
-        pushUndo();
-        n.disabled = !n.disabled;
-        renderNodes();
-        if (state.selected && state.selected.id === n.uuid) showProps();
-        afterChange();
-        closeNodeMenu();
-      });
-    }
-    document.addEventListener('pointerdown', function (ev) {
-      var menu = document.getElementById('wf-node-menu');
-      if (menu && !menu.contains(ev.target)) closeNodeMenu();
-    });
     wrap.addEventListener('contextmenu', function (ev) {
       var t = ev.target;
-      var node = t && t.closest ? t.closest('.wfnode') : null;
-      if (node) {
-        ev.preventDefault();
-        var n = findNode(node.dataset.uuid);
-        if (n && n.type !== 'Group') showNodeMenu(ev, n);
-        return;
-      }
-      if (t && t.closest && t.closest('#wfed-run, input, textarea')) return;
+      if (t && t.closest && t.closest('#wfed-run, .n-title, .n-sub, .wfnode-prow, input, textarea')) return;
       ev.preventDefault();
-      closeNodeMenu();
     });
 
     // 滚轮缩放
@@ -2827,7 +2799,17 @@
 
     canvas.addEventListener('click', function (ev) {
       var node = ev.target.closest ? ev.target.closest('.wfnode') : null;
-      if (node && ev.target.classList.contains('wfnode-del')) { deleteNode(node.dataset.uuid); return; }
+      if (!node) return;
+      if (ev.target.classList.contains('wfnode-del')) { deleteNode(node.dataset.uuid); return; }
+      if (ev.target.classList.contains('wfnode-dis')) {
+        var n = findNode(node.dataset.uuid);
+        if (!n || n.type === 'Group') return;
+        pushUndo();
+        n.disabled = !n.disabled;
+        renderNodes();
+        if (state.selected && state.selected.id === n.uuid) showProps();
+        afterChange();
+      }
     });
     svg.addEventListener('click', function (ev) {
       var p = ev.target;
