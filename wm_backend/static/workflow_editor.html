@@ -6,7 +6,7 @@
 <title>工作流编辑器 — Uni-Lab OS 工作流编排</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236366f1'/%3E%3Cpath d='M9 16h5m4 0h5M14 10v12' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='9' cy='16' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='16' r='3' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/app.css?v=20261014l">
-<link rel="stylesheet" href="assets/wfed.css?v=20261018b">
+<link rel="stylesheet" href="assets/wfed.css?v=20261028e">
 </head>
 <body class="page-wfed">
 
@@ -15,6 +15,7 @@
   <a href="index.html" data-icon="📊">总览-510</a>
   <a href="overview_photo.html" data-icon="☀️">总览-光催化闭环设计</a>
   <a href="workflow_editor.html" class="active" data-icon="🛠️">工作流编辑器</a>
+  <a href="datalog.html" data-icon="📋">数据日志</a>
 </nav>
 
 <div id="app">
@@ -25,7 +26,6 @@
     </div>
     <div class="wf-stats" id="wf-stats">节点 0 · 连线 0</div>
     <div class="wf-btns">
-      <button id="btn-new" title="清空画布，新建工作流">🆕 新建</button>
       <div class="btn-group">
         <button id="btn-open">📂 打开</button>
         <div class="open-menu hidden" id="open-menu">
@@ -63,6 +63,13 @@
         </div>
       </div>
       <button id="btn-save" class="primary">💾 保存</button>
+      <div class="btn-group">
+        <button id="btn-insert-tpl" title="把一份模版插进当前画布。先在左侧工作流上右键「转为模版」">📎 插入模版</button>
+        <div class="open-menu hidden" id="insert-menu">
+          <div class="om-title">选择要插入的模版</div>
+          <div id="insert-list" class="om-list scrollbar"></div>
+        </div>
+      </div>
       <span class="vsep"></span>
       <button id="btn-validate" title="校验：环 / 孤立节点 / 同设备并行冲突 / 工艺规则">✅ 校验</button>
       <button id="btn-autolayout" title="按依赖分层自动布局（并行分支并列）">🧭 自动布局</button>
@@ -82,14 +89,8 @@
     <aside id="wfed-lib">
       <div class="lib-inner">
         <div class="wf-pick" id="wf-pick">
-          <div class="wf-pick-h"><span>工作流</span><span class="wf-pick-sub">插入后跟随模版</span></div>
+          <div class="wf-pick-h"><span>工作流</span><span class="wf-pick-sub">点击切换 · 右键新建</span></div>
           <div id="wf-pick-list" class="wf-pick-list scrollbar"></div>
-          <div class="wf-pick-acts">
-            <button type="button" id="wf-pick-insert" title="把选中的模版插进当前画布。模版以后改了，这里会一起变">插入</button>
-            <button type="button" id="wf-pick-edit" title="打开选中的模版进行修改">修改</button>
-            <button type="button" id="wf-pick-new" title="新建一份空白工作流，并留在这个列表里">新建</button>
-            <button type="button" id="wf-pick-del" title="从列表里删除选中的工作流。插过它的地方也会去掉这块">删除</button>
-          </div>
         </div>
         <div class="lib-head">
           <input id="lib-search" type="text" placeholder="搜索设备 / 动作 / 指令号…" />
@@ -205,7 +206,7 @@ window.PAGE_CONFIG={"page":"wfed","theme":"gn"};
 window.WFED_MODE = (new URLSearchParams(location.search)).get('mode') || 'real';
 </script>
 <script src="assets/gn_node_library.js?v=20261027b"></script>
-<script src="assets/app_workflow.js?v=20261027a"></script>
+<script src="assets/app_workflow.js?v=20261029e"></script>
 <script src="assets/runmode.js?v=20261016a"></script>
 <script src="assets/wfrun.js?v=20261017b"></script>
 </body>

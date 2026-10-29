@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""纯 BO 闭环：预测读全部主表；产率 UCB 只排 CH4≤100 的旧配方和新配方。"""
+"""纯 BO 闭环：扫离散网格，列出还能推翻当前最优的实验，用来证明网格里没有更好的点。"""
 
 import math
 import os
@@ -7,6 +7,7 @@ import re
 import statistics as st
 from collections import defaultdict
 
+import numpy as np
 import openpyxl
 
 KAPPA = 1.96
@@ -14,7 +15,11 @@ CH4_RANK_MAX = 100.0
 MASTER = "/Users/fenglongli/Downloads/unilabWorld/data/OCM_master.xlsx"
 GAS = "/Users/fenglongli/Downloads/unilabWorld/data/gas-solid_reactions_314（每个时间段的六行代表了间隔26min的时间）.xlsx"
 MAX_ROUNDS = 36
-TOP_N = 12
+PROOF_MASS = 5
+GRID_GAS_STEP = 5.0
+GRID_POWER_STEP = 10.0
+LOCAL_GAS = 10.0
+LOCAL_POWER = 20.0
 
 
 def _clamp(x, lo, hi):
@@ -79,7 +84,7 @@ def _load_fmt(values):
     med = st.median(nums)
     if abs(med - round(med)) < 1e-6:
         return str(int(round(med)))
-    return ("%.2f" % med).rstrip("0").rstrip(".")
+    return ("%.4f" % med).rstrip("0").rstrip(".")
 
 
 def _load_laws(wb):
@@ -318,8 +323,14 @@ def _knob_reason(g, base, cond):
     return "".join(s if s.endswith("。") else s + "。" for s in parts)
 
 
-def _key(metal, support, cond):
-    return (metal, support, cond["T"], cond["ch4"], cond["o2"], cond["ar"], cond["lpd"])
+def _key(metal, support, cond, load=None):
+    """同一套气体、光强、温度下，不同负载、不同进料氧浓度各自保留。"""
+    oi = cond.get("o2_in")
+    oi_k = None if oi is None else round(float(oi), 3)
+    return (
+        metal, support, cond["T"], cond["ch4"], cond["o2"], cond["ar"], cond["lpd"],
+        _load_num(load), oi_k,
+    )
 
 
 def _cond_from_row(r, ix):
@@ -328,7 +339,7 @@ def _cond_from_row(r, ix):
     o2 = _flow(r[ix["o2"]])
     ar = _flow(r[ix["ar"]])
     lpd = _light(r[ix["lpd"]])
-    if T is None or ch4 is None or o2 is None or lpd is None:
+    if T is None or ch4 is None or o2 is None:
         return None
     if ar is None:
         ar = 0.0
@@ -341,7 +352,7 @@ def _vec(cond):
         cond["ch4"] / 50.0,
         cond["o2"] / 10.0,
         cond["ar"] / 20.0,
-        cond["lpd"] / 100.0,
+        (cond.get("lpd") or 0) / 100.0,
     )
 
 
@@ -422,12 +433,20 @@ def _rankable(cond):
     return ch4 is not None and ch4 <= CH4_RANK_MAX
 
 
-def _yield_ucb(y, y_max):
-    score = 0.0 if y is None or not y_max else y / y_max
-    return score, score, "靠产率"
+def _objective(y, sel, z):
+    """综合得分 = 产率 × 选择性/80 × 保持率/90。选择性、保持率都按百分数来除。"""
+    if y is None or sel is None or z is None:
+        return None
+    y, sel, z = float(y), float(sel), float(z)
+    if y <= 0 or sel <= 0 or z <= 0:
+        return None
+    # 主表里的保持率是 0–1 的比值。按百分数参加公式时先乘 100，再除以 90。
+    return y * (sel / 80.0) * ((z * 100.0) / 90.0)
 
 
 def _lookup_z(ret_load, ret_flow, metal, support, load, cond):
+    if cond.get("lpd") is None:
+        return None
     flow = (round(cond["ch4"], 1), round(cond["o2"], 1), round(cond["ar"], 1), int(cond["lpd"]))
     ld = _num(load)
     if ld is not None:
@@ -485,8 +504,206 @@ def _show_t(v):
 
 
 def _recipe_text(cond):
-    return "%s · CH4 %.1f · O2 %.1f · Ar %.1f · 光强 %d" % (
-        _show_t(cond["T"]), cond["ch4"], cond["o2"], cond["ar"], cond["lpd"],
+    light = "光强未记" if cond.get("lpd") is None else "光强 %d" % int(cond["lpd"])
+    return "%s · CH4 %.1f · O2 %.1f · Ar %.1f · %s" % (
+        _show_t(cond["T"]), cond["ch4"], cond["o2"], cond["ar"], light,
+    )
+
+
+def _clip_flow(v):
+    return round(_clamp(float(v), 0.0, 100.0), 1)
+
+
+def _is_pd_p25(metal, support):
+    return str(metal or "").strip().lower() == "pd" and "p25" in str(support or "").lower()
+
+
+def _load_num(v):
+    n = _num(v)
+    if n is None or n <= 0:
+        return None
+    return round(n, 3)
+
+
+def _spread_masses(n=8):
+    """主表没有催化剂质量。8 套在 1–20 mg 里取不同整数。"""
+    if n <= 1:
+        return [10]
+    out = []
+    for i in range(n):
+        out.append(int(round(1 + i * 19 / (n - 1))))
+    for i in range(1, len(out)):
+        if out[i] <= out[i - 1]:
+            out[i] = min(20, out[i - 1] + 1)
+    return out
+
+
+def _obs_power(cond, ref):
+    """历史光强是 mW/cm²。相对光功率 = 该点光强 / Pd-P25 最大光强，保留连续值。"""
+    lpd = cond.get("lpd")
+    if lpd is None or ref is None or ref <= 0:
+        return None
+    return _clamp(100.0 * float(lpd) / float(ref), 0.0, 100.0)
+
+
+def _power_text(power):
+    return "—" if power is None else "%d%%" % int(round(float(power)))
+
+
+def _same_power(a, b):
+    if a is None and b is None:
+        return True
+    if a is None or b is None:
+        return False
+    return abs(float(a) - float(b)) < 0.51
+
+
+def _one_pct_inlet(ob):
+    """推荐锚点只用进料氧浓度 1% 的记录。0.5% 和 20% 仍留在预测里。"""
+    oi = ob["cond"].get("o2_in")
+    if oi is None:
+        oi = ob.get("o2_in")
+    return oi is not None and abs(float(oi) - 1.0) <= 0.05
+
+
+def _dist_pd(load_a, cond_a, load_b, cond_b):
+    dims = [
+        (math.log10(load_a) - math.log10(load_b)) ** 2,
+        ((cond_a["ch4"] - cond_b["ch4"]) / 100.0) ** 2,
+        ((cond_a["o2"] - cond_b["o2"]) / 100.0) ** 2,
+        ((cond_a["ar"] - cond_b["ar"]) / 100.0) ** 2,
+    ]
+    pa, pb = cond_a.get("power"), cond_b.get("power")
+    if pa is not None and pb is not None:
+        dims.append(((float(pa) - float(pb)) / 100.0) ** 2)
+    oa, ob_in = cond_a.get("o2_in"), cond_b.get("o2_in")
+    if oa is not None and ob_in is not None:
+        dims.append((float(oa) - float(ob_in)) ** 2)
+    return math.sqrt(sum(dims) / len(dims))
+
+
+def _light_gap(cond, old):
+    """光功率打成平局时按光强差再排，不跟主表行序。"""
+    la, lb = cond.get("lpd"), old.get("lpd")
+    if la is None or lb is None:
+        return 0.0
+    pa, pb = cond.get("power"), old.get("power")
+    if pa is not None and pb is not None and not _same_power(pa, pb):
+        return 0.0
+    return abs(float(la) - float(lb))
+
+
+def _same_measured_cond(load_a, cond_a, load_b, cond_b):
+    """负载、气体、相对光功率、进料氧浓度一致，就视为同一条实测。"""
+    if _load_num(load_a) != _load_num(load_b):
+        return False
+    for k in ("ch4", "o2", "ar"):
+        if round(float(cond_a[k]), 1) != round(float(cond_b[k]), 1):
+            return False
+    if not _same_power(cond_a.get("power"), cond_b.get("power")):
+        return False
+    oa, ob_in = cond_a.get("o2_in"), cond_b.get("o2_in")
+    if oa is not None and ob_in is not None and abs(float(oa) - float(ob_in)) > 0.05:
+        return False
+    return True
+
+
+def _exact_field(obs, load, cond, field):
+    """条件和某条实测完全一致时，预测就用这条实测，不再和附近点平均。"""
+    hit = None
+    for ob in obs:
+        if ob.get(field) is None:
+            continue
+        ld = _load_num(ob.get("load"))
+        if ld is None or not _same_measured_cond(load, cond, ld, ob["cond"]):
+            continue
+        if hit is None or (ob.get("y") or -1) > (hit.get("y") or -1):
+            hit = ob
+    if hit is None:
+        return None
+    v = max(0.0, float(hit[field]))
+    return v, v
+
+
+def _predict_pd(obs, load, cond, field):
+    exact = _exact_field(obs, load, cond, field)
+    if exact is not None:
+        return exact
+    pairs = []
+    for ob in obs:
+        if ob.get(field) is None:
+            continue
+        ld = _load_num(ob.get("load"))
+        if ld is None:
+            continue
+        pairs.append((ob["cond"], ld, ob[field]))
+    if not pairs:
+        return None, None
+    near = sorted(
+        (_dist_pd(load, cond, ld, old), _light_gap(cond, old), v)
+        for old, ld, v in pairs
+    )[:5]
+    weights = [1.0 / (d + 0.001) for d, _, _ in near]
+    vals = [v for _, _, v in near]
+    hat = sum(w * v for w, v in zip(weights, vals)) / sum(weights)
+    sigma = st.pstdev(vals) if len(vals) >= 2 else abs(hat) * 0.08
+    se = sigma * (1.0 + 2.0 * near[0][0]) / math.sqrt(len(vals))
+    ucb = hat + KAPPA * se
+    return max(0.0, hat), max(0.0, ucb)
+
+
+def _flow_candidates(anchor, power):
+    base = {
+        "T": anchor["T"],
+        "ch4": _clip_flow(anchor["ch4"]),
+        "o2": _clip_flow(anchor["o2"]),
+        "ar": _clip_flow(anchor["ar"]),
+        "lpd": anchor.get("lpd"),
+        "power": power,
+        "o2_in": 1.0,
+    }
+    out = [dict(base)]
+    for step in (10.0, -10.0, 20.0, -20.0):
+        out.append(dict(base, ch4=_clip_flow(base["ch4"] + step)))
+        out.append(dict(base, o2=_clip_flow(base["o2"] + step)))
+        out.append(dict(base, ar=_clip_flow(base["ar"] + step)))
+    powers = (20, 40, 60, 80, 100) if power is None else (
+        int(round(_clamp(power + step, 0, 100))) for step in (0, 20, -20, 40, -40)
+    )
+    for p in powers:
+        if power is not None and int(round(float(p))) == int(round(float(power))):
+            continue
+        step = dict(base, power=int(p))
+        if power is None or not _same_power(p, power):
+            step["lpd"] = None
+        out.append(step)
+    uniq = []
+    seen = set()
+    for cond in out:
+        if not _rankable(cond):
+            continue
+        key = (cond["ch4"], cond["o2"], cond["ar"], cond.get("power"))
+        if key in seen:
+            continue
+        seen.add(key)
+        uniq.append(cond)
+    return uniq
+
+
+def _cond_moved(a, b):
+    if abs(a["ch4"] - b["ch4"]) >= 5 or abs(a["o2"] - b["o2"]) >= 5 or abs(a["ar"] - b["ar"]) >= 5:
+        return True
+    pa, pb = a.get("power"), b.get("power")
+    return pa is not None and pb is not None and abs(pa - pb) >= 10
+
+
+def _pd_recipe(load, cond):
+    power = cond.get("power")
+    power_s = _power_text(power)
+    mass = cond.get("mass")
+    mass_s = "—" if mass is None else "%d mg" % int(mass)
+    return "%s%%Pd-P25 · 甲烷 %.1f · 1%%氧气 %.1f · 氩气 %.1f · 质量 %s · 相对光功率 %s" % (
+        _load_fmt([load]), cond["ch4"], cond["o2"], cond["ar"], mass_s, power_s,
     )
 
 
@@ -501,14 +718,14 @@ def _metric_text(y, sel, z, score, how, y_hi=None, s_hi=None, z_hi=None, measure
             y, sel_s, _fmt_z(z), score, how,
         )
     gate = ""
-    if y_hi is not None and s_hi is not None and z_hi is not None:
+    if y_hi is not None and s_hi is not None and z_hi is not None and y_hi > y + 1:
         gate = "UCB上界产率 %.0f、选择性 %.1f%%、保持率 %.2f。" % (y_hi, s_hi, z_hi)
     return "%s预测均值产率 %.0f，选择性 %s%%，130分钟保持率 %s。产率 UCB %.2f，%s。" % (
         gate, y, sel_s, _fmt_z(z), score, how,
     )
 
 
-def _pack_row(g, cond_or_ob, y, sel, z, score, floor, how, kind, rnd, knob="", bounds=None, measured=False, o2_in=None, o2_out=None):
+def _pack_row(g, cond_or_ob, y, sel, z, score, floor, how, kind, rnd, knob="", bounds=None, measured=False, o2_in=None, o2_out=None, c2h4=None, c2h6=None, co2=None):
     cond = cond_or_ob["cond"] if isinstance(cond_or_ob, dict) and "cond" in cond_or_ob and "y" in cond_or_ob else cond_or_ob
     bounds = bounds or {}
     text = _metric_text(
@@ -531,6 +748,9 @@ def _pack_row(g, cond_or_ob, y, sel, z, score, floor, how, kind, rnd, knob="", b
         "lpd": cond["lpd"],
         "o2_in": None if o2_in is None else round(o2_in, 3),
         "o2_out": None if o2_out is None else round(o2_out, 1),
+        "c2h4": None if c2h4 is None else round(c2h4, 1),
+        "c2h6": None if c2h6 is None else round(c2h6, 1),
+        "co2": None if co2 is None else round(co2, 1),
         "y": round(show_y, 1),
         "sel": round(show_sel, 1) if show_sel is not None else None,
         "z": None if show_z is None else round(show_z, 3),
@@ -545,6 +765,364 @@ def _pack_row(g, cond_or_ob, y, sel, z, score, floor, how, kind, rnd, knob="", b
         "round": rnd,
     }
 
+
+def _drop_blank_light_copies(obs):
+    """光强空着、但和一条有光强记录的产率重复时，不拿来当近邻。"""
+    lighted, dark = [], []
+    for ob in obs:
+        if _load_num(ob.get("load")) is None:
+            continue
+        if ob["cond"].get("power") is None:
+            dark.append(ob)
+        else:
+            lighted.append(ob)
+
+    def sig(ob):
+        c = ob["cond"]
+        oi = c.get("o2_in")
+        return (
+            round(_load_num(ob["load"]), 3),
+            round(float(c["ch4"]), 1), round(float(c["o2"]), 1), round(float(c["ar"]), 1),
+            round(float(oi) if oi is not None else -1, 2),
+            round(float(ob["y"]), 0),
+        )
+
+    lit = {sig(ob) for ob in lighted}
+    return lighted + [ob for ob in dark if sig(ob) not in lit]
+
+
+def _grid_arrays(obs, target="y"):
+    load = np.array([_load_num(ob["load"]) for ob in obs], float)
+    power = np.array([ob["cond"]["power"] if ob["cond"].get("power") is not None else np.nan for ob in obs], float)
+    inlet = np.array([ob["cond"]["o2_in"] if ob["cond"].get("o2_in") is not None else np.nan for ob in obs], float)
+    has_p = np.isfinite(power)
+    has_i = np.isfinite(inlet)
+    return {
+        "load": load,
+        "log": np.log10(load),
+        "ch4": np.array([ob["cond"]["ch4"] for ob in obs], float),
+        "o2": np.array([ob["cond"]["o2"] for ob in obs], float),
+        "ar": np.array([ob["cond"]["ar"] for ob in obs], float),
+        "power": power,
+        "inlet": inlet,
+        "y": np.array([ob[target] for ob in obs], float),
+        "has_p": has_p,
+        "has_i": has_i,
+        "nd": 4.0 + has_p.astype(float) + has_i.astype(float),
+    }
+
+
+def _grid_predict(arr, q_load, Q):
+    """Q 列是甲烷、氧气、氩气、相对光功率。进料氧按 1% 比较。"""
+    n = len(arr["y"])
+    b = len(Q)
+    dsum = (
+        (math.log10(q_load) - arr["log"])[None, :] ** 2
+        + ((Q[:, 0:1] - arr["ch4"][None, :]) / 100.0) ** 2
+        + ((Q[:, 1:2] - arr["o2"][None, :]) / 100.0) ** 2
+        + ((Q[:, 2:3] - arr["ar"][None, :]) / 100.0) ** 2
+    )
+    if arr["has_p"].any():
+        dp = np.zeros((b, n))
+        dp[:, arr["has_p"]] = ((Q[:, 3:4] - arr["power"][arr["has_p"]][None, :]) / 100.0) ** 2
+        dsum = dsum + dp
+    q_in = Q[:, 4:5] if Q.shape[1] > 4 else np.ones((b, 1))
+    if arr["has_i"].any():
+        di = np.zeros((b, n))
+        di[:, arr["has_i"]] = ((q_in - arr["inlet"][arr["has_i"]][None, :]) / 20.0) ** 2
+        dsum = dsum + di
+    dist = np.sqrt(dsum / arr["nd"][None, :])
+    exact = np.zeros(b, dtype=bool)
+    exact_y = np.zeros(b)
+    qin = q_in[:, 0]
+    for j in np.where(np.abs(arr["load"] - q_load) < 1e-6)[0]:
+        if not arr["has_i"][j] or not arr["has_p"][j]:
+            continue
+        hit = (
+            (np.abs(Q[:, 0] - arr["ch4"][j]) < 0.05)
+            & (np.abs(Q[:, 1] - arr["o2"][j]) < 0.05)
+            & (np.abs(Q[:, 2] - arr["ar"][j]) < 0.05)
+            & (np.abs(Q[:, 3] - arr["power"][j]) < 0.51)
+            & (np.abs(qin - arr["inlet"][j]) <= 0.05)
+        )
+        if hit.any():
+            exact[hit] = True
+            exact_y[hit] = np.maximum(exact_y[hit], arr["y"][j])
+    k = min(5, n)
+    part = np.argpartition(dist, k - 1, axis=1)[:, :k]
+    rows = np.arange(b)[:, None]
+    d5 = dist[rows, part]
+    y5 = arr["y"][part]
+    order = np.argsort(d5, axis=1)
+    d5 = np.take_along_axis(d5, order, 1)
+    y5 = np.take_along_axis(y5, order, 1)
+    w = 1.0 / (d5 + 0.001)
+    hat = (w * y5).sum(1) / w.sum(1)
+    mu = y5.mean(1)
+    sigma = np.sqrt(((y5 - mu[:, None]) ** 2).mean(1))
+    sigma = np.where(sigma == 0, np.abs(hat) * 0.08, sigma)
+    se = sigma / math.sqrt(float(k))
+    ucb = np.maximum(0.0, hat + KAPPA * se)
+    hat = np.where(exact, exact_y, np.maximum(0.0, hat))
+    ucb = np.where(exact, exact_y, ucb)
+    se = np.where(exact, 0.0, se)
+    return hat, ucb, exact, se
+
+
+def _select_pd_p25(g, y_max):
+    """最优负载加最近三档。每档一条实测，一条只在周围两步里按期望改进挑。"""
+    obs = list(g["obs"])
+    ref = max(
+        (float(ob["cond"]["lpd"]) for ob in obs if isinstance(ob["cond"].get("lpd"), (int, float)) and ob["cond"]["lpd"] > 0),
+        default=None,
+    )
+    for ob in obs:
+        power = _obs_power(ob["cond"], ref)
+        if power is not None:
+            ob["cond"]["power"] = power
+        if ob.get("o2_in") is not None and ob["cond"].get("o2_in") is None:
+            ob["cond"]["o2_in"] = ob["o2_in"]
+    train = _drop_blank_light_copies(obs)
+    lighted = [
+        ob for ob in train
+        if ob["cond"].get("power") is not None and _load_num(ob.get("load")) is not None
+        and _rankable(ob["cond"]) and _one_pct_inlet(ob)
+    ]
+    if not lighted:
+        return [], [], {}, "主表里没有甲烷不超过 100、进料氧 1%、带光强的 Pd-P25，定不出约束内的产率最优。"
+    def _pass(ob):
+        sel, z = ob.get("sel"), ob.get("z")
+        return sel is not None and z is not None and float(sel) > 84.0 and float(z) > 0.95
+
+    feasible = [ob for ob in lighted if _pass(ob)]
+    if not feasible:
+        return [], [], {}, "约束内没有选择性大于 84 且保持率大于 95% 的 Pd-P25，定不出产率最优。"
+    inc = max(feasible, key=lambda ob: ob["y"])
+    inc_load = _load_num(inc["load"])
+    inc_ch4, inc_o2, inc_ar = float(inc["cond"]["ch4"]), float(inc["cond"]["o2"]), float(inc["cond"]["ar"])
+    inc_power = float(inc["cond"]["power"])
+    inc_in = inc["cond"].get("o2_in")
+    if inc_in is None:
+        inc_in = inc.get("o2_in")
+    ystar = float(inc["y"])
+
+    def _arr_for(field):
+        rows = [ob for ob in train if _load_num(ob.get("load")) is not None and ob.get(field) is not None]
+        return _grid_arrays(rows, target=field) if rows else None
+
+    arr_y, arr_s, arr_z = _arr_for("y"), _arr_for("sel"), _arr_for("z")
+    if arr_y is None or arr_s is None or arr_z is None:
+        return [], [], {}, "产率、选择性或保持率的实测不够，采集分算不出来。"
+    all_loads = sorted({
+        round(_load_num(ob["load"]), 3)
+        for ob in train
+        if _load_num(ob.get("load")) is not None
+    })
+    others = sorted((ld for ld in all_loads if abs(ld - inc_load) > 1e-9), key=lambda ld: abs(math.log10(ld) - math.log10(inc_load)))
+    chosen = [inc_load] + others[:3]
+
+    def _axis(v, step, lo, hi):
+        out = []
+        for k in (-2, -1, 0, 1, 2):
+            x = min(hi, max(lo, float(v) + k * step))
+            out.append(round(x, 1))
+        return sorted(set(out))
+
+    def _near_grid(ch4, o2, ar, power):
+        cs = _axis(ch4, GRID_GAS_STEP, 0.0, CH4_RANK_MAX)
+        os_ = _axis(o2, GRID_GAS_STEP, 0.0, 100.0)
+        as_ = _axis(ar, GRID_GAS_STEP, 0.0, 100.0)
+        ps = _axis(power, GRID_POWER_STEP, 0.0, 100.0)
+        rows = [(c, o, a, p) for c in cs for o in os_ for a in as_ for p in ps]
+        return np.array(rows, float) if rows else np.zeros((0, 4))
+
+    def _ei(hat, se):
+        se = np.maximum(se, 0.0)
+        ei = np.zeros_like(hat)
+        ok = se > 1e-6
+        z = np.zeros_like(hat)
+        z[ok] = (hat[ok] - ystar) / se[ok]
+        phi = np.exp(-0.5 * z * z) / math.sqrt(2.0 * math.pi)
+        Phi = 0.5 * (1.0 + np.vectorize(math.erf)(z / math.sqrt(2.0)))
+        ei[ok] = se[ok] * (z[ok] * Phi[ok] + phi[ok])
+        ei[~ok] = np.maximum(0.0, hat[~ok] - ystar)
+        return np.maximum(ei, 0.0)
+
+    def _same_pt(a, b):
+        return (
+            abs(a[0] - b[0]) < 0.05 and abs(a[1] - b[1]) < 0.05
+            and abs(a[2] - b[2]) < 0.05 and abs(a[3] - b[3]) < 0.51
+        )
+    proof = {
+        "sstar": round(ystar, 1),
+        "ystar": round(float(inc["y"]), 1),
+        "selstar": None if inc.get("sel") is None else round(float(inc["sel"]), 1),
+        "zstar": None if inc.get("z") is None else round(float(inc["z"]), 3),
+        "load": _load_fmt([inc_load]),
+        "ch4": inc_ch4,
+        "o2": inc_o2,
+        "ar": inc_ar,
+        "o2_in": None if inc_in is None else round(float(inc_in), 1),
+        "power": int(round(inc_power)),
+        "mass": PROOF_MASS,
+        "n_cells": 0,
+        "n_above": 0,
+        "n_open": 0,
+        "loads": [_load_fmt([ld]) for ld in chosen],
+        "near": len(chosen),
+        "far": 0,
+        "certified": [],
+    }
+
+    def side(load, ch4, o2, ar, power, inlet):
+        cond = {
+            "T": inc["cond"]["T"], "ch4": ch4, "o2": o2, "ar": ar,
+            "lpd": None, "power": power, "o2_in": inlet, "mass": PROOF_MASS,
+        }
+        out = {}
+        for field in ("y", "sel", "z", "o2_out", "c2h4", "c2h6", "co2"):
+            pred, _ = _predict_pd(train, load, cond, field)
+            if field == "z" and pred is not None:
+                pred = min(pred, 1.0)
+            out[field] = pred
+        return cond, out
+
+    def measured_at(load, ch4, o2, ar, power):
+        hit = None
+        for ob in train:
+            ld = _load_num(ob.get("load"))
+            if ld is None or abs(ld - load) > 1e-6:
+                continue
+            c = ob["cond"]
+            if abs(float(c["ch4"]) - ch4) > 0.05 or abs(float(c["o2"]) - o2) > 0.05 or abs(float(c["ar"]) - ar) > 0.05:
+                continue
+            if not _same_power(c.get("power"), power):
+                continue
+            oi = c.get("o2_in", ob.get("o2_in"))
+            if oi is None or abs(float(oi) - 1.0) > 0.05:
+                continue
+            if hit is None or (ob.get("score") or -1) > (hit.get("score") or -1):
+                hit = ob
+        return hit
+
+    def _gt(hat, se, thr):
+        se = np.maximum(se, 0.0)
+        p = np.empty_like(hat)
+        ok = se > 1e-6
+        zz = np.zeros_like(hat)
+        zz[ok] = (hat[ok] - thr) / se[ok]
+        p[ok] = 0.5 * (1.0 + np.vectorize(math.erf)(zz[ok] / math.sqrt(2.0)))
+        p[~ok] = np.where(hat[~ok] > thr, 1.0, 0.0)
+        return np.clip(p, 0.0, 1.0)
+
+    def best_on_load(load):
+        pool = [ob for ob in feasible if abs(_load_num(ob["load"]) - load) < 1e-6]
+        return max(pool, key=lambda ob: ob["y"]) if pool else None
+
+    def neighbor(load, anchor):
+        Q = _near_grid(*anchor)
+        if len(Q) == 0:
+            return None
+        Qin = np.concatenate([Q, np.ones((len(Q), 1))], axis=1)
+        yhat, yucb, exact, yse = _grid_predict(arr_y, load, Qin)
+        shat, _, _, sse = _grid_predict(arr_s, load, Qin)
+        zhat, _, _, zse = _grid_predict(arr_z, load, Qin)
+        zhat = np.minimum(zhat, 1.0)
+        ei = _ei(yhat, yse)
+        ps, pz = _gt(shat, sse, 84.0), _gt(zhat, zse, 0.95)
+        acq = ei * ps * pz
+        anchor_m = np.array([_same_pt(tuple(Q[i]), anchor) for i in range(len(Q))])
+        fresh = ~anchor_m
+        if not fresh.any():
+            return None
+        order = np.lexsort((yhat, yucb, np.where(fresh, acq, -np.inf)))
+        i = int(order[-1])
+        return {
+            "ch4": float(Q[i, 0]), "o2": float(Q[i, 1]), "ar": float(Q[i, 2]), "power": float(Q[i, 3]),
+            "hat": float(yhat[i]), "ucb": float(yucb[i]), "ei": float(ei[i]), "acq": float(acq[i]),
+            "sel": float(shat[i]), "z": float(zhat[i]), "ps": float(ps[i]), "pz": float(pz[i]),
+            "exact": bool(exact[i]),
+            "close": bool(yucb[i] > ystar + 1e-6 and ps[i] >= 0.5 and pz[i] >= 0.5),
+        }
+
+    slots = []
+    n_local = 0
+    for load in chosen:
+        hit = best_on_load(load)
+        if hit is not None:
+            anchor = (float(hit["cond"]["ch4"]), float(hit["cond"]["o2"]), float(hit["cond"]["ar"]), float(hit["cond"]["power"]))
+            slots.append((load, "旧配方", anchor, hit, None))
+        else:
+            anchor = (inc_ch4, inc_o2, inc_ar, inc_power)
+            slots.append((load, "转移", anchor, None, None))
+        nb = neighbor(load, anchor)
+        n_local += 1
+        if nb is not None:
+            slots.append((load, "附近", (nb["ch4"], nb["o2"], nb["ar"], nb["power"]), None, nb))
+    proof["n_cells"] = int(n_local * (5 ** 4))
+    proof["n_open"] = sum(1 for _ld, src, _a, _h, nb in slots if src == "附近" and nb and nb["close"])
+    proof["n_above"] = proof["n_open"]
+
+    top, trace = [], []
+    for rank, (load, src, anchor, hit, nb) in enumerate(slots, 1):
+        ch4, o2, ar, power = anchor
+        cond, extra = side(load, ch4, o2, ar, power, 1.0)
+        if src == "旧配方" and hit is not None:
+            y, sel, z = hit["y"], hit.get("sel"), hit.get("z")
+            score, ucb = hit["y"], hit["y"]
+            reason = "该负载上，选择性大于 84 且保持率大于 95% 里产率最高的实测。" if abs(load - inc_load) > 1e-6 else "当前最优实测。选择性大于 84，保持率大于 95%，产率最高。"
+            o2_out, c2h4, c2h6, co2 = hit.get("o2_out"), hit.get("c2h4"), hit.get("c2h6"), hit.get("co2")
+            measured = True
+        elif src == "转移":
+            pred_y = _grid_predict(arr_y, load, np.array([[ch4, o2, ar, power, 1.0]]))
+            pred_s = _grid_predict(arr_s, load, np.array([[ch4, o2, ar, power, 1.0]]))
+            pred_z = _grid_predict(arr_z, load, np.array([[ch4, o2, ar, power, 1.0]]))
+            y, sel, z = float(pred_y[0][0]), float(pred_s[0][0]), min(1.0, float(pred_z[0][0]))
+            score, ucb = y, float(pred_y[1][0])
+            reason = "这个负载没有选择性大于 84 且保持率大于 95% 的实测，条件从当前最优移过来。数字是这里的预测。"
+            o2_out, c2h4, c2h6, co2 = extra.get("o2_out"), extra.get("c2h4"), extra.get("c2h6"), extra.get("co2")
+            measured = False
+        else:
+            y, sel, z = nb["hat"], nb["sel"], nb["z"]
+            score, ucb = nb["acq"], nb["ucb"]
+            o2_out, c2h4, c2h6, co2 = extra.get("o2_out"), extra.get("c2h4"), extra.get("c2h6"), extra.get("co2")
+            measured = False
+            reason = "周围两步内采集分最高。预测产率 %.0f，选择性 %.1f（超过 84 的概率 %.0f%%），保持率 %.1f%%（超过 95%% 的概率 %.0f%%）。" % (
+                nb["hat"], nb["sel"], 100.0 * nb["ps"], 100.0 * nb["z"], 100.0 * nb["pz"],
+            )
+        row = _pack_row(
+            g, cond, y if y is not None else score, sel, z, score, score, "靠综合得分",
+            src, rank, "", None, measured=measured,
+            o2_in=1.0, o2_out=o2_out, c2h4=c2h4, c2h6=c2h6, co2=co2,
+        )
+        row["loading"] = _load_fmt([load])
+        row["mass"] = PROOF_MASS
+        row["power"] = int(round(float(power)))
+        row["recipe"] = _pd_recipe(load, cond)
+        row["ucb"] = round(float(ucb), 1)
+        row["score"] = round(float(score), 1)
+        row["gap"] = round(float(ucb) - ystar, 1)
+        row["group"] = src
+        row["metal"] = "Pd"
+        row["support"] = "P25"
+        row["rank"] = rank
+        row["reason"] = reason
+        row.pop("brief", None)
+        row.pop("knob", None)
+        top.append(row)
+        trace.append({"round": rank, "scheme": "Pd/P25", "recipe": row["recipe"], "y": row["score"], "ucb": row["ucb"], "group": src})
+    stop = (
+        "门槛：选择性大于 84，保持率大于 95%%。甲烷不超过 100，进料氧 1%%。门槛里产率最高。"
+        "当前最优实测是 %s%% Pd-P25，甲烷 %.0f、1%%氧气 %.0f、氩气 %.0f mL/min，相对光功率 %d%%，"
+        "产率 %.0f，选择性 %.1f%%，保持率 %.1f%%。"
+        "没测过的格子采集分 = 产率期望改进 × 选择性超过 84 的概率 × 保持率超过 95%% 的概率，只在周围两步里算。"
+        "负载是这一档和对数负载上最近的三档。共 %d 组。其中产率上界更高、两个概率都不低于一半的有 %d 组。"
+    ) % (
+        proof["load"], inc_ch4, inc_o2, inc_ar, proof["power"],
+        proof["ystar"], proof["selstar"] or 0, 100.0 * (proof["zstar"] or 0),
+        len(top), proof["n_open"],
+    )
+    return top, trace, stop, proof
 
 def run_closed_loop(master_path=MASTER):
     wb = openpyxl.load_workbook(master_path, data_only=True)
@@ -573,6 +1151,9 @@ def run_closed_loop(master_path=MASTER):
         "sel": col("C2+选择性"),
         "o2_in": col("进料"),
         "o2_out": col("尾气"),
+        "c2h4": col("C2H4浓度"),
+        "c2h6": col("C2H6浓度"),
+        "co2": col("CO2浓度"),
     }
     groups = {}
     seen = set()
@@ -604,13 +1185,17 @@ def run_closed_loop(master_path=MASTER):
             }
         g["loads"].append(r[ix["load"]])
         g["sels"].append(sel)
-        k = _key(metal, support, cond)
+        oi = _num(r[ix["o2_in"]])
+        if oi is not None:
+            cond["o2_in"] = oi
+        k = _key(metal, support, cond, r[ix["load"]])
         seen.add(k)
         prev = g["seen"].get(k)
         if prev is None or y > prev["y"]:
             g["seen"][k] = {
                 "cond": cond, "y": y, "sel": sel, "z": None, "load": r[ix["load"]],
-                "o2_in": _num(r[ix["o2_in"]]), "o2_out": _num(r[ix["o2_out"]]),
+                "o2_in": oi, "o2_out": _num(r[ix["o2_out"]]),
+                "c2h4": _num(r[ix["c2h4"]]), "c2h6": _num(r[ix["c2h6"]]), "co2": _num(r[ix["co2"]]),
             }
     ret_load, ret_flow, allz = _load_retention()
     for g in groups.values():
@@ -619,153 +1204,73 @@ def run_closed_loop(master_path=MASTER):
             ob["z"] = _lookup_z(ret_load, ret_flow, g["metal"], g["support"], ob["load"], ob["cond"])
 
     y_max = max((ob["y"] for g in groups.values() for ob in g["obs"]), default=0.0)
-    raw_rows = []
-    pool = []
-    for g in groups.values():
-        ys = [ob["y"] for ob in g["obs"]]
-        n = len(ys)
-        mu = sum(ys) / n
-        mean_sel = sum(g["sels"]) / len(g["sels"])
-        pf, supdesc, metaldesc = _physfactor(P, metals, sup_table, g["metal"], g["support"], mean_sel)
-        g.update(
-            mu=mu, n=n, pf=pf, n_sim=0,
-            mean_sel=mean_sel, supdesc=supdesc, metaldesc=metaldesc,
-        )
-        for ob in g["obs"]:
-            if not _rankable(ob["cond"]):
-                continue
-            score, floor, how = _yield_ucb(ob["y"], y_max)
-            raw_rows.append(_pack_row(
-                g, ob, ob["y"], ob["sel"], ob["z"], score, floor, how, "主表旧配方", 0,
-                measured=True, o2_in=ob.get("o2_in"), o2_out=ob.get("o2_out"),
-            ))
-        anchors = sorted(
-            (ob for ob in g["obs"] if _rankable(ob["cond"])),
-            key=lambda it: -it["y"],
-        )[:6]
-        for base in anchors:
-            for cond in _neighbors(dict(base["cond"])):
-                if not _rankable(cond):
-                    continue
-                k = _key(g["metal"], g["support"], cond)
-                if k in seen or k in g["seen"]:
-                    continue
-                seen.add(k)
-                pool.append({"g": g, "cond": cond, "base": base["cond"]})
-
-    simulated = []
-    trace = []
-    stop_reason = ""
-    for rnd in range(1, MAX_ROUNDS + 1):
-        if len(simulated) >= TOP_N:
-            break
-        if not pool:
-            stop_reason = "按主表精度还能取的新配方已经试完，共模拟 %d 轮。" % (rnd - 1)
-            break
-        scored = []
-        for item in pool:
-            g = item["g"]
-            y_hat, y_ucb = _predict_field(g["obs"], item["cond"], "y", g["n_sim"])
-            s_hat, s_ucb = _predict_field(g["obs"], item["cond"], "sel", g["n_sim"])
-            z_hat, z_ucb = _predict_field(g["obs"], item["cond"], "z", g["n_sim"])
-            in_hat, _in_ucb = _predict_field(g["obs"], item["cond"], "o2_in", g["n_sim"])
-            out_hat, _out_ucb = _predict_field(g["obs"], item["cond"], "o2_out", g["n_sim"])
-            if z_hat is not None:
-                z_hat = min(z_hat, 1.0)
-            if z_ucb is not None:
-                z_ucb = min(z_ucb, 1.0)
-            if y_ucb is None or not _rankable(item["cond"]):
-                continue
-            ucb_score, ucb_floor, ucb_how = _yield_ucb(y_ucb, y_max)
-            item.update(
-                y_hat=y_hat, s_hat=s_hat, z_hat=z_hat,
-                y_ucb=y_ucb, s_ucb=s_ucb, z_ucb=z_ucb,
-                o2_in=in_hat, o2_out=out_hat,
-                score=ucb_score, floor=ucb_floor, how=ucb_how,
-            )
-            scored.append(item)
-        if not scored:
-            stop_reason = "模拟 %d 轮后停止。没有还能试的新配方。" % len(simulated)
-            break
-        scored.sort(key=lambda it: -it["score"])
-        best = scored[0]
-        g = best["g"]
-        y_sim, s_sim, z_sim = best["y_hat"], best["s_hat"], best["z_hat"]
-        score, how = best["score"], best["how"]
-        written = {
-            "cond": best["cond"], "y": y_sim, "sel": s_sim, "z": z_sim,
-            "o2_in": best.get("o2_in"), "o2_out": best.get("o2_out"),
-            "score": score, "how": how, "floor": best["floor"], "load": None,
-        }
-        g["obs"].append(written)
-        g["seen"][_key(g["metal"], g["support"], best["cond"])] = written
-        g["n_sim"] += 1
-        knob = _knob_reason(g, best["base"], best["cond"]) + "按最近实测锚定。"
-        bounds = {"y": best["y_ucb"], "sel": best["s_ucb"], "z": best["z_ucb"]}
-        row = _pack_row(
-            g, best["cond"], y_sim, s_sim, z_sim, score, best["floor"], how,
-            "新配方", rnd, knob, bounds, o2_in=best.get("o2_in"), o2_out=best.get("o2_out"),
-        )
-        row["ucb"] = round(best["y_ucb"], 1)
-        simulated.append(row)
-        trace.append({
-            "round": rnd,
-            "scheme": "%s/%s" % (g["metal"], g["support"]),
-            "recipe": row["recipe"],
-            "y": round(y_sim, 1),
-            "ucb": row["ucb"],
-        })
-        pool = [it for it in pool if it is not best]
-    if not stop_reason:
-        stop_reason = (
-            "预测读取全部主表，含 CH4>100，用来学习附近规律。产率 UCB 只排 CH4≤100 的旧配方和新配方。共模拟 %d 轮。"
-            % len(simulated)
-        )
-
-    top = sorted(raw_rows + simulated, key=lambda s: (-s["score"], -s["y"]))[:TOP_N]
-    seen_sys = set()
-    for i, row in enumerate(top, 1):
-        row["rank"] = i
-        key = (row["metal"], row["support"])
-        tail = "未试新配方的采集分盖不过当前最优，不可能有更优解了。" if "不可能有更优解" in stop_reason else ""
-        if key not in seen_sys:
-            row["reason"] = row["brief"] + row["knob"] + tail
-            seen_sys.add(key)
-        else:
-            row["reason"] = row["knob"] + tail
-        row.pop("brief", None)
-        row.pop("knob", None)
-    if not stop_reason:
-        stop_reason = "模拟结束。"
-    save_dir, save_name = _write_top12(top, stop_reason, len(trace))
+    pd_groups = [g for g in groups.values() if _is_pd_p25(g["metal"], g["support"])]
+    if not pd_groups:
+        top, trace, stop_reason, proof = [], [], "主表里没有 Pd-P25，定不出当前最优。", {}
+    else:
+        pd_groups.sort(key=lambda g: -len(g["obs"]))
+        top, trace, stop_reason, proof = _select_pd_p25(pd_groups[0], y_max)
+    save_dir, save_name = _write_top8(top, stop_reason, len(trace), proof)
     return {
         "ok": True,
         "rounds": len(trace),
         "stop_reason": stop_reason,
         "top": top,
         "trace": trace,
+        "proof": proof,
         "systems": len(groups),
         "save_dir": save_dir,
         "save_name": save_name,
     }
 
 
-def _write_top12(top, stop_reason, rounds):
+def _write_top8(top, stop_reason, rounds, proof=None):
     save_dir = os.path.dirname(MASTER)
-    path = os.path.join(save_dir, "bo_top12.xlsx")
+    path = os.path.join(save_dir, "bo_grid_proof.xlsx")
+    proof = proof or {}
     wb = openpyxl.Workbook()
     ws = wb.active
-    ws.title = "前12"
-    ws.append(["排名", "来源", "金属", "载体", "负载wt%", "配方", "温度", "CH4", "O2", "进料c_O2/%", "尾气c_O2/ppm", "Ar", "光强", "产率", "选择性", "保持率", "采集分", "入选方式", "推荐原因"])
+    ws.title = "网格证明"
+    ws.append([
+        "组别", "排名", "金属", "载体", "负载wt%", "甲烷流速", "氧气流速", "氩气流速",
+        "催化剂质量mg", "相对光功率%", "进料氧%", "产率", "选择性", "保持率",
+        "采集分", "产率上界", "高出当前最优",
+        "进料c_O2/%", "尾气c_O2/ppm", "C2H4浓度/ppm", "C2H6浓度/ppm", "CO2浓度/ppm",
+        "说明",
+    ])
     for row in top:
         ws.append([
-            row["rank"], row.get("kind", ""), row["metal"], row["support"], row["loading"], row["recipe"],
-            row["T"], row["ch4"], row["o2"], row.get("o2_in"), row.get("o2_out"), row["ar"], row["lpd"],
-            row["y"], row.get("sel"), row.get("z"), row.get("score"), row.get("how"), row["reason"],
+            row.get("group") or "新配方",
+            row["rank"], row["metal"], row["support"], row["loading"],
+            row["ch4"], row["o2"], row["ar"], row.get("mass"), row.get("power"),
+            row.get("o2_in"), row["y"], row.get("sel"), row.get("z"),
+            row.get("score"), row.get("ucb"), row.get("gap"),
+            row.get("o2_in"), row.get("o2_out"),
+            row.get("c2h4"), row.get("c2h6"), row.get("co2"),
+            row["reason"],
         ])
     note = wb.create_sheet("说明")
+    note.append(["目标", "选择性>84 且 保持率>95% 的前提下产率最高；采集分=产率期望改进×两个门槛的概率"])
+    note.append(["当前最优负载", proof.get("load")])
+    note.append(["门槛内最高产率", proof.get("ystar")])
+    note.append(["选择性门槛", ">84"])
+    note.append(["保持率门槛", ">95%"])
+    note.append(["进料氧%", proof.get("o2_in")])
+    note.append(["预测产率超过主表最高的格数", proof.get("n_above")])
+    note.append(["当前最优选择性", proof.get("selstar")])
+    note.append(["当前最优保持率", proof.get("zstar")])
+    note.append(["甲烷", proof.get("ch4")])
+    note.append(["1%氧气", proof.get("o2")])
+    note.append(["氩气", proof.get("ar")])
+    note.append(["相对光功率%", proof.get("power")])
+    note.append(["催化剂质量mg", proof.get("mass")])
+    note.append(["网格格数", proof.get("n_cells")])
+    note.append(["上界仍更高的格数", proof.get("n_open")])
+    note.append(["旁边组数", proof.get("near")])
+    note.append(["远处组数", proof.get("far")])
+    note.append(["已经整片压住的负载", "、".join(proof.get("certified") or [])])
     note.append(["停止原因", stop_reason])
-    note.append(["模拟轮数", rounds])
+    note.append(["推荐组数", rounds])
     note.append(["保存目录", os.path.abspath(save_dir)])
     note.append(["文件名", os.path.basename(path)])
     wb.save(path)

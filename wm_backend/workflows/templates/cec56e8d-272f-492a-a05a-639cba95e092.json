@@ -1,0 +1,61 @@
+{
+  "target_lab_uuid": "75fb74df-2e98-4fc6-91e6-8992aa39e7ca",
+  "name": "demo",
+  "data": {
+    "workflow_uuid": "cec56e8d-272f-492a-a05a-639cba95e092",
+    "workflow_name": "demo",
+    "nodes": [
+      {
+        "uuid": "7998d943-5e9e-4660-a546-b0f62f1eed96",
+        "parent_uuid": "",
+        "name": "reset",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 60,
+            "y": 56,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "timeout": 120
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "reset",
+        "resource_name": "PRCXI"
+      }
+    ],
+    "edges": [],
+    "embeds": [],
+    "as_template": true
+  }
+}

@@ -90,6 +90,7 @@ NAME_ACTIONS = {
         ('transfer_liquid','移液'),('auto-create_protocol','创建移液协议'),
         ('auto-run_protocol','运行移液协议'),('move_plate','搬运孔板'),
         ('titration_liquid','滴注液体'),('auto-shaking_incubation_action','震荡孵育'),
+        ('reset','复位'),
     ],
 }
 

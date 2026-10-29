@@ -470,6 +470,13 @@ def workflow_editor_html():
     return FileResponse(os.path.join(STATIC_DIR, "workflow_editor.html"))
 
 
+@router.get("/datalog")
+@router.get("/datalog.html")
+def datalog_html():
+    """工作流运行日志：按工作流查看每次运行，并下载 xlsx。"""
+    return FileResponse(os.path.join(STATIC_DIR, "datalog.html"))
+
+
 # ------------------------------------------------------------
 # 工作流编辑器：保存 / 列表 / 打开（用户手工编排的工作流）
 # ------------------------------------------------------------
@@ -564,6 +571,7 @@ def _tpl_summary(wf: dict, mtime: int, source: str) -> dict:
         "embeds": len(embeds),
         "mtime": mtime,
         "source": source,
+        "as_template": bool(data.get("as_template")),
     }
 
 
@@ -982,6 +990,36 @@ def workflow_runs():
                       "elapsed": round((r.ended_at or time.time()) - (r.started_at or time.time()), 2),
                       "counts": r.summary().get("counts", {})})
     return {"ok": True, "runs": items}
+
+
+@router.get("/api/datalog")
+def datalog_list():
+    """已落盘的工作流运行日志（新→旧）。xlsx 在 data/Datalog_Workflow。"""
+    from .run_datalog import list_runs, DATALOG_DIR
+    return {"ok": True, "dir": DATALOG_DIR, "runs": list_runs()}
+
+
+@router.get("/api/datalog/{run_id}")
+def datalog_detail(run_id: str):
+    from .run_datalog import run_detail
+    hit = run_detail(run_id)
+    if not hit:
+        return {"ok": False, "error": "没有这份运行日志"}
+    hit["ok"] = True
+    return hit
+
+
+@router.get("/api/datalog/{run_id}/xlsx")
+def datalog_xlsx(run_id: str):
+    from .run_datalog import xlsx_path
+    path = xlsx_path(run_id)
+    if not path:
+        return {"ok": False, "error": "xlsx 不存在"}
+    return FileResponse(
+        path,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filename=os.path.basename(path),
+    )
 
 
 @router.get("/api/workflow-run/{run_id}")
@@ -1562,7 +1600,7 @@ def bo_run():
 
 @router.post("/api/bo/closed-loop")
 def bo_closed_loop():
-    """读主表，按 p_C2+ 的 UCB 逐轮模拟新配方，停在前 12 名无法再被超越时。"""
+    """扫 Pd-P25 离散网格，列出证明当前最优点还要做的实验。"""
     try:
         from .bo_closed_loop import run_closed_loop
         return run_closed_loop()

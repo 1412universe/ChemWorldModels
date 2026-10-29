@@ -2827,7 +2827,7 @@ document.getElementById('btn-play').addEventListener('click',()=>{
 });
 document.getElementById('btn-step').addEventListener('click',()=>{ stepOnce(); });
 
-// 纯 BO：文献学习主表后，按 p_C2+ 的 UCB 逐轮模拟新配方，停稳后再弹前 12 组
+// 纯 BO：扫离散网格，列出证明当前最优点还要做的实验
 let _boRunning = false;
 let _boAbort = false;
 function _esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -2857,6 +2857,57 @@ async function _boWalk(key, stage, label){
     await new Promise(r=>setTimeout(r, 80));
   }
 }
+function _boNum(v, d){ return v==null?'—':Number(v).toFixed(d); }
+function _boRows(rows){
+  const th = 'padding:7px 8px;white-space:nowrap;font-weight:600;color:#666';
+  const td = 'padding:7px 8px;white-space:nowrap';
+  const head = `<tr style="text-align:left">
+    <th style="${th}">#</th>
+    <th style="${th}">来源</th>
+    <th style="${th}">负载</th>
+    <th style="${th}">甲烷</th>
+    <th style="${th}">氧气</th>
+    <th style="${th}">氩气</th>
+    <th style="${th}">进料氧%</th>
+    <th style="${th}">质量 mg</th>
+    <th style="${th}">光功率</th>
+    <th style="${th}">产率</th>
+    <th style="${th}">选择性</th>
+    <th style="${th}">保持率</th>
+    <th style="${th}">采集分</th>
+    <th style="${th}">上界</th>
+    <th style="${th}">高出当前最优</th>
+    <th style="${th}">C2H4</th>
+    <th style="${th}">C2H6</th>
+    <th style="${th}">CO2</th>
+    <th style="${th}">说明</th>
+  </tr>`;
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:16px">${head}`;
+  rows.forEach(c=>{
+    html += `<tr style="border-top:1px solid #eee">
+      <td style="${td};font-weight:700;color:#2a4d9e">${c.rank}</td>
+      <td style="${td}">${_esc(c.group||'')}</td>
+      <td style="${td}">${_esc(c.loading)}%</td>
+      <td style="${td}">${_boNum(c.ch4,0)}</td>
+      <td style="${td}">${_boNum(c.o2,0)}</td>
+      <td style="${td}">${_boNum(c.ar,0)}</td>
+      <td style="${td}">${c.o2_in==null?'—':Number(c.o2_in).toFixed(1)}</td>
+      <td style="${td}">${c.mass==null?'—':c.mass}</td>
+      <td style="${td}">${c.power==null?'—':c.power+'%'}</td>
+      <td style="${td}">${c.y==null?'—':Math.round(c.y)}</td>
+      <td style="${td}">${c.sel==null?'—':Number(c.sel).toFixed(1)}</td>
+      <td style="${td}">${c.z==null?'—':Number(c.z).toFixed(3)}</td>
+      <td style="${td}">${c.score==null?'—':(Math.abs(c.score)<100?Number(c.score).toFixed(1):Math.round(c.score))}</td>
+      <td style="${td};font-weight:700;color:#c0392b">${c.ucb==null?'—':Math.round(c.ucb)}</td>
+      <td style="${td}">${c.gap==null?'—':Math.round(c.gap)}</td>
+      <td style="${td}">${c.c2h4==null?'—':Number(c.c2h4).toFixed(1)}</td>
+      <td style="${td}">${c.c2h6==null?'—':Number(c.c2h6).toFixed(1)}</td>
+      <td style="${td}">${c.co2==null?'—':Number(c.co2).toFixed(1)}</td>
+      <td style="padding:7px 8px;color:#333;line-height:1.45;min-width:180px">${_esc(c.reason)}</td>
+    </tr>`;
+  });
+  return html + `</table>`;
+}
 async function runPureBO(){
   if(_boRunning) return;
   _boRunning = true;
@@ -2869,74 +2920,39 @@ async function runPureBO(){
   loopState = 'idle';
   if(bp) bp.textContent = '⏸ 暂停';
   try {
-    log('ai','① 文献学习：读取主表，按金属×载体汇总 p_C2+，并对照世界模型法则里的价带、导带、带隙、选择性和氧空位能。');
+    log('ai','① 文献学习：最优负载加最近三档，每档一条实测、一条周围两步的期望改进。');
     const req = fetch('/api/bo/closed-loop', {method:'POST'}).then(r=>r.json());
     await _boWalk('literature', 0, '① 文献学习');
     const j = await req;
     if(_boAbort) return;
     if(!j.ok) throw new Error(j.error || '闭环失败');
-    const trace = j.trace || [];
-    const syn = ['gn_solid','furnace','balance','sonicator','stirrer','tube'].filter(k=>DEV[k]);
-    for(const t of trace){
-      if(_boAbort) return;
-      log('ok', `第 ${t.round} 轮　${t.scheme}　${t.recipe}　预测 p_C2+=${Math.round(t.y)}　UCB=${Math.round(t.ucb)}`);
-      if(t.round>1) await _boWalk('literature', 0, '① 文献学习');
-      if(_boAbort) return;
-      await _boWalk(syn[(t.round-1)%Math.max(syn.length,1)] || 'furnace', 1, '② 虚拟合成');
-      if(_boAbort) return;
-      await _boWalk('lamp', 2, '③ 实验反馈');
-      if(_boAbort) return;
-      await _boWalk('reactor', 2, '③ 实验反馈');
-      if(_boAbort) return;
-      await _boWalk('gc', 2, '③ 实验反馈');
-    }
-    if(_boAbort) return;
-    log('ai', '④ 强化 / 主动学习：' + (j.stop_reason || '搜索结束。'));
-    await _boWalk('ai', 3, '④ 强化 / 主动学习');
-    if(_boAbort) return;
     const top = j.top || [];
+    const proof = j.proof || {};
+    log('ok', `门槛内产率最高 ${proof.ystar==null?'—':Math.round(proof.ystar)}，${proof.load||''}% Pd-P25，甲烷 ${_boNum(proof.ch4,0)}，1%氧气 ${_boNum(proof.o2,0)}，氩气 ${_boNum(proof.ar,0)}，光功率 ${proof.power==null?'—':proof.power+'%'}，选择性 ${proof.selstar==null?'—':Number(proof.selstar).toFixed(1)}%，保持率 ${proof.zstar==null?'—':(proof.zstar*100).toFixed(1)}%。附近过线的有 ${proof.n_open||0} 组。推荐 ${top.length} 组。`);
+    if(_boAbort) return;
+    await _boWalk('gn_solid', 1, '② 虚拟合成');
+    if(_boAbort) return;
+    await _boWalk('reactor', 2, '③ 实验反馈');
+    if(_boAbort) return;
+    await _boWalk('gc', 2, '③ 实验反馈');
+    if(_boAbort) return;
+    log('ai', '④ 网格证明：' + (j.stop_reason || '扫描结束。'));
+    await _boWalk('ai', 3, '④ 网格证明');
+    if(_boAbort) return;
     const bt = document.getElementById('bo-modal-title');
-    if(bt) bt.textContent = `纯 BO · 产率 UCB 最高的前 ${top.length} 组`;
-    let html = `<div style="color:#444;margin-bottom:12px;font-size:13px;line-height:1.55;background:#f7f8fb;border-radius:8px;padding:10px 12px">
-      共模拟 <b>${j.rounds||trace.length}</b> 轮，学了 <b>${j.systems||'—'}</b> 个金属×载体。${_esc(j.stop_reason||'')}
-      预测读取全部主表，含 CH4 &gt; 100。产率 UCB 只排 CH4 ≤ 100 的旧配方和新配方：旧配方用实测产率，新配方用产率上界，都除以主表最高产率。进料 O2 是气源浓度，尾气 O2 是末 3 点均值；新配方这两列是预测均值。
-      <div style="margin-top:8px">保存目录：<code style="background:#f5f5f5;padding:2px 6px;border-radius:3px">${_esc(j.save_dir||'')}</code></div>
-      <div>文件名：<code style="background:#f5f5f5;padding:2px 6px;border-radius:3px">${_esc(j.save_name||'')}</code></div>
+    if(bt) bt.textContent = '纯 BO · 八组推荐';
+    let html = `<div style="color:#444;margin-bottom:14px;font-size:13px;line-height:1.6;background:#f7f8fb;border-radius:8px;padding:12px 14px">
+      <div style="font-weight:700;color:#1a1a1a;margin-bottom:6px">门槛内产率最高　${_esc(proof.load)}% Pd-P25　甲烷 ${_boNum(proof.ch4,0)}　1%氧气 ${_boNum(proof.o2,0)}　氩气 ${_boNum(proof.ar,0)} mL/min　光功率 ${proof.power==null?'—':proof.power+'%'}　产率 ${proof.ystar==null?'—':Math.round(proof.ystar)}　选择性 ${proof.selstar==null?'—':Number(proof.selstar).toFixed(1)}%　保持率 ${proof.zstar==null?'—':(proof.zstar*100).toFixed(1)}%</div>
+      选择性要大于 84，保持率要大于 95%。甲烷不超过 100，进料氧 1%。采集分 = 产率期望改进 × 选择性超过 84 的概率 × 保持率超过 95% 的概率。负载是当前最优和对数负载上最近的三档。每档一条合格实测，没有就把最优条件移过去；另一条只在周围两步里按采集分挑。共 ${top.length} 组。
+      其中产率上界更高、两个概率都不低于一半的有 <b>${proof.n_open||0}</b> 组。
+      <div style="margin-top:8px">保存目录：<code style="background:#fff;padding:2px 6px;border-radius:3px">${_esc(j.save_dir||'')}</code>　文件名：<code style="background:#fff;padding:2px 6px;border-radius:3px">${_esc(j.save_name||'')}</code></div>
     </div>`;
-    html += `<table style="width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed">
-      <tr style="color:#666;text-align:left">
-        <th style="padding:8px 6px;width:32px">#</th>
-        <th style="padding:8px 6px;width:108px">方案</th>
-        <th style="padding:8px 6px;width:148px">配方</th>
-        <th style="padding:8px 6px;width:68px">进料O2/%</th>
-        <th style="padding:8px 6px;width:78px">尾气O2/ppm</th>
-        <th style="padding:8px 6px;width:64px">产率</th>
-        <th style="padding:8px 6px;width:64px">选择性</th>
-        <th style="padding:8px 6px;width:64px">保持率</th>
-        <th style="padding:8px 6px;width:52px">采集分</th>
-        <th style="padding:8px 6px">推荐原因</th>
-      </tr>`;
-    top.forEach((c,i)=>{
-      html += `<tr style="border-top:1px solid #eee;vertical-align:top">
-        <td style="padding:8px 6px;font-weight:700;color:#2a4d9e">${i+1}</td>
-        <td style="padding:8px 6px;word-break:break-word"><b>${_esc(c.metal)}/${_esc(c.support)}</b><br><span style="color:#666">${_esc(c.kind||'')} · 负载 ${_esc(c.loading)} wt%</span></td>
-        <td style="padding:8px 6px;word-break:break-word">${_esc(c.recipe)}</td>
-        <td style="padding:8px 6px">${c.o2_in==null?'—':Number(c.o2_in).toFixed(2)}</td>
-        <td style="padding:8px 6px">${c.o2_out==null?'—':Number(c.o2_out).toFixed(1)}</td>
-        <td style="padding:8px 6px;font-weight:700;color:#c0392b">${Math.round(c.y)}</td>
-        <td style="padding:8px 6px">${c.sel==null?'—':Number(c.sel).toFixed(1)}</td>
-        <td style="padding:8px 6px">${c.z==null?'—':Number(c.z).toFixed(2)}</td>
-        <td style="padding:8px 6px;font-weight:700">${c.score==null?'—':Number(c.score).toFixed(2)}</td>
-        <td style="padding:8px 6px;color:#333;line-height:1.45;word-break:break-word">${_esc(c.reason)}</td>
-      </tr>`;
-    });
-    html += `</table>`;
-    if(!top.length){
-      html += `<div style="margin-top:8px;color:#666">没有可推荐的配方。</div>`;
-    }
+    html += `<div style="font-weight:700;margin:4px 0 8px">八组推荐</div>`;
+    html += `<div style="color:#666;font-size:12.5px;margin-bottom:8px">旧配方是门槛内产率最高的实测。转移是该负载没有合格实测时沿用最优条件。附近是周围两步里采集分最高的一格。采集分一列，旧配方填的是产率。流速单位 mL/min。</div>`;
+    html += top.length ? _boRows(top) : `<div style="color:#666;margin-bottom:12px">没有可比较的新格子。</div>`;
     document.getElementById('bo-modal-body').innerHTML = html;
     document.getElementById('bo-modal').style.display = 'flex';
-    if(top[0]) log('ok', `弹窗已给出前 ${top.length} 组。第 1 名 ${top[0].metal}/${top[0].support}（${top[0].kind||''}），采集分 ${Number(top[0].score).toFixed(2)}，${top[0].how||''}。`);
+    log('ok', `弹窗已给出网格证明表，共 ${top.length} 组待做实验。`);
   } catch(e) {
     log('warn','❌ 纯 BO 失败：'+(e&&e.message||e));
     alert('纯 BO 失败：'+(e&&e.message||e));

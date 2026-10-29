@@ -59,6 +59,17 @@ _BALANCE_STABLE_INTERVAL_S = 0.2
 _BALANCE_POST_TARE_WAIT_S = 15.0
 # 水：ρ≈1 g/mL
 _WATER_UL_PER_GRAM = 1000.0
+# 机械手在离心机：1=反应板（第一个动作），2=离心机前面的天平
+REACTION_PLATE_NUMBER = 1
+BALANCE_PLACE_NUMBER = 2
+COUNTERWEIGHT_STACK_NUMBER = 5
+# 9320：枪头 T15。反应板更重 → T6 吸、T16 放；配平板更重 → T16 吸、T2 放
+BALANCE_TIP_SLOT = 15
+BALANCE_ASPIRATE_SOURCE = 6
+BALANCE_ASPIRATE_TARGET = 16
+BALANCE_DISPENSE_SOURCE = 16
+BALANCE_DISPENSE_TARGET = 2
+BALANCE_VOLUME_CAP_UL = 1250.0
 
 # Centrifuge_CmdType（与 CSV 表头一致）
 CENTRIFUGE_CMD_LABELS = {
@@ -74,6 +85,33 @@ CENTRIFUGE_CMD_LABELS = {
     10: "夹爪夹紧",
     11: "配重天平去皮",
 }
+
+
+def plan_plate_balance(reaction_g: float, counterweight_g: float) -> dict:
+    """反应板重量 − 配平板重量。绝对差值（水，1g≈1000μL）同时作为吸液量和放液量。
+
+    差值为正：吸液，T15 取枪头，T6 吸、T16 放。
+    差值为负：放液，T15 取枪头，T16 吸、T2 放。
+    """
+    delta_g = round(float(reaction_g) - float(counterweight_g), 2)
+    delta_ul = round(delta_g * _WATER_UL_PER_GRAM, 1)
+    volume = round(min(abs(delta_ul), BALANCE_VOLUME_CAP_UL), 1)
+    if delta_g > 0:
+        direction, src, tgt = "吸液", BALANCE_ASPIRATE_SOURCE, BALANCE_ASPIRATE_TARGET
+    elif delta_g < 0:
+        direction, src, tgt = "放液", BALANCE_DISPENSE_SOURCE, BALANCE_DISPENSE_TARGET
+    else:
+        direction, src, tgt, volume = "无需配平", None, None, 0.0
+    return {
+        "delta_g": delta_g,
+        "delta_ul": delta_ul,
+        "volume_ul": volume,
+        "direction": direction,
+        "tip_slot": BALANCE_TIP_SLOT,
+        "source_slot": src,
+        "target_slot": tgt,
+        "capped": abs(delta_ul) > BALANCE_VOLUME_CAP_UL,
+    }
 
 
 class CentrifugeCommand(int, Enum):
@@ -271,6 +309,95 @@ class CentrifugeDevice(GNStationClient):
             "delta_g": delta_g,
             "delta_ul_water": delta_ul,
             "cache_path": BALANCE_DELTA_CACHE_PATH,
+        }
+
+    def _arm(self):
+        """与本离心机共用同一条 OPC 会话的机械手。"""
+        arm = getattr(self, "_balance_arm", None)
+        if arm is not None:
+            return arm
+        import importlib
+        mod = importlib.import_module("unilabos.devices.workstation.GN.robotic_arm")
+        arm = mod.RoboticArmDevice(url=self._plc_url, csv_path=DEFAULT_CSV_PATH)
+        self._balance_arm = arm
+        return arm
+
+    def _weigh_plate_g(self, place, balance_number: int, timeout: float, description: str) -> float:
+        """空盘去皮后把板放到离心机前天平上，读稳定重量，再按原路放回。"""
+        self._tare_and_read_stable_weight_g(timeout=timeout)
+        arm = self._arm()
+        arm.transfer(
+            place["source"], "centrifuge", "plate",
+            int(place["source_number"]), int(balance_number),
+            timeout=timeout,
+        )
+        weight = self._wait_stable_weight_g(timeout=min(60.0, timeout), description=description)
+        arm.transfer(
+            "centrifuge", place["source"], "plate",
+            int(balance_number), int(place["source_number"]),
+            timeout=timeout,
+        )
+        return weight
+
+    @action(
+        auto_prefix=True,
+        description=(
+            "称量反应板与堆栈配平板，按差值决定 9320 吸液或放液。"
+            "机械臂把离心机 1 号反应板放到离心机前天平（工位 2）称重后放回；"
+            "再取堆栈 5 号配平板同样称重后放回。"
+            "反应板更重则吸液：T15 取枪头，T6 吸、T16 放；"
+            "配平板更重则放液：T15 取枪头，T16 吸、T2 放。"
+            "吸液量和放液量相同，写入缓存。"
+            "本节点之后必须先接 PRCXI auto-create_protocol 创建协议，"
+            "协议建好后再接 transfer_liquid，最后 auto-run_protocol。"
+            "transfer_liquid 会读取这次称出的差值做配平。"
+        ),
+    )
+    def balance_plates(
+        self,
+        reaction_number: int = REACTION_PLATE_NUMBER,
+        balance_number: int = BALANCE_PLACE_NUMBER,
+        counterweight_number: int = COUNTERWEIGHT_STACK_NUMBER,
+        timeout: float = 180.0,
+    ) -> dict:
+        reaction = self._weigh_plate_g(
+            {"source": "centrifuge", "source_number": int(reaction_number)},
+            int(balance_number), timeout, "反应板",
+        )
+        counter = self._weigh_plate_g(
+            {"source": "stack", "source_number": int(counterweight_number)},
+            int(balance_number), timeout, "配平板",
+        )
+        plan = plan_plate_balance(reaction, counter)
+        if plan["volume_ul"]:
+            self._write_balance_delta_cache(plan["delta_g"])
+        src = plan["source_slot"]
+        tgt = plan["target_slot"]
+        msg = (
+            "反应板 %.2fg，配平板 %.2fg，%s %sμL"
+            % (reaction, counter, plan["direction"], plan["volume_ul"])
+        )
+        if src and tgt:
+            msg += "（T15 取枪头，T%s→T%s）" % (src, tgt)
+        if plan["capped"]:
+            msg += "；超出单次 1250μL，已按上限写入"
+        if not plan["volume_ul"]:
+            msg += "；两块板重量相同，不移液"
+        else:
+            msg += "。后面先接 auto-create_protocol 创建协议，再建好后接 transfer_liquid，最后 auto-run_protocol"
+        return {
+            "success": True,
+            "message": msg,
+            "reaction_weight_g": reaction,
+            "counterweight_weight_g": counter,
+            "delta_g": plan["delta_g"],
+            "delta_ul": plan["delta_ul"],
+            "volume_ul": plan["volume_ul"],
+            "direction": plan["direction"],
+            "tip_slot": plan["tip_slot"],
+            "source_slot": src,
+            "target_slot": tgt,
+            "cache_path": BALANCE_DELTA_CACHE_PATH if plan["volume_ul"] else "",
         }
 
     @action(auto_prefix=True, description=_EXECUTE_CMD_DOC)

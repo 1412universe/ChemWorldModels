@@ -302,7 +302,8 @@ class DmtpSimServer:
                 return True
             if method == "GetResetStatus":
                 with self._lock:
-                    return self._reset_done
+                    # 真机：true = 正在复位，完成后回到 false。
+                    return not self._reset_done
             if method == "GetStartStatus":
                 with self._lock:
                     return self._running

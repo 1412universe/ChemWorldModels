@@ -1,0 +1,12 @@
+{
+  "target_lab_uuid": "75fb74df-2e98-4fc6-91e6-8992aa39e7ca",
+  "name": "demo",
+  "data": {
+    "workflow_uuid": "cec56e8d-272f-492a-a05a-639cba95e092",
+    "workflow_name": "demo",
+    "nodes": [],
+    "edges": [],
+    "embeds": [],
+    "as_template": true
+  }
+}

@@ -72,7 +72,7 @@ async def _no_cache_static(request, call_next):
     p = request.url.path
     if p.startswith(("/assets/", "/static/", "/index.html", "/lab.html",
                      "/char.html", "/dft.html", "/recipe.html", "/overview_photo.html",
-                     "/workflow_editor.html", "/")):
+                     "/workflow_editor.html", "/datalog.html", "/")):
         resp.headers.update({
             "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
             "Pragma": "no-cache",

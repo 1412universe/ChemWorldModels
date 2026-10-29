@@ -23,6 +23,7 @@ PRCXI **不是** PLC 点位设备：它是一台跑着 NeonGenesis.exe（SC93-4.
     move_plate         搬运孔板        → MvKit 步骤（Position=to/from）
     titration_liquid   滴注液体        → Aspirate+Dispense × repeat_count（周期 pause）
     shaking_incubation 震荡孵育        → TempAndOsc / OscSet + Pause(time) 步骤
+    reset              复位            → 清错 + Stop + IAutomation.Reset，再等 GetResetStatus 退出复位中
 
 安全
 ----
@@ -247,9 +248,11 @@ def build_steps(action: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
             fields["Temperature"] = _coerce_num(temp)
             return [_step("TempAndOsc", "震荡孵育 %.0fmin %.0f℃" % (duration, fields["Temperature"]), **fields)]
         return [_step("OscSet", "震荡 %.0fmin" % duration, **fields)]
+    if action == "reset":
+        return []
     raise ValueError("PRCXI 未知动作 %r（支持：%s）"
                      % (action, "transfer_liquid / create_protocol / run_protocol / "
-                                "move_plate / titration_liquid / shaking_incubation"))
+                                "move_plate / titration_liquid / shaking_incubation / reset"))
 
 
 # ---------------------------------------------------------------------------
@@ -369,6 +372,8 @@ class PrcxiDevice:
             return self._create_protocol(action, params, t0)
         if action in ("run_protocol", "auto-run_protocol"):
             return self._run_protocol(action, params, to, t0)
+        if action == "reset":
+            return self._reset(to, t0)
 
         # 其余动作：建方案 → 装载 → 启动 → 轮询到终态
         steps = build_steps(action, params)
@@ -430,6 +435,48 @@ class PrcxiDevice:
         return {"success": True,
                 "message": "PRCXI 协议运行完成：%s（%.1fs）" % (name, time.time() - t0),
                 "action": action, "solution": name, "step_states": states}
+
+    def _reset(self, to: float, t0: float) -> Dict[str, Any]:
+        """V4.0 复位：GetErrorCode → RemoveErrorCodet → Stop → Reset，再等复位结束。
+
+        协议（RPC 调用文档 4.1）：异常时调用 ``IAutomation.Reset()``，正式超时至少 60 秒。
+        ``GetResetStatus`` 为 true 表示正在复位，回到 false 才算复位完成。
+        """
+        rpc_to = max(float(to or 0), 60.0)
+        error_code = self._call("IAutomation", "GetErrorCode", timeout=PROBE_TIMEOUT)
+        self._call("IAutomation", "RemoveErrorCodet", timeout=PROBE_TIMEOUT)
+        try:
+            self._call("IAutomation", "Stop", timeout=PROBE_TIMEOUT)
+        except Exception:                                       # noqa: BLE001
+            pass
+        started = self._call("IAutomation", "Reset", timeout=rpc_to)
+        if started is False or started == "false":
+            raise RuntimeError("PRCXI Reset 被拒绝")
+        self._wait_reset_done(rpc_to, t0)
+        return {
+            "success": True,
+            "message": "PRCXI 复位完成（%.1fs）" % (time.time() - t0),
+            "action": "reset",
+            "error_code": error_code,
+        }
+
+    def _wait_reset_done(self, to: float, t0: float) -> None:
+        """轮询 GetResetStatus，直到退出「复位中」。"""
+        deadline = t0 + max(float(to), 60.0)
+        start_deadline = min(deadline, time.time() + min(5.0, max(1.0, float(to) * 0.1)))
+        seen_resetting = False
+        while True:
+            if self._is_resetting():
+                seen_resetting = True
+            elif seen_resetting or time.time() >= start_deadline:
+                return
+            if time.time() >= deadline:
+                raise TimeoutError("PRCXI 复位超时未完成（%.0fs）" % to)
+            time.sleep(RUN_POLL_INTERVAL)
+
+    def _is_resetting(self) -> bool:
+        flag = self._call("IAutomation", "GetResetStatus", timeout=PROBE_TIMEOUT)
+        return flag is True or flag == "true" or flag == 1
 
     def _latest_solution(self) -> str:
         sols = self._call("ISolution", "GetSolutionList", timeout=PROBE_TIMEOUT)
@@ -559,6 +606,20 @@ class PrcxiDevice:
         out.update(ok=False, error=last_err or "PRCXI 两种通道均不可用")
         return out
 
+    def ensure_transport(self) -> Dict[str, Any]:
+        """真机首次调用前选定通道。
+
+        510 现场 9320（SC93 V4.0，192.168.6.99:9999）不接受 8 字节长度头 JSON：
+        TCP 能连上，但服务端直接关连接，读长度头得到 0 字节。
+        同一端口的 TouchSocket DMTP（协议 Demo 的 Lilith）可以握手。
+        探测成功后缓存通道，后续调用不再重复试 legacy。
+        """
+        if self.action_mode != "real":
+            return {"ok": True, "channel": self.transport_mode}
+        if self._transport_mode:
+            return {"ok": True, "channel": self._transport_mode, "connected": True}
+        return self.probe()
+
 
 # ---------------------------------------------------------------------------
 # station.py 的 DMTP 分支入口
@@ -601,7 +662,7 @@ def resolve_prcxi_call(node: Dict[str, Any]) -> Dict[str, Any]:
     }
     action = alias.get(action, action)
     if action not in ("transfer_liquid", "create_protocol", "run_protocol",
-                      "move_plate", "titration_liquid", "shaking_incubation"):
+                      "move_plate", "titration_liquid", "shaking_incubation", "reset"):
         raise ValueError("PRCXI 未知动作 %r" % action)
     return {"action": action, "params": params}
 
@@ -633,7 +694,11 @@ def run_prcxi_node(station, node: Dict[str, Any],
 
     try:
         driver = station.open(device_id)
+        link = driver.ensure_transport()
         base["channel"] = driver.transport_mode
+        if not link.get("ok"):
+            return False, dict(base, phase="probe",
+                               error="PRCXI 连接失败：%s" % (link.get("error") or "两种通道都不可用"))
     except Exception as exc:                                    # noqa: BLE001
         return False, dict(base, phase="open", error=str(exc))
 

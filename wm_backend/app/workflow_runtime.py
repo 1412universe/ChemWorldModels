@@ -528,12 +528,15 @@ class WorkflowRun:
 
     def mark_running(self, u: str) -> None:
         self.states[u] = RUNNING
-        self.timing.setdefault(u, {})["start"] = self._elapsed()
+        t = self.timing.setdefault(u, {})
+        t["start"] = self._elapsed()
+        t["start_wall"] = time.time()
 
     def mark_finished(self, u: str, ok: bool, info: Dict[str, Any]) -> None:
         self.states[u] = SUCCESS if ok else FAILED
         t = self.timing.setdefault(u, {})
         t["end"] = self._elapsed()
+        t["end_wall"] = time.time()
         t["dur"] = round(t["end"] - t.get("start", t["end"]), 3)
         self.info[u] = info
         self.held.pop(u, None)
@@ -636,6 +639,12 @@ class WorkflowRun:
                 self._emit("canceled", None, {})
             else:
                 self._emit("finish", None, self.summary())
+            try:
+                from .run_datalog import save_workflow_run
+                save_workflow_run(self)
+            except Exception:
+                import logging
+                logging.getLogger("workflow_runtime").exception("保存运行日志失败")
             self._plane.shutdown(wait=False)
 
     def pause(self) -> bool:

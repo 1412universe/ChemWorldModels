@@ -121,7 +121,8 @@ _CENTRIFUGE_BALANCE_DELTA_CACHE = os.path.normpath(
     )
 )
 _BALANCE_DELTA_MIN_UL = 1.0
-# 天平缓存为整板总质量差；移液按 96 孔均分到单孔，单孔上限 1250μL（1250 枪头）
+# 天平缓存为整板质量差（水，1g≈1000μL）。吸/放写同一个体积：
+# Δ>0 吸液 T6→T16，Δ<0 放液 T16→T2，枪头 T15。
 _BALANCE_WELL_COUNT = 96
 _BALANCE_PER_WELL_MAX_UL = 1250.0
 # 天平差值移液默认：吸/放速率 300、blow_out 20μL、枪头盒 T15
@@ -4131,15 +4132,13 @@ class PRCXI9300Handler(LiquidHandlerAbstract):
     def _plan_balance_delta_transfer(
         delta_ul: float,
     ) -> Tuple[int, int, List[float], List[float]]:
-        """整板 ΔμL / 96 → 单孔体积（上限 1250μL，保留 1 位小数）。
+        """差值的绝对值（μL，上限 1250）同时作为吸液量和放液量。
 
-        吸/放体积均为该单孔量（都不为 0）：
-        Δ>0 吸液：T7→T16；Δ<0 放液：T16→T2。
+        Δ>0 吸液：T6→T16；Δ<0 放液：T16→T2。枪头 T15。
         """
-        per_well = abs(float(delta_ul)) / float(_BALANCE_WELL_COUNT)
-        vol = round(min(per_well, _BALANCE_PER_WELL_MAX_UL), 1)
+        vol = round(min(abs(float(delta_ul)), _BALANCE_PER_WELL_MAX_UL), 1)
         if delta_ul > 0:
-            return 7, 16, [vol], [vol]
+            return 6, 16, [vol], [vol]
         return 16, 2, [vol], [vol]
 
     def _consumable_at_deck_slot(
@@ -4208,23 +4207,7 @@ class PRCXI9300Handler(LiquidHandlerAbstract):
         bool,
     ]:
         delta_ul = self._read_centrifuge_balance_delta_ul()
-        if delta_ul is None:
-            return (
-                list(sources),
-                list(targets),
-                list(tip_racks),
-                asp_vols,
-                dis_vols,
-                asp_flow_rates,
-                dis_flow_rates,
-                blow_out_air_volume,
-                source_slots,
-                target_slots,
-                tip_rack_slots,
-                False,
-            )
-        per_well_ul = abs(float(delta_ul)) / float(_BALANCE_WELL_COUNT)
-        if per_well_ul < _BALANCE_DELTA_MIN_UL:
+        if delta_ul is None or abs(float(delta_ul)) < _BALANCE_DELTA_MIN_UL:
             return (
                 list(sources),
                 list(targets),
@@ -4249,8 +4232,8 @@ class PRCXI9300Handler(LiquidHandlerAbstract):
         direction = "吸液" if delta_ul > 0 else "放液"
         well_vol = float(new_asp[0])
         print(
-            f"[PRCXI] 离心机天平差值移液：{direction} 整板Δ={abs(delta_ul):.1f}μL"
-            f" → 单孔吸/放各 {well_vol:.1f}μL（/96，上限{_BALANCE_PER_WELL_MAX_UL:g}）"
+            f"[PRCXI] 离心机天平差值移液：{direction} Δ={abs(delta_ul):.1f}μL"
+            f" → 吸/放各 {well_vol:.1f}μL（上限{_BALANCE_PER_WELL_MAX_UL:g}）"
             f" T{src_slot}→T{tgt_slot}，枪头 T{tip_slot}，"
             f"速率={flow}，blow_out={blow}μL"
         )

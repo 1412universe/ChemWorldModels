@@ -18,6 +18,89 @@
   "use strict";
 
   var LIB = window.GN_NODE_LIBRARY || { devices: [], scriptNodes: [] };
+  (function () {
+    var devs = LIB.devices || [];
+    for (var i = 0; i < devs.length; i++) {
+      if (devs[i].id !== 'gn_centrifuge') continue;
+      var acts = devs[i].actions || (devs[i].actions = []);
+      var exists = acts.some(function (a) { return a && a.name === 'balance_plates'; });
+      if (exists) break;
+      acts.unshift({
+        name: 'balance_plates',
+        label: '反应板与配平板配平',
+        inRealWorkflow: true,
+        params: {
+          reaction_number: { type: 'int', default: 1, meta: { key: 'reaction_number', label: '反应板工位', unit: '', desc: '机械手在离心机的第 1 个动作，即反应板' } },
+          balance_number: { type: 'int', default: 2, meta: { key: 'balance_number', label: '天平工位', unit: '', desc: '离心机前面的天平，机械手第 2 个动作' } },
+          counterweight_number: { type: 'int', default: 5, meta: { key: 'counterweight_number', label: '配平板堆栈号', unit: '', desc: '堆栈 5 号位' } },
+          timeout: { type: 'float', default: 180, meta: { key: 'timeout', label: '超时', unit: '秒', desc: '单段抓放或称量的超时' } }
+        }
+      });
+      break;
+    }
+  })();
+  (function () {
+    var keep = [
+      'air_suck_volume', 'asp_flow_rates', 'asp_vols',
+      'blow_out_air_volume', 'blow_out_air_volume_before', 'blow_sample_volume',
+      'delays', 'dis_flow_rates', 'dis_vols',
+      'dispensing_air_suck_position', 'dispensing_complete_z_position', 'dispensing_direction',
+      'dispensing_method', 'hover_below_liquid_level', 'is_96_well', 'liquid_height',
+      'mix_if_tip_touch', 'mix_liquid_height', 'mix_rate', 'mix_stage', 'mix_times',
+      'mix_tip_touch_height', 'mix_tip_touch_offset_x', 'mix_vol', 'none_keys', 'offsets',
+      'post_air_volume', 'post_discharge_pause_time_ms', 'sources', 'spread', 'suction_method',
+      'targets', 'tip_racks', 'touch_tip', 'use_channels', 'z_start_point_offset_height'
+    ];
+    function extra(type, label, unit, desc) {
+      return { type: type, omit: true, meta: { label: label, unit: unit || '', desc: desc || '' } };
+    }
+    var add = {
+      air_suck_volume: extra('json', '吸液空气体积', 'µL', '吸液时的空气柱体积'),
+      blow_sample_volume: extra('number', '吹样体积', 'µL', '吹出样品的体积'),
+      dispensing_air_suck_position: extra('string', '排液吸气位置', '', ''),
+      dispensing_complete_z_position: extra('string', '排液完成 Z 位置', '', ''),
+      dispensing_direction: extra('string', '排液方向', '', 'X 或 Y'),
+      mix_if_tip_touch: extra('bool', '混匀时触壁', '', ''),
+      mix_tip_touch_height: extra('int', '混匀触壁高度', '', ''),
+      mix_tip_touch_offset_x: extra('int', '混匀触壁 X 偏移', '', ''),
+      suction_method: extra('string', '吸液方式', '', '')
+    };
+    var devs = LIB.devices || [];
+    for (var i = 0; i < devs.length; i++) {
+      if (devs[i].id !== 'PRCXI') continue;
+      var acts = devs[i].actions || [];
+      for (var j = 0; j < acts.length; j++) {
+        if (!acts[j] || acts[j].name !== 'transfer_liquid') continue;
+        var prev = acts[j].params || {};
+        var next = {};
+        keep.forEach(function (k) { next[k] = prev[k] || add[k]; });
+        acts[j].params = next;
+      }
+    }
+  })();
+  (function () {
+    var devs = LIB.devices || [];
+    for (var i = 0; i < devs.length; i++) {
+      if (devs[i].id !== 'PRCXI') continue;
+      var acts = devs[i].actions || (devs[i].actions = []);
+      if (acts.some(function (a) { return a && a.name === 'reset'; })) break;
+      acts.push({
+        name: 'reset',
+        label: '复位',
+        inRealWorkflow: true,
+        params: {
+          timeout: {
+            type: 'int', min: 60, max: 600, default: 120,
+            meta: {
+              key: 'timeout', label: '超时', unit: '秒',
+              desc: '等待 IAutomation.Reset 完成。协议要求正式调用至少 60 秒。'
+            }
+          }
+        }
+      });
+      break;
+    }
+  })();
   var STATION_MAP = LIB.stationMap || {};
   var PROTO = LIB.protocol || {};
 
@@ -258,6 +341,7 @@
     var p = {};
     Object.keys((action && action.params) || {}).forEach(function (k) {
       var s = action.params[k];
+      if (s && s.omit) return;
       p[k] = (s && s.default !== undefined) ? s.default : '';
     });
     if (action && action.cmdType !== undefined) p.cmd_type = action.cmdType;
@@ -1201,6 +1285,7 @@
       var keep = {};
       if (na.cmdType !== undefined) keep.cmd_type = na.cmdType;
       Object.keys(na.params || {}).forEach(function (k) {
+        if (na.params[k] && na.params[k].omit) return;
         keep[k] = na.params[k].default !== undefined ? na.params[k].default : '';
       });
       if (n.footer && !(na.cmdType !== undefined)) keep.footer = n.footer;
@@ -1911,7 +1996,14 @@
     });
 
     if (!preds.length && !succs.length && n.type !== 'Group') notes.push('⚠ 该节点未连接任何流程线（孤立节点），导出前会被提示。');
-    if (n.device_name === 'PRCXI') notes.push('ℹ 移液工作站节点需被 create_protocol → 动作… → run_protocol 包裹后才能执行。');
+    if (n.device_name === 'PRCXI' && n.name === 'reset') {
+      notes.push('ℹ 复位直接调用 IAutomation.Reset，各轴回到初始位置，不需要创建协议。');
+    } else if (n.device_name === 'PRCXI') {
+      notes.push('ℹ 移液工作站节点需被 create_protocol → 动作… → run_protocol 包裹后才能执行。');
+    }
+    if (n.name === 'balance_plates') {
+      notes.push('ℹ 配平之后先接 9320 的 auto-create_protocol 创建协议，协议建好后再接 transfer_liquid，最后 auto-run_protocol。不能把 transfer_liquid 直接接在配平后面。');
+    }
     if (n.device_name === 'gn_locking_mechanism' && (n.param || {}).cmd_type === 11) {
       notes.push('ℹ 终锁(11)：需先完成四角预锁(15)，且终锁扭矩必须大于预锁扭矩上限；孔顺序 1→3→2→4。');
     }
@@ -2113,12 +2205,39 @@
     }
     // PRCXI 包裹规则
     ['create', 'run'].forEach(function () { });
-    var prc = nodes.filter(function (n) { return n.device_name === 'PRCXI'; });
+    var prc = nodes.filter(function (n) {
+      return n.device_name === 'PRCXI' && n.name !== 'reset';
+    });
     if (prc.length) {
       var hasCreate = prc.some(function (n) { return n.name === 'auto-create_protocol'; });
       var hasRun = prc.some(function (n) { return n.name === 'auto-run_protocol'; });
       if (!hasCreate || !hasRun) errors.push('移液工作站（PRCXI）节点缺少协议包裹：需要 auto-create_protocol 与 auto-run_protocol。');
     }
+    nodes.forEach(function (n) {
+      if (n.name !== 'balance_plates') return;
+      var nexts = edges.filter(function (e) { return e.source_node_uuid === n.uuid; });
+      var nxt = nexts.length === 1 ? findNode(nexts[0].target_node_uuid) : null;
+      if (!nxt || nxt.name !== 'auto-create_protocol') {
+        errors.push('「反应板与配平板配平」后面要先接 auto-create_protocol。协议创建之后才能再接 transfer_liquid，最后接 auto-run_protocol。');
+        return;
+      }
+      var after = edges.filter(function (e) { return e.source_node_uuid === nxt.uuid; }).map(function (e) { return findNode(e.target_node_uuid); }).filter(Boolean);
+      var transfer = null;
+      after.forEach(function (x) {
+        if (x.name === 'transfer_liquid' || x.template_name === 'transfer_liquid') transfer = x;
+      });
+      if (!transfer) {
+        errors.push('auto-create_protocol 之后要接 transfer_liquid，由它按配平差值吸放液，然后再接 auto-run_protocol。');
+        return;
+      }
+      var ran = edges.some(function (e) {
+        return e.source_node_uuid === transfer.uuid && (function () {
+          var t = findNode(e.target_node_uuid);
+          return t && t.name === 'auto-run_protocol';
+        })();
+      });
+      if (!ran) errors.push('transfer_liquid 之后要接 auto-run_protocol，协议才会真正执行。');
+    });
     // 锁紧工艺规则
     var lock = nodes.filter(function (n) { return n.device_name === 'gn_locking_mechanism'; });
     var hasFinal = lock.some(function (n) { return (n.param || {}).cmd_type === 11; });
@@ -2266,11 +2385,12 @@
 
   // ---------- 草稿 ----------
   var draftTimer = null;
+  function writeDraftNow() {
+    try { localStorage.setItem('wfed_draft', JSON.stringify({ name: state.wf.name, wf: collectLinked(), at: Date.now() })); } catch (e) { }
+  }
   function scheduleDraft() {
     if (draftTimer) clearTimeout(draftTimer);
-    draftTimer = setTimeout(function () {
-      try { localStorage.setItem('wfed_draft', JSON.stringify({ name: state.wf.name, wf: collectLinked(), at: Date.now() })); } catch (e) { }
-    }, 700);
+    draftTimer = setTimeout(writeDraftNow, 700);
   }
 
   // ---------- 事件绑定 ----------
@@ -2981,8 +3101,15 @@
   var tplCache = {};          // id -> workflow（未展开的正文）
   var tplList = [];
   var tplSel = '';
+  var tplSwitchGen = 0;
+  var tplListGen = 0;
+  var tplRemoved = {};        // 已删除的 id：挡住晚到的保存把它们又写回去
   var tplPutTimer = {};
   var tplSyncTimer = null;
+  var bootDraftAt = 0;
+  var bootReady = false;
+  var bootNameChecked = false;
+  var bootListArrived = false;
   state.tplRegistered = false;
 
   function wfUuid(wf) {
@@ -2995,6 +3122,13 @@
     delete c._embed;
     return c;
   }
+  function pruneTransferParam(n) {
+    if (!n || (n.name !== 'transfer_liquid' && n.template_name !== 'transfer_liquid') || !n.param) return n;
+    delete n.param.source_slots;
+    delete n.param.target_slots;
+    delete n.param.tip_rack_slots;
+    return n;
+  }
   function collectLinked() {
     var name = (document.getElementById('wf-name').value || '').trim() || '未命名工作流';
     state.wf.name = name;
@@ -3003,7 +3137,9 @@
     var out = cloneData(state.wf);
     out.name = name;
     out.data.workflow_name = name;
-    out.data.nodes = state.wf.data.nodes.filter(function (n) { return !n._embed; }).map(stripRuntime);
+    out.data.nodes = state.wf.data.nodes.filter(function (n) { return !n._embed; }).map(function (n) {
+      return pruneTransferParam(stripRuntime(n));
+    });
     out.data.edges = state.wf.data.edges.filter(function (e) { return !e._embed; }).map(function (e) {
       var c = cloneData(e); delete c._embed; return c;
     });
@@ -3015,35 +3151,217 @@
     if (!box) return;
     var curId = wfUuid(state.wf);
     var curName = (document.getElementById('wf-name').value || '').trim() || state.wf.name || '未命名工作流';
-    var rows = [{ id: curId, name: curName, nodes: state.wf.data.nodes.filter(function (n) { return !n._embed; }).length, live: true }];
+    var ownNodes = state.wf.data.nodes.filter(function (n) { return !n._embed; });
+    var keepLive = curId && !tplRemoved[curId] &&
+      (state.tplRegistered || ownNodes.length > 0 || (state.wf.data.embeds || []).length > 0);
+    var rows = keepLive ? [{ id: curId, name: curName, nodes: ownNodes.length, live: true }] : [];
     tplList.forEach(function (t) {
-      if (!t.id || t.id === curId) return;
+      if (!t.id || t.id === curId || tplRemoved[t.id]) return;
       rows.push(t);
     });
-    if (!tplSel || !rows.some(function (r) { return r.id === tplSel; })) tplSel = curId;
+    tplSel = curId;
     if (!rows.length) {
-      box.innerHTML = '<div class="wf-pick-empty">导入或保存后会出现在这里</div>';
+      box.innerHTML = '<div class="wf-pick-empty">右键这里可以新建</div>';
       return;
     }
     box.innerHTML = rows.map(function (r) {
-      var meta = r.live ? '正在编辑' : ((r.nodes || 0) + ' 个自身节点' + (r.embeds ? ' · 含 ' + r.embeds + ' 个插入' : ''));
-      if (r.live && (state.wf.data.embeds || []).length) meta += ' · 已插入 ' + state.wf.data.embeds.length + ' 份';
-      return '<button type="button" class="wf-pick-item' + (r.id === tplSel ? ' on' : '') + '" data-tid="' + esc(r.id) + '">' +
-        '<span class="wn">' + esc(r.name || '未命名工作流') + '</span>' +
-        '<span class="wm">' + esc(meta) + '</span></button>';
+      var meta = r.live ? '正在编辑' : ((r.nodes || 0) + ' 个节点');
+      var name = r.name || '未命名工作流';
+      var asTpl = r.live ? !!(state.wf.data && state.wf.data.as_template) : !!r.as_template;
+      var badge = asTpl ? '<span class="wt">模版</span>' : '';
+      return '<div class="wf-pick-item' + (r.live ? ' on' : '') + '" data-tid="' + esc(r.id) + '" data-tpl="' + (asTpl ? '1' : '0') + '" role="button" tabindex="0" title="点击切换。右键可新建、重命名、转为模版或删除">' +
+        '<span class="wr"><span class="wn" title="' + esc(name) + '">' + esc(name) + '</span>' + badge + '</span>' +
+        '<span class="wm">' + esc(meta) + '</span></div>';
     }).join('');
     Array.prototype.forEach.call(box.querySelectorAll('.wf-pick-item'), function (b) {
-      b.addEventListener('click', function () {
-        tplSel = b.getAttribute('data-tid') || '';
-        renderTplPick();
+      var open = function () {
+        var tid = b.getAttribute('data-tid') || '';
+        if (!tid || tid === wfUuid(state.wf)) return;
+        editTemplate(tid);
+      };
+      b.addEventListener('click', open);
+      b.addEventListener('keydown', function (ev) {
+        if (ev.target !== b) return;
+        if (ev.key !== 'Enter' && ev.key !== ' ') return;
+        ev.preventDefault();
+        open();
+      });
+      b.addEventListener('contextmenu', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        var nameEl = b.querySelector('.wn');
+        showWfMenu(ev.clientX, ev.clientY, b.getAttribute('data-tid') || '', (nameEl && nameEl.textContent) || '', b.getAttribute('data-tpl') === '1');
       });
     });
   }
+  function hideWfMenu() {
+    var m = document.getElementById('wf-ctx');
+    if (m) m.remove();
+  }
+  function showWfMenu(x, y, tid, name, isTpl) {
+    hideWfMenu();
+    var m = document.createElement('div');
+    m.id = 'wf-ctx';
+    m.className = 'wf-ctx';
+    var html = '<button type="button" data-act="new">新建</button>';
+    if (tid) {
+      html += '<button type="button" data-act="edit" class="sep">重命名</button>' +
+        '<button type="button" data-act="tpl"' + (isTpl ? ' disabled' : '') + '>' + (isTpl ? '已是模版' : '转为模版') + '</button>' +
+        '<button type="button" data-act="del" class="danger">删除</button>';
+    }
+    m.innerHTML = html;
+    document.body.appendChild(m);
+    var left = Math.max(8, Math.min(x, window.innerWidth - m.offsetWidth - 8));
+    var top = Math.max(8, Math.min(y, window.innerHeight - m.offsetHeight - 8));
+    m.style.left = left + 'px';
+    m.style.top = top + 'px';
+    m.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      var actEl = ev.target && ev.target.closest ? ev.target.closest('button') : null;
+      var act = actEl && actEl.getAttribute('data-act');
+      if (!act || actEl.disabled) return;
+      hideWfMenu();
+      if (act === 'new') newTemplate();
+      else if (act === 'edit') renameWorkflow(tid, name);
+      else if (act === 'tpl') convertToTemplate(tid);
+      else if (act === 'del') deleteTemplate(tid, name);
+    });
+  }
+  function applyWorkflowName(wf, raw) {
+    var name = (raw || '').trim() || '未命名工作流';
+    wf.name = name;
+    if (!wf.data) wf.data = {};
+    wf.data.workflow_name = name;
+    return name;
+  }
+  function renameWorkflow(tid, currentName) {
+    if (!tid) return;
+    askPrompt('重命名工作流', currentName || '', function (raw) {
+      var name = (raw || '').trim() || '未命名工作流';
+      if (tid === wfUuid(state.wf)) {
+        var input = document.getElementById('wf-name');
+        if (input) input.value = name;
+        applyWorkflowName(state.wf, name);
+        state.tplRegistered = true;
+        tplList.forEach(function (t) { if (t.id === tid) t.name = name; });
+        renderTplPick();
+        writeDraftNow();
+        putTemplate(collectLinked()).then(function () {
+          renderTplPick();
+          note('ok', '已重命名', name, 2400);
+        });
+        return;
+      }
+      ensureTemplates([tid]).then(function () {
+        if (!tplCache[tid]) { note('err', '读不到这份工作流', tid); return; }
+        var wf = cloneData(tplCache[tid]);
+        applyWorkflowName(wf, name);
+        putTemplate(wf).then(function () {
+          note('ok', '已重命名', name, 2400);
+        });
+      });
+    });
+  }
+  function convertToTemplate(tid) {
+    if (!tid) return;
+    var mark = function (wf) {
+      if (!wf.data) wf.data = {};
+      wf.data.as_template = true;
+      if (tid === wfUuid(state.wf)) state.wf.data.as_template = true;
+      return putTemplate(wf).then(function () {
+        var label = wf.name || (wf.data && wf.data.workflow_name) || '这份工作流';
+        note('ok', '已转为模版', '「' + label + '」可以在上方「插入模版」里选用。', 3600);
+      });
+    };
+    if (tid === wfUuid(state.wf)) {
+      mark(collectLinked());
+      writeDraftNow();
+      return;
+    }
+    ensureTemplates([tid]).then(function () {
+      if (!tplCache[tid]) { note('err', '读不到这份工作流', tid); return; }
+      mark(cloneData(tplCache[tid]));
+    });
+  }
+  function placeInsertMenu() {
+    var btn = document.getElementById('btn-insert-tpl');
+    var menu = document.getElementById('insert-menu');
+    if (!btn || !menu) return;
+    if (menu.parentNode !== document.body) document.body.appendChild(menu);
+    var r = btn.getBoundingClientRect();
+    var width = menu.offsetWidth || 340;
+    menu.style.position = 'fixed';
+    menu.style.zIndex = '200';
+    menu.style.right = 'auto';
+    menu.style.top = Math.round(r.bottom + 6) + 'px';
+    menu.style.left = Math.max(8, Math.round(Math.min(r.right - width, window.innerWidth - width - 8))) + 'px';
+  }
+  function renderInsertMenu() {
+    var box = document.getElementById('insert-list');
+    if (!box) return;
+    if (!box._insBound) {
+      box._insBound = true;
+      box.addEventListener('pointerdown', function (ev) {
+        var it = ev.target.closest ? ev.target.closest('.om-item[data-tid]') : null;
+        if (!it) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (it.getAttribute('data-self') === '1') {
+          note('warn', '不能插入自己', '先在左侧点开另一份工作流，再插入这份模版。');
+          return;
+        }
+        var menu = document.getElementById('insert-menu');
+        if (menu) menu.classList.add('hidden');
+        insertTemplate(it.getAttribute('data-tid') || '');
+      });
+    }
+    var cur = wfUuid(state.wf);
+    var items = tplList.filter(function (t) { return t && t.id && t.as_template; });
+    if (!items.length) {
+      box.innerHTML = '<div class="om-item" style="cursor:default;color:#94a3b8">还没有模版。在左侧工作流上右键，选「转为模版」。</div>';
+      return;
+    }
+    box.innerHTML = items.map(function (t) {
+      var self = t.id === cur;
+      return '<div class="om-item' + (self ? ' is-self' : '') + '" data-tid="' + esc(t.id) + '"' + (self ? ' data-self="1"' : '') + '><span>' + esc(t.name || '未命名工作流') + '</span><span class="om-meta">' + (self ? '正在编辑' : ((t.nodes || 0) + ' 个节点')) + '</span></div>';
+    }).join('');
+  }
+  function reconcileSavedWorkflow() {
+    if (!bootReady || bootNameChecked || !bootListArrived) return;
+    var id = wfUuid(state.wf);
+    if (!id) { bootNameChecked = true; return; }
+    var hit = null;
+    tplList.forEach(function (t) { if (t.id === id) hit = t; });
+    if (!hit) { bootNameChecked = true; return; }
+    bootNameChecked = true;
+    var input = document.getElementById('wf-name');
+    var shown = ((input && input.value) || '').trim();
+    var serverName = (hit.name || '').trim();
+    if (!serverName || serverName === shown) return;
+    var serverMs = (hit.mtime || 0) * 1000;
+    if (bootDraftAt && serverMs + 1500 < bootDraftAt) return;
+    ensureTemplates([id]).then(function () {
+      if (state.dirty || wfUuid(state.wf) !== id) return;
+      if (!tplCache[id]) {
+        if (input) input.value = serverName;
+        applyWorkflowName(state.wf, serverName);
+        writeDraftNow();
+        renderTplPick();
+        return;
+      }
+      openWorkflow(cloneData(tplCache[id]));
+      writeDraftNow();
+    });
+  }
   function fetchTplList() {
+    var gen = ++tplListGen;
     return fetch('/api/workflow-templates').then(function (r) { return r.json(); }).then(function (res) {
-      tplList = (res && res.templates) || [];
+      if (gen !== tplListGen) return;
+      bootListArrived = true;
+      tplList = ((res && res.templates) || []).filter(function (t) { return t && t.id && !tplRemoved[t.id]; });
       renderTplPick();
-    }).catch(function () { renderTplPick(); });
+      reconcileSavedWorkflow();
+    }).catch(function () { if (gen === tplListGen) renderTplPick(); });
   }
   function cacheTemplate(wf) {
     var id = wfUuid(wf);
@@ -3093,16 +3411,21 @@
   }
   function putTemplate(wf) {
     var id = wfUuid(wf);
-    if (!id) return Promise.resolve();
+    if (!id || tplRemoved[id]) return Promise.resolve();
     cacheTemplate(wf);
     state.tplRegistered = state.tplRegistered || id === wfUuid(state.wf);
     return fetch('/api/workflow-templates/' + encodeURIComponent(id), {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ workflow: tplCache[id] })
-    }).then(function () { return fetchTplList(); }).catch(function () { });
+    }).then(function () {
+      if (tplRemoved[id]) {
+        return fetch('/api/workflow-templates/' + encodeURIComponent(id), { method: 'DELETE' });
+      }
+      return fetchTplList();
+    }).catch(function () { });
   }
   function scheduleTplPut(tid) {
-    if (!tid || !tplCache[tid]) return;
+    if (!tid || !tplCache[tid] || tplRemoved[tid]) return;
     if (tplPutTimer[tid]) clearTimeout(tplPutTimer[tid]);
     tplPutTimer[tid] = setTimeout(function () {
       putTemplate(tplCache[tid]).then(function () { pullTemplate(tid); });
@@ -3263,8 +3586,9 @@
       var cur = wfUuid(state.wf);
       if (cur && (state.tplRegistered || tplCache[cur])) {
         var linked = collectLinked();
-        var prev = tplCache[cur] ? JSON.stringify(tplCache[cur].data) : '';
-        if (prev !== JSON.stringify(linked.data)) {
+        var prevData = tplCache[cur] ? JSON.stringify(tplCache[cur].data) : '';
+        var prevName = tplCache[cur] ? (tplCache[cur].name || '') : '';
+        if (prevData !== JSON.stringify(linked.data) || prevName !== (linked.name || '')) {
           cacheTemplate(linked);
           scheduleTplPut(cur);
         }
@@ -3306,7 +3630,7 @@
   }
   function insertTemplate(tid) {
     var cur = wfUuid(state.wf);
-    if (!tid) { note('warn', '先选一份工作流', '在左侧「工作流」列表里点一项。'); return; }
+    if (!tid) { note('warn', '先选一份模版', '点上方「插入模版」，再选一份。'); return; }
     if (tid === cur) {
       note('warn', '不能插入自己', '正在编辑的这份不能再插进自己。先打开另一份工作流，再插入它。');
       return;
@@ -3326,33 +3650,49 @@
         });
         if (!state.wf.data.embeds) state.wf.data.embeds = [];
         var em = { id: uid(), template_id: tid, dx: maxX, dy: 60 };
+        var before = {};
+        state.wf.data.nodes.forEach(function (n) { before[n.uuid] = 1; });
         state.wf.data.embeds.push(em);
         expandEmbed(em);
+        var fresh = state.wf.data.nodes.filter(function (n) { return !before[n.uuid]; });
+        state.selectedIds = {};
+        state.selected = fresh[0] ? { type: 'node', id: fresh[0].uuid } : null;
+        fresh.forEach(function (n) { state.selectedIds[n.uuid] = 1; });
         renderNodes(); showProps(); updateStats(); afterChange();
         emptyHint.style.display = state.wf.data.nodes.length ? 'none' : '';
+        state.tplRegistered = true;
+        writeDraftNow();
+        putTemplate(collectLinked());
+        if (fresh.length) setTimeout(fitView, 40);
         var tpl = tplCache[tid];
-        note('ok', '已插入模版', (tpl.name || tid) + '。以后修改这份模版，所有插过它的工作流都会一起变。', 4200);
+        if (!fresh.length) {
+          note('warn', '这份模版是空的', (tpl && tpl.name || '模版') + ' 里还没有节点，插进来看不到内容。先打开它，放上节点后再插入。', 4600);
+        } else {
+          note('ok', '已插入模版', (tpl && tpl.name || tid) + '，画布上多了 ' + fresh.length + ' 个节点。以后改这份模版，这里会一起变。', 4200);
+        }
       });
     });
   }
   function editTemplate(tid) {
     var cur = wfUuid(state.wf);
-    if (!tid) { note('warn', '先选一份工作流', ''); return; }
-    if (tid === cur) { note('info', '正在编辑这份', '直接在画布上改即可。保存后，插过它的工作流会一起变。', 3600); return; }
-    var go = function () {
-      var linked = collectLinked();
-      putTemplate(linked).then(function () {
-        return ensureTemplates([tid]);
-      }).then(function () {
-        if (!tplCache[tid]) { note('err', '读不到这份模版', tid); return; }
-        state.tplRegistered = true;
-        openWorkflow(cloneData(tplCache[tid]));
-        note('info', '正在修改模版', '这里的改动会写回模版，所有插入过它的工作流都会同步。', 4200);
-      });
-    };
-    if (state.dirty) {
-      askConfirm('打开模版进行修改', '当前画布的改动会先记成模版，再打开选中的那份。', go, '继续修改');
-    } else go();
+    if (!tid || tid === cur) return;
+    var gen = ++tplSwitchGen;
+    var curHas = (state.wf.data.nodes || []).some(function (n) { return !n._embed; }) ||
+      (state.wf.data.embeds || []).length;
+    var saveFirst = (!tplRemoved[cur] && (state.tplRegistered || curHas))
+      ? putTemplate(collectLinked()) : Promise.resolve();
+    saveFirst.then(function () {
+      if (gen !== tplSwitchGen) return;
+      return ensureTemplates([tid]);
+    }).then(function () {
+      if (gen !== tplSwitchGen) return;
+      if (!tplCache[tid]) { note('err', '读不到这份模版', tid); return; }
+      state.tplRegistered = true;
+      openWorkflow(cloneData(tplCache[tid]));
+    }).catch(function () {
+      if (gen !== tplSwitchGen) return;
+      note('err', '切换失败', '网络或后端没有响应。');
+    });
   }
   function dropEmbedsOf(tid) {
     var ems = (state.wf.data.embeds || []).filter(function (e) { return e.template_id === tid; });
@@ -3379,63 +3719,117 @@
       }, '继续新建');
     } else go();
   }
-  function deleteTemplate(tid) {
-    if (!tid) { note('warn', '先选一份工作流', '在左侧列表里点一项。'); return; }
+  function deleteTemplate(tid, name) {
+    if (!tid) { note('warn', '先选一份工作流', '在左侧列表里右键一项。'); return; }
     var cur = wfUuid(state.wf);
-    var nameEl = document.querySelector('#wf-pick-list .wf-pick-item.on .wn');
-    var name = (nameEl && nameEl.textContent) || '这份工作流';
+    if (!name) {
+      var nameEl = document.querySelector('#wf-pick-list .wf-pick-item.on .wn');
+      name = (nameEl && nameEl.textContent) || '这份工作流';
+    }
     var body = tid === cur
       ? '正在编辑的这份会从列表里去掉，画布换成空白。其它工作流里插入的这块也会去掉。'
       : '「' + name + '」会从列表里去掉。其它工作流里插入的这块也会去掉。';
     askConfirm('删除工作流', body, function () {
       if (tplSyncTimer) { clearTimeout(tplSyncTimer); tplSyncTimer = null; }
       if (tplPutTimer[tid]) { clearTimeout(tplPutTimer[tid]); delete tplPutTimer[tid]; }
+      tplRemoved[tid] = 1;
+      delete tplCache[tid];
+      tplList = tplList.filter(function (t) { return t.id !== tid; });
+      if (tid === cur) {
+        state.wf = freshWorkflow();
+        state.tplRegistered = false;
+        state.dirty = false;
+        document.getElementById('wf-name').value = state.wf.name;
+        state.selected = null; state.selectedIds = {};
+        state.undo = []; state.redo = [];
+        tplSel = '';
+        renderNodes(); showProps(); updateStats();
+        emptyHint.style.display = '';
+        try {
+          var draft = JSON.parse(localStorage.getItem('wfed_draft') || 'null');
+          if (draft && draft.wf && wfUuid(draft.wf) === tid) localStorage.removeItem('wfed_draft');
+        } catch (e) { /* 草稿损坏就不管 */ }
+      } else {
+        dropEmbedsOf(tid);
+        if (tplSel === tid) tplSel = cur;
+        renderNodes(); showProps(); updateStats();
+        if ((state.tplRegistered || tplCache[cur]) && !tplRemoved[cur]) putTemplate(collectLinked());
+        else scheduleDraft();
+      }
+      renderTplPick();
       fetch('/api/workflow-templates/' + encodeURIComponent(tid), { method: 'DELETE' })
         .then(function (r) { return r.json(); })
         .then(function (res) {
-          if (!res || res.ok === false) { note('err', '删除失败', (res && res.error) || ''); return; }
-          delete tplCache[tid];
-          if (tid === cur) {
-            state.wf = freshWorkflow();
-            state.tplRegistered = false;
-            state.dirty = false;
-            document.getElementById('wf-name').value = state.wf.name;
-            state.selected = null; state.selectedIds = {};
-            state.undo = []; state.redo = [];
-            tplSel = wfUuid(state.wf);
-            renderNodes(); showProps(); updateStats();
-            emptyHint.style.display = '';
-            scheduleDraft();
-          } else {
-            dropEmbedsOf(tid);
-            if (tplSel === tid) tplSel = cur;
-            renderNodes(); showProps(); updateStats();
-            if (state.tplRegistered || tplCache[cur]) putTemplate(collectLinked());
-            else scheduleDraft();
+          if (!res || res.ok === false) {
+            delete tplRemoved[tid];
+            note('err', '删除失败', (res && res.error) || '');
+            fetchTplList();
+            return;
           }
           fetchTplList();
           note('ok', '已删除', name, 3200);
         })
-        .catch(function () { note('err', '删除失败', '网络或后端没有响应。'); });
+        .catch(function () {
+          delete tplRemoved[tid];
+          note('err', '删除失败', '网络或后端没有响应。');
+          fetchTplList();
+        });
     }, '删除');
   }
   function bindTplPick() {
-    var ins = document.getElementById('wf-pick-insert');
-    var ed = document.getElementById('wf-pick-edit');
-    var nw = document.getElementById('wf-pick-new');
-    var del = document.getElementById('wf-pick-del');
-    if (ins) ins.addEventListener('click', function () { insertTemplate(tplSel); });
-    if (ed) ed.addEventListener('click', function () { editTemplate(tplSel); });
-    if (nw) nw.addEventListener('click', function () { newTemplate(); });
-    if (del) del.addEventListener('click', function () { deleteTemplate(tplSel); });
+    var pick = document.getElementById('wf-pick');
+    if (pick) {
+      pick.addEventListener('contextmenu', function (ev) {
+        if (ev.target.closest && ev.target.closest('.wf-pick-item')) return;
+        ev.preventDefault();
+        showWfMenu(ev.clientX, ev.clientY, '', '', false);
+      });
+    }
+    var btn = document.getElementById('btn-insert-tpl');
+    var menu = document.getElementById('insert-menu');
+    if (btn && menu) {
+      btn.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        hideWfMenu();
+        var open = document.getElementById('open-menu');
+        var imp = document.getElementById('import-menu');
+        if (open) open.classList.add('hidden');
+        if (imp) imp.classList.add('hidden');
+        var willOpen = menu.classList.contains('hidden');
+        menu.classList.toggle('hidden');
+        if (willOpen) {
+          renderInsertMenu();
+          placeInsertMenu();
+        }
+      });
+      menu.addEventListener('pointerdown', function (ev) { ev.stopPropagation(); });
+      menu.addEventListener('click', function (ev) { ev.stopPropagation(); });
+    }
+    document.addEventListener('click', hideWfMenu);
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') hideWfMenu();
+    });
     var name = document.getElementById('wf-name');
-    if (name) name.addEventListener('input', function () { renderTplPick(); });
+    var nameSaveTimer = null;
+    if (name) name.addEventListener('input', function () {
+      applyWorkflowName(state.wf, name.value);
+      state.dirty = true;
+      renderTplPick();
+      writeDraftNow();
+      if (nameSaveTimer) clearTimeout(nameSaveTimer);
+      nameSaveTimer = setTimeout(function () {
+        if (tplRemoved[wfUuid(state.wf)]) return;
+        state.tplRegistered = true;
+        putTemplate(collectLinked());
+      }, 400);
+    });
     fetchTplList();
   }
 
   function openWorkflow(wf) {
     if (!wf || !wf.data || !Array.isArray(wf.data.nodes)) { note('err', '文件格式不对', '未找到 data.nodes 数组。请选择由本编辑器导出的 Uni-Lab 工作流 JSON。'); return; }
     clearNotes();
+    state.dirty = false;
     state.wf = wf;
     if (!wf.data.workflow_uuid) wf.data.workflow_uuid = uid();
     wf.data.edges = wf.data.edges || [];
@@ -3469,7 +3863,7 @@
     var out = cloneData(state.wf);
     out.name = name;
     out.data.workflow_name = name;
-    out.data.nodes = state.wf.data.nodes.map(stripRuntime);
+    out.data.nodes = state.wf.data.nodes.map(function (n) { return pruneTransferParam(stripRuntime(n)); });
     out.data.edges = state.wf.data.edges.map(function (e) { var c = cloneData(e); delete c._embed; return c; });
     delete out.data.embeds;
     return out;
@@ -3494,21 +3888,20 @@
     note('ok', '已导出', a.download + '（' + wf.data.nodes.length + ' 节点 / ' + wf.data.edges.length + ' 连线）');
   }
   function bindOpenSave() {
-    document.getElementById('btn-new').addEventListener('click', function () {
-      if (state.wf.data.nodes.length) {
-        askConfirm('新建工作流', '当前画布有 ' + state.wf.data.nodes.length + ' 个节点，新建会清空它们（可用 Ctrl+Z 撤销）。', doNew, '清空并新建');
-        return;
-      }
-      doNew();
-    });
     var om = document.getElementById('open-menu');
     document.getElementById('btn-open').addEventListener('click', function (ev) {
       document.getElementById('import-menu').classList.add('hidden');
+      var ins = document.getElementById('insert-menu');
+      if (ins) ins.classList.add('hidden');
       om.classList.toggle('hidden'); ev.stopPropagation(); loadList();
     });
-    document.addEventListener('click', function () {
+    document.addEventListener('click', function (ev) {
+      var t = ev.target;
+      if (t && t.closest && t.closest('#insert-menu, #btn-insert-tpl, #open-menu, #btn-open, #import-menu, #btn-import')) return;
       om.classList.add('hidden');
       document.getElementById('import-menu').classList.add('hidden');
+      var ins = document.getElementById('insert-menu');
+      if (ins) ins.classList.add('hidden');
     });
     om.addEventListener('click', function (ev) { ev.stopPropagation(); });
     // 注意：文件导入的 change 绑定已挪到 bindImport()（同一个 #wf-file，
@@ -3954,6 +4347,8 @@
   }
   function openImportMenu() {
     document.getElementById('open-menu').classList.add('hidden');
+    var ins = document.getElementById('insert-menu');
+    if (ins) ins.classList.add('hidden');
     document.getElementById('import-menu').classList.remove('hidden');
   }
 
@@ -3992,6 +4387,8 @@
       ev.stopPropagation();
       var willOpen = menu.classList.contains('hidden');
       document.getElementById('open-menu').classList.add('hidden');
+      var ins = document.getElementById('insert-menu');
+      if (ins) ins.classList.add('hidden');
       menu.classList.toggle('hidden');
       if (willOpen) {
         // 每次打开都从干净状态开始，避免上一份预览误导人
@@ -4099,10 +4496,16 @@
     document.body.classList.toggle('narrow', window.innerWidth < 980);
     try {
       var draft = JSON.parse(localStorage.getItem('wfed_draft') || 'null');
-      if (draft && draft.wf && draft.wf.data &&
-          ((draft.wf.data.nodes && draft.wf.data.nodes.length) ||
-           (draft.wf.data.embeds && draft.wf.data.embeds.length))) openWorkflow(draft.wf);
+      var data = draft && draft.wf && draft.wf.data;
+      var hasBody = data && ((data.nodes && data.nodes.length) || (data.embeds && data.embeds.length));
+      var named = draft && draft.wf && draft.wf.name && draft.wf.name !== '未命名工作流';
+      if (data && (hasBody || named)) {
+        bootDraftAt = draft.at || 0;
+        openWorkflow(draft.wf);
+      }
     } catch (e) { /* 忽略损坏草稿 */ }
+    bootReady = true;
+    reconcileSavedWorkflow();
     updateStats();
     applyView();
     refitShare();
