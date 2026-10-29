@@ -13,7 +13,7 @@
     GN_ALLOW_REAL       总闸（1/0）。未打开时任何 real 下发都被拒绝，
                         保证「默认不会动硬件」。
     GN_NODE_CSV         覆盖驱动加载的节点表 CSV（默认为本适配器内由 1.4.0
-                        「点位表」生成的 node_tables/opcua_gn1.4.0.csv）。
+                        「点位表」生成的 node_tables/opcua_gn1.4.1.csv）。
     GN_DEFAULT_TIMEOUT  单节点默认超时（秒），默认 180。
     GN_MAX_TIMEOUT      单节点超时上限（秒），默认 3600。
 
@@ -115,7 +115,7 @@ def preferred_node_csv() -> str:
         于是这两行被整行跳过 —— CSV 235 行、驱动只注册 233 个。
     """
     return os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        "node_tables", "opcua_gn1.4.0.csv")
+                        "node_tables", "opcua_gn1.4.1.csv")
 
 
 def node_csv_path(root: Optional[str] = None) -> Optional[str]:
@@ -123,7 +123,7 @@ def node_csv_path(root: Optional[str] = None) -> Optional[str]:
 
     优先级：
       1. `GN_NODE_CSV` 环境变量（现场临时换表用）
-      2. 本适配器内由 1.4.0 生成的 `node_tables/opcua_gn1.4.0.csv`
+      2. 本适配器内由 1.4.0 生成的 `node_tables/opcua_gn1.4.1.csv`
       3. 兜底：仓库里的 `opcua_gn1.3.9.csv`
 
     为什么必须显式给定而不能用驱动默认值：`robotic_arm.py` / `rotary_stack.py`
@@ -135,7 +135,7 @@ def node_csv_path(root: Optional[str] = None) -> Optional[str]:
         return os.path.abspath(env)
     live = repo_gn_dir()
     if live:
-        gn_csv = os.path.join(live, "opcua_gn1.4.0.csv")
+        gn_csv = os.path.join(live, "opcua_gn1.4.1.csv")
         if os.path.isfile(gn_csv):
             return os.path.abspath(gn_csv)
     p = preferred_node_csv()
@@ -199,9 +199,9 @@ def summary() -> dict:
         "gn_dir": gn_dir(root),
         "node_csv": csv_path,
         "node_csv_source": ("env:GN_NODE_CSV" if _env("GN_NODE_CSV")
-                            else "wm_action/opcua_gn1.4.0.csv" if csv_path and repo_gn_dir()
+                            else "wm_action/opcua_gn1.4.1.csv" if csv_path and repo_gn_dir()
                             and os.path.abspath(csv_path) == os.path.abspath(
-                                os.path.join(repo_gn_dir() or "", "opcua_gn1.4.0.csv"))
+                                os.path.join(repo_gn_dir() or "", "opcua_gn1.4.1.csv"))
                             else "1.4.0（本适配器生成）" if csv_path == pref
                             else "1.3.9（仓库兜底）" if csv_path else "无"),
         "node_csv_points": man.get("points_total"),

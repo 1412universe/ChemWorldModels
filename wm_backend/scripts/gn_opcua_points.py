@@ -2,7 +2,7 @@
 """OPC UA 1.4.0「点位表」逐模块点位清单 —— 由 scripts/gen_gn_opcua_points.py 生成，勿手改。
 
 源文件：OPC_UA协议1.4.0(2).xlsx
-点位合计：240 个 / 模块：13 组
+点位合计：235 个 / 模块：13 组（1.4.1 锁紧模块去掉 5 个扭矩/结果点）
 
 每个点位 = dict(name 中文点位名, node 命名空间内相对名, dtype 数据类型, rw 读写, desc 说明)
 """
@@ -35,11 +35,6 @@ _RAW = [
         ('夹爪位置', 'Lock_JawPosition', 'Double', 'W', ''),
         ('夹爪力度', 'Lock_JawForce', 'Double', 'W', ''),
         ('预锁圈数', 'Lock_PreTurnsSet', 'Int16', 'W', '单位0.1圈。20=2.0圈。四颗螺丝共用，预锁Type=15必写'),
-        ('预锁扭矩上限', 'Lock_PreTorqueLimit', 'Int16', 'W', '单位0.001N.m。300=0.300N.m。圈数未满但已顶死时停，防止预锁变成锁死。Type=15必写'),
-        ('终锁目标扭矩', 'Lock_FinalTorqueSet', 'Int16', 'W', '单位0.001N.m。600=0.600N.m。对应电批E12C。Type=11必写，且必须大于预锁扭矩上限'),
-        ('电批结果', 'Lock_ScrewResult', 'Int16', 'R', '0无 1OK 2滑牙 3浮锁 4超时 5故障 6预锁到扭矩上限(算成功)'),
-        ('完成扭矩反馈', 'Lock_TorqueFB', 'Int16', 'R', '单位0.001N.m。来自电批20C9'),
-        ('完成角度反馈', 'Lock_AngleFB', 'Int16', 'R', '单位0.1度。来自电批20CA，最大约3276.7度'),
     ]),
     ('快换', [
         ('X位置反馈', 'QuickChange_XPosFB', 'Int16', 'R', ''),

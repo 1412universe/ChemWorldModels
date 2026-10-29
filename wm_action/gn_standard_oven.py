@@ -1,7 +1,7 @@
 """
 常规烘箱 设备驱动
 
-协议：opcua_gn1.4.0.csv「常规烘箱」(前缀 Oven_)。
+协议：opcua_gn1.4.1.csv「常规烘箱」(前缀 Oven_)。
 对外仅暴露 execute_command（Oven_CmdType + 写参 + 开关门）。
 
 指令类型 (Oven_CmdType)：
@@ -41,7 +41,7 @@ from unilabos.devices.workstation.GN.gn_station_base import GNStationClient
 from unilabos.devices.workstation.GN.base_opcua_client import OpcUaNode
 from unilabos.device_comms.opcua_client.node.uniopcua import NodeType, DataType
 
-DEFAULT_CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "opcua_gn1.4.0.csv")
+DEFAULT_CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "opcua_gn1.4.1.csv")
 
 # CSV 中 DataType=bool 无法被通用加载器识别，在此手动注册开关门节点
 _DOOR_OPC_NODES = (

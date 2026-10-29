@@ -385,6 +385,7 @@ class WorkflowRun:
         self.workflow_name = self.workflow.get("name") or data.get("workflow_name") or "未命名工作流"
         self.workflow_uuid = data.get("workflow_uuid") or ""
         self.nodes: Dict[str, Dict[str, Any]] = {}
+        self.log_nodes: List[Dict[str, Any]] = []
         self.order: List[str] = []
         self.states: Dict[str, str] = {}
         self.pending_parents: Dict[str, Set[str]] = {}
@@ -423,14 +424,23 @@ class WorkflowRun:
     # ---- 构图（对齐 dag_state._build / _detect_cycle） ----
     def _build(self) -> None:
         data = self.workflow.get("data") or {}
+        disabled: Set[str] = set()
+        live: Set[str] = set()
         for n in (data.get("nodes") or []):
             u = n.get("uuid")
             if not u:
                 continue
+            if n.get("type") != "Group" and n.get("name") != "group":
+                self.log_nodes.append(n)
             if n.get("disabled"):
+                disabled.add(u)
                 self.states[u] = SKIPPED
-                self.info[u] = {"reason": "节点已禁用"}
+                self.info[u] = {
+                    "reason": "节点已禁用",
+                    "error_log": "已禁用，沿连线跳到下一节点",
+                }
                 continue
+            live.add(u)
             self.nodes[u] = n
             self.states[u] = PENDING
             self.order.append(u)
@@ -438,12 +448,38 @@ class WorkflowRun:
             self.children[u] = []
             self.lock_keys[u] = node_lock_keys(n)
 
+        preds: Dict[str, List[str]] = {}
+        succs: Dict[str, List[str]] = {}
+        known = live | disabled
         for e in (data.get("edges") or []):
             s = e.get("source_node_uuid")
             t = e.get("target_node_uuid")
-            if s in self.nodes and t in self.nodes:
-                self.pending_parents[t].add(s)
-                self.children[s].append(t)
+            if s in known and t in known and s != t:
+                succs.setdefault(s, []).append(t)
+                preds.setdefault(t, []).append(s)
+
+        def walk(starts: List[str], graph: Dict[str, List[str]]) -> List[str]:
+            """从 starts 向外走，禁用节点直接穿过去，只收集还要执行的节点。"""
+            out: List[str] = []
+            seen = set(starts)
+            queue = []
+            for s in starts:
+                queue.extend(graph.get(s, []))
+            while queue:
+                v = queue.pop(0)
+                if v in seen:
+                    continue
+                seen.add(v)
+                if v in disabled:
+                    queue.extend(graph.get(v, []))
+                elif v in live:
+                    out.append(v)
+            return out
+
+        for u in live:
+            for parent in walk([u], preds):
+                self.pending_parents[u].add(parent)
+            self.children[u] = walk([u], succs)
 
         self._detect_cycle()
         self._emit("build", None, {

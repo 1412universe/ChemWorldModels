@@ -10,6 +10,7 @@ OPC UA 通讯基类（简化版 - 无工作流功能）
 """
 
 import json
+import threading
 import time
 import traceback
 from typing import Any, Dict, List, Optional, Tuple
@@ -27,6 +28,88 @@ from unilabos.utils.log import logger
 # 点位表里有、当前 GN PLC 固件地址空间里没有的点。缺它们不代表会话失败。
 _FIRMWARE_ABSENT_NODES = {"Tare_the_scale", "VacuumOven_STOP"}
 _missing_node_logged = set()
+
+# 一次节点执行期间的 PLC 写点记录。没开启时 note/plan 什么都不做。
+_trace = threading.local()
+
+
+def trace_begin() -> None:
+    _trace.on = True
+    _trace.rows = []
+    _trace.plan = []
+
+
+def trace_plan(mapping) -> None:
+    """动作准备写的点。后面没执行到的，日志里记成未写入。"""
+    if not getattr(_trace, "on", False) or not isinstance(mapping, dict):
+        return
+    for name, value in mapping.items():
+        if value is None:
+            continue
+        _trace.plan.append((str(name), value))
+
+
+def trace_note(name, value, ok, error: str = "") -> None:
+    if not getattr(_trace, "on", False):
+        return
+    _trace.rows.append({
+        "name": str(name),
+        "value": value,
+        "ok": bool(ok),
+        "error": error or "",
+    })
+
+
+def trace_end():
+    rows = list(getattr(_trace, "rows", None) or [])
+    plan = list(getattr(_trace, "plan", None) or [])
+    _trace.on = False
+    _trace.rows = []
+    _trace.plan = []
+    return rows, plan
+
+
+def _trace_fmt(value) -> str:
+    if isinstance(value, float):
+        return ("%g" % value)
+    return str(value)
+
+
+def format_plc_report(error: str, rows, plan) -> str:
+    """异常原因，以及哪些点已经写进 PLC、哪些没有。"""
+    by = {}
+    order = []
+    for row in rows or []:
+        name = row.get("name") or ""
+        if name not in by:
+            order.append(name)
+        by[name] = row
+    written = []
+    missed = []
+    attempted = set()
+    for name in order:
+        row = by[name]
+        attempted.add(name)
+        shown = "%s=%s" % (name, _trace_fmt(row.get("value")))
+        if row.get("ok"):
+            written.append(shown)
+        else:
+            why = row.get("error") or "写入失败"
+            missed.append("%s（%s）" % (shown, why))
+    for name, value in plan or []:
+        if name in attempted:
+            continue
+        attempted.add(name)
+        missed.append("%s=%s（未执行到）" % (name, _trace_fmt(value)))
+    lines = ["原因：" + (error or "执行失败")]
+    lines.append("已写入PLC：" + ("；".join(written) if written else "无"))
+    if missed:
+        lines.append("未写入PLC：" + "；".join(missed))
+    elif not written:
+        lines.append("未写入PLC：没有写点记录")
+    else:
+        lines.append("未写入PLC：无")
+    return "\n".join(lines)
 
 
 class OpcUaNode(BaseModel):
@@ -647,14 +730,17 @@ class OpcUaClientWithSubscription(BaseOpcUaClient):
     def set_node_value(self, name, value):
         """设置节点值"""
         # 处理名称映射
-        if name in self._name_mapping:
-            chinese_name = self._name_mapping[name]
-        elif name in self._node_registry:
-            chinese_name = name
-        else:
-            raise ValueError(f"未找到名称为 '{name}' 的节点")
-        
-        error = self._write_raw(chinese_name, value)
+        try:
+            if name in self._name_mapping:
+                chinese_name = self._name_mapping[name]
+            elif name in self._node_registry:
+                chinese_name = name
+            else:
+                raise ValueError(f"未找到名称为 '{name}' 的节点")
+            error = self._write_raw(chinese_name, value)
+        except Exception as exc:
+            trace_note(name, value, False, "%s: %s" % (type(exc).__name__, exc))
+            raise
         if not error:
             self._node_values[chinese_name] = {
                 'value': value,
@@ -662,10 +748,11 @@ class OpcUaClientWithSubscription(BaseOpcUaClient):
                 'source': 'write'
             }
             logger.debug(f"写入成功: {chinese_name} = {value}")
+            trace_note(name, value, True, "")
             return True
-        else:
-            logger.warning(f"写入节点 {chinese_name} 失败")
-            return False
+        logger.warning(f"写入节点 {chinese_name} 失败")
+        trace_note(name, value, False, "写入失败")
+        return False
     
     def _reconnect(self) -> bool:
         """断线按需重连（无后台线程）：复用同一 client 重建会话，成功后重建订阅。

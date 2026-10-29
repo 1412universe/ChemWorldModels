@@ -3,10 +3,10 @@ window.GN_NODE_LIBRARY = {
  "version": "20261014.1",
  "protocol": {
   "name": "OPC UA",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "server": "opc.tcp://192.168.6.6:4840",
   "nsPrefix": "ns=4;s=|var|Inovance-X86-Linux.Application.OPC_UA.",
-  "source": "OPC_UA协议1.4.0(2).xlsx（工作簿①点位表 384 行 / 13 模块 / 240 个有效点位；②锁紧预锁说明 55 行）",
+  "source": "OPC_UA协议1.4.1.xlsx（工作簿①点位表 / 13 模块 / 235 个有效点位）",
   "sheet": "点位表",
   "modules": [
    "锁紧模块",
@@ -23,7 +23,7 @@ window.GN_NODE_LIBRARY = {
    "七个液冷模块",
    "报错信息"
   ],
-  "pointTotal": 240
+  "pointTotal": 235
  },
  "stationMap": {
   "1": "常规烘箱",
@@ -44,7 +44,6 @@ window.GN_NODE_LIBRARY = {
    "type": 15,
    "hole": 1,
    "pre_turns": 20,
-   "pre_torque_limit": 300,
    "expect": "带上，不锁死"
   },
   {
@@ -52,7 +51,6 @@ window.GN_NODE_LIBRARY = {
    "type": 15,
    "hole": 3,
    "pre_turns": 20,
-   "pre_torque_limit": 300,
    "expect": "对角"
   },
   {
@@ -60,7 +58,6 @@ window.GN_NODE_LIBRARY = {
    "type": 15,
    "hole": 2,
    "pre_turns": 20,
-   "pre_torque_limit": 300,
    "expect": ""
   },
   {
@@ -68,42 +65,36 @@ window.GN_NODE_LIBRARY = {
    "type": 15,
    "hole": 4,
    "pre_turns": 20,
-   "pre_torque_limit": 300,
    "expect": "四角都已贴合"
   },
   {
    "step": 5,
    "type": 11,
    "hole": 1,
-   "final_torque": 600,
    "expect": "锁死"
   },
   {
    "step": 6,
    "type": 11,
    "hole": 3,
-   "final_torque": 600,
    "expect": ""
   },
   {
    "step": 7,
    "type": 11,
    "hole": 2,
-   "final_torque": 600,
    "expect": ""
   },
   {
    "step": 8,
    "type": 11,
    "hole": 4,
-   "final_torque": 600,
    "expect": "整盖完成"
   }
  ],
  "lockInterlocks": [
   "同一时刻只允许一条锁紧指令（下发前校验 CompleteFB=0）",
-  "CmdType=15 预锁必须写预锁圈数 + 预锁扭矩上限；Type=11 终锁必须写终锁目标扭矩",
-  "终锁目标扭矩必须大于预锁扭矩上限",
+  "CmdType=15 预锁必须写 pre_turns>0（×0.1圈）",
   "孔顺序必须对角：孔1→孔3→孔2→孔4，禁止邻边 1-2-3-4",
   "必须四颗预锁全部结束后再终锁，禁止同一颗 15 完立刻 11",
   "CmdTrig 必须 0→1 触发，不得长期置 1"
@@ -459,39 +450,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -654,39 +615,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -849,39 +780,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -1044,39 +945,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -1239,39 +1110,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -1434,39 +1275,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -1629,39 +1440,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -1824,39 +1605,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -2019,39 +1770,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -2214,39 +1935,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -2409,39 +2100,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -2604,39 +2265,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -2799,39 +2430,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -2994,39 +2595,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -3189,39 +2760,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -3384,39 +2925,9 @@ window.GN_NODE_LIBRARY = {
        "unit": "0.1圈",
        "desc": "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收"
       },
-      "pre_torque_limit": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 600,
-       "meta": {
-        "key": "pre_torque_limit",
-        "label": "预锁扭矩上限",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；Type=15 必写，且必须小于终锁目标扭矩"
-      },
-      "final_torque": {
-       "type": "int",
-       "optional": true,
-       "min": 1,
-       "max": 1200,
-       "meta": {
-        "key": "final_torque",
-        "label": "终锁目标扭矩",
-        "unit": "0.001N·m",
-        "rw": "W",
-        "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-       },
-       "unit": "0.001N·m",
-       "desc": "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，且必须大于预锁扭矩上限"
-      },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -3544,49 +3055,14 @@ window.GN_NODE_LIBRARY = {
      "dtype": "Int16",
      "rw": "W",
      "desc": "单位0.1圈。20=2.0圈。四颗螺丝共用，预锁Type=15必写"
-    },
-    {
-     "name": "预锁扭矩上限",
-     "node": "Lock_PreTorqueLimit",
-     "dtype": "Int16",
-     "rw": "W",
-     "desc": "单位0.001N.m。300=0.300N.m。圈数未满但已顶死时停，防止预锁变成锁死。Type=15必写"
-    },
-    {
-     "name": "终锁目标扭矩",
-     "node": "Lock_FinalTorqueSet",
-     "dtype": "Int16",
-     "rw": "W",
-     "desc": "单位0.001N.m。600=0.600N.m。对应电批E12C。Type=11必写，且必须大于预锁扭矩上限"
-    },
-    {
-     "name": "电批结果",
-     "node": "Lock_ScrewResult",
-     "dtype": "Int16",
-     "rw": "R",
-     "desc": "0无 1OK 2滑牙 3浮锁 4超时 5故障 6预锁到扭矩上限(算成功)"
-    },
-    {
-     "name": "完成扭矩反馈",
-     "node": "Lock_TorqueFB",
-     "dtype": "Int16",
-     "rw": "R",
-     "desc": "单位0.001N.m。来自电批20C9"
-    },
-    {
-     "name": "完成角度反馈",
-     "node": "Lock_AngleFB",
-     "dtype": "Int16",
-     "rw": "R",
-     "desc": "单位0.1度。来自电批20CA，最大约3276.7度"
     }
    ],
    "pointStats": {
-    "total": 23,
-    "r": 8,
-    "w": 15
+    "total": 18,
+    "r": 5,
+    "w": 13
    },
-   "protocolNodes": 23
+   "protocolNodes": 18
   },
   {
    "id": "gn_quick_carrier_exchange",
@@ -3773,7 +3249,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -3966,7 +3442,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -4159,7 +3635,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -4352,7 +3828,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -4545,7 +4021,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -4738,7 +4214,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -4931,7 +4407,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -5124,7 +4600,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -5317,7 +4793,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -5510,7 +4986,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -5703,7 +5179,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -5896,7 +5372,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -6089,7 +5565,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -6282,7 +5758,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -6577,7 +6053,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -6732,7 +6208,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -6887,7 +6363,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -7042,7 +6518,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -7197,7 +6673,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -7352,7 +6828,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -7507,7 +6983,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -7662,7 +7138,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -7817,7 +7293,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -7972,7 +7448,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -8127,7 +7603,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -8676,7 +8152,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -9112,7 +8588,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -9548,7 +9024,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -9984,7 +9460,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -10418,7 +9894,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -10852,7 +10328,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -11286,7 +10762,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -11720,7 +11196,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -12154,7 +11630,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -12588,7 +12064,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -13022,7 +12498,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -13456,7 +12932,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -13890,7 +13366,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -14324,7 +13800,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -14758,7 +14234,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -15192,7 +14668,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -15626,7 +15102,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -16060,7 +15536,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -16511,7 +15987,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -16962,7 +16438,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -17413,7 +16889,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -17864,7 +17340,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -18313,7 +17789,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -18765,7 +18241,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -19217,7 +18693,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -19669,7 +19145,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -20121,7 +19597,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -20573,7 +20049,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -21026,7 +20502,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -21479,7 +20955,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -21919,7 +21395,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -22359,7 +21835,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -22812,7 +22288,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -23264,7 +22740,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -23701,7 +23177,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -24137,7 +23613,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -24571,7 +24047,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -25007,7 +24483,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -25441,7 +24917,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -25877,7 +25353,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -26311,7 +25787,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -26747,7 +26223,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -27181,7 +26657,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -27617,7 +27093,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -28051,7 +27527,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -28489,7 +27965,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -28923,7 +28399,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -29357,7 +28833,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -29791,7 +29267,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -30275,7 +29751,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -30351,7 +29827,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -30427,7 +29903,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -30503,7 +29979,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -30579,7 +30055,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -30655,7 +30131,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -30731,7 +30207,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -30884,7 +30360,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -30960,7 +30436,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -31036,7 +30512,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -31112,7 +30588,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -31188,7 +30664,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -31264,7 +30740,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -31340,7 +30816,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -31484,6 +30960,7 @@ window.GN_NODE_LIBRARY = {
         "8": "stack",
         "9": "solid",
         "10": "finished_area",
+        "9320": "nine9320",
         "oven": "oven",
         "furnace": "oven",
         "gn_standard_oven": "oven",
@@ -31500,7 +30977,6 @@ window.GN_NODE_LIBRARY = {
         "voven": "vacuum_oven",
         "vacuum_oven": "vacuum_oven",
         "nine9320": "nine9320",
-        "9320": "nine9320",
         "prcxi": "nine9320",
         "tube": "tube",
         "tubeh": "tube",
@@ -31560,7 +31036,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -31627,6 +31103,7 @@ window.GN_NODE_LIBRARY = {
         "8": "stack",
         "9": "solid",
         "10": "finished_area",
+        "9320": "nine9320",
         "oven": "oven",
         "furnace": "oven",
         "gn_standard_oven": "oven",
@@ -31643,7 +31120,6 @@ window.GN_NODE_LIBRARY = {
         "voven": "vacuum_oven",
         "vacuum_oven": "vacuum_oven",
         "nine9320": "nine9320",
-        "9320": "nine9320",
         "prcxi": "nine9320",
         "tube": "tube",
         "tubeh": "tube",
@@ -31703,7 +31179,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -31765,6 +31241,7 @@ window.GN_NODE_LIBRARY = {
         "8": "stack",
         "9": "solid",
         "10": "finished_area",
+        "9320": "nine9320",
         "oven": "oven",
         "furnace": "oven",
         "gn_standard_oven": "oven",
@@ -31781,7 +31258,6 @@ window.GN_NODE_LIBRARY = {
         "voven": "vacuum_oven",
         "vacuum_oven": "vacuum_oven",
         "nine9320": "nine9320",
-        "9320": "nine9320",
         "prcxi": "nine9320",
         "tube": "tube",
         "tubeh": "tube",
@@ -31837,6 +31313,7 @@ window.GN_NODE_LIBRARY = {
         "8": "stack",
         "9": "solid",
         "10": "finished_area",
+        "9320": "nine9320",
         "oven": "oven",
         "furnace": "oven",
         "gn_standard_oven": "oven",
@@ -31853,7 +31330,6 @@ window.GN_NODE_LIBRARY = {
         "voven": "vacuum_oven",
         "vacuum_oven": "vacuum_oven",
         "nine9320": "nine9320",
-        "9320": "nine9320",
         "prcxi": "nine9320",
         "tube": "tube",
         "tubeh": "tube",
@@ -31918,7 +31394,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -31985,6 +31461,7 @@ window.GN_NODE_LIBRARY = {
         "8": "stack",
         "9": "solid",
         "10": "finished_area",
+        "9320": "nine9320",
         "oven": "oven",
         "furnace": "oven",
         "gn_standard_oven": "oven",
@@ -32001,7 +31478,6 @@ window.GN_NODE_LIBRARY = {
         "voven": "vacuum_oven",
         "vacuum_oven": "vacuum_oven",
         "nine9320": "nine9320",
-        "9320": "nine9320",
         "prcxi": "nine9320",
         "tube": "tube",
         "tubeh": "tube",
@@ -32050,7 +31526,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -32073,7 +31549,7 @@ window.GN_NODE_LIBRARY = {
      "params": {
       "timeout": {
        "type": "number",
-       "default": 60.0,
+       "default": 60,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -32096,7 +31572,7 @@ window.GN_NODE_LIBRARY = {
      "params": {
       "timeout": {
        "type": "number",
-       "default": 60.0,
+       "default": 60,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -32119,7 +31595,7 @@ window.GN_NODE_LIBRARY = {
      "params": {
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -32142,7 +31618,7 @@ window.GN_NODE_LIBRARY = {
      "params": {
       "timeout": {
        "type": "number",
-       "default": 120.0,
+       "default": 120,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -32492,7 +31968,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -32670,7 +32146,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -32848,7 +32324,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -33026,7 +32502,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -33204,7 +32680,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -33382,7 +32858,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -33560,7 +33036,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -33738,7 +33214,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -33916,7 +33392,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -34094,7 +33570,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -34272,7 +33748,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -34450,7 +33926,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -34628,7 +34104,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -34806,7 +34282,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -34984,7 +34460,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -35162,7 +34638,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -35340,7 +34816,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -35518,7 +34994,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -35696,7 +35172,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -35874,7 +35350,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -36052,7 +35528,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -36230,7 +35706,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -36408,7 +35884,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -36586,7 +36062,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -36764,7 +36240,7 @@ window.GN_NODE_LIBRARY = {
       },
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {
@@ -38787,7 +38263,7 @@ window.GN_NODE_LIBRARY = {
      "params": {
       "timeout": {
        "type": "number",
-       "default": 180.0,
+       "default": 180,
        "min": 1,
        "max": 3600,
        "meta": {

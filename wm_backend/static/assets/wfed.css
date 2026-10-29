@@ -603,7 +603,7 @@ body.page-wfed.libnarrow #wfed-lib.pts-open .lib-rail{ opacity:0; }
    否则工作流坐标超出视口时连线会被裁掉。 */
 #wfed-svg{ position:absolute; inset:0; z-index:2; pointer-events:none; overflow:visible; }
 
-#wfed-canvas{ position:absolute; inset:0; z-index:3; transform-origin:0 0; }
+#wfed-canvas{ position:absolute; inset:0; z-index:3; transform-origin:0 0; pointer-events:none; }
 #wfed-empty{
   position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
   z-index:1; text-align:center; color:#9aa8bc; font-size:13px; line-height:2; pointer-events:none;
@@ -658,7 +658,7 @@ body.page-wfed.libnarrow #wfed-lib.pts-open .lib-rail{ opacity:0; }
 .wfnode{
   position:absolute; width:236px; background:#fff; border:1.5px solid #c7d2e2;
   border-radius:12px; box-shadow:0 4px 14px rgba(15,23,42,.08);
-  cursor:grab; user-select:none; z-index:5;
+  cursor:grab; user-select:none; z-index:5; pointer-events:auto;
 }
 .wfnode .n-title, .wfnode .n-sub, .wfnode-prow, .wfnode-prow span{
   -webkit-user-select:text; user-select:text; cursor:text;
@@ -668,7 +668,18 @@ body.page-wfed.libnarrow #wfed-lib.pts-open .lib-rail{ opacity:0; }
 }
 .wfnode.selected{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(99,102,241,.16),0 6px 18px rgba(15,23,42,.12); }
 .wfnode.ghost{ opacity:.55; border-style:dashed; }
-.wfnode.disabled{ opacity:.45; }
+.wfnode.disabled{ opacity:.55; }
+.wfnode .n-badge.off{ background:#94a3b8; }
+.wf-node-menu{
+  position:fixed; z-index:80; min-width:148px; padding:4px;
+  background:#fff; border:1px solid #d7dee8; border-radius:8px;
+  box-shadow:0 8px 24px rgba(15,23,42,.16);
+}
+.wf-node-menu button{
+  display:block; width:100%; text-align:left; border:0; background:transparent;
+  padding:7px 10px; border-radius:6px; cursor:pointer; font-size:13px; color:#1e293b;
+}
+.wf-node-menu button:hover{ background:#eef2ff; color:#4338ca; }
 .wfnode-band{ height:4px; border-radius:10px 10px 0 0; }
 .wfnode-head{ display:flex; align-items:flex-start; gap:6px; padding:7px 9px 5px; }
 .wfnode-head .n-ico{ font-size:14px; line-height:1.2; }
@@ -734,7 +745,8 @@ body.page-wfed.libnarrow #wfed-lib.pts-open .lib-rail{ opacity:0; }
 .wfnode.st-locked .lockflag{ display:block; }
 
 /* ---------- 连线 ---------- */
-#wfed-svg path.wfedge{ stroke:var(--dep); stroke-width:2; fill:none; marker-end:url(#arr); }
+#wfed-svg path.wfedge-hit{ stroke:transparent; stroke-width:16; fill:none; pointer-events:stroke; }
+#wfed-svg path.wfedge{ stroke:var(--dep); stroke-width:2; fill:none; marker-end:url(#arr); pointer-events:stroke; }
 #wfed-svg path.wfedge.selected{ stroke:var(--accent); stroke-width:3; }
 #wfed-svg path.wfedge.parallel{ stroke:var(--par); stroke-width:2.2; marker-end:url(#arr-par); }
 #wfed-svg path.wfedge.material{ stroke:var(--mat); stroke-width:2.2; marker-end:url(#arr-mat); }

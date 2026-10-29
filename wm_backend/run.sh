@@ -32,7 +32,7 @@ echo "访问：http://127.0.0.1:8000"
 #                              | real（真实 OPC 会话）
 #   GN_ALLOW_REAL     真机总闸，默认 0（关）。**要动硬件必须显式打开**
 #   GN_NODE_CSV       覆盖驱动加载的节点表 CSV。默认用本适配器内由 1.4.0「点位表」
-#                     生成的 app/gn_adapter/node_tables/opcua_gn1.4.0.csv
+#                     生成的 app/gn_adapter/node_tables/opcua_gn1.4.1.csv
 #                     （240 点位；仓库自带的 1.3.9 表有 11 处冲突、且会静默丢 2 个点）
 #   GN_DEFAULT_TIMEOUT  单节点默认超时（秒），默认 180
 #   GN_MAX_TIMEOUT      单节点超时上限（秒），默认 3600
@@ -44,6 +44,6 @@ echo "访问：http://127.0.0.1:8000"
 #   curl 'http://127.0.0.1:8000/api/gn-adapter/status?device=gn_locking_mechanism'
 # ---------------------------------------------------------------------------
 echo "GN 适配器：GN_ACTION_MODE=${GN_ACTION_MODE:-simulate}  GN_ALLOW_REAL=${GN_ALLOW_REAL:-0}"
-echo "           节点表=${GN_NODE_CSV:-app/gn_adapter/node_tables/opcua_gn1.4.0.csv（1.4.0 生成）}"
+echo "           节点表=${GN_NODE_CSV:-app/gn_adapter/node_tables/opcua_gn1.4.1.csv（1.4.0 生成）}"
 
 "$PYTHON" -m uvicorn main:app --host 127.0.0.1 --port 8000

@@ -38,6 +38,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import threading
 import time
 from typing import Any, Dict, Optional, Sequence
@@ -262,6 +263,10 @@ class SimulatedPlc:
                     self._triggered[prefix] = False
                     self._writes.pop(prefix + "CmdType", None)
                     self._busy_until.pop(prefix, None)
+        mod = sys.modules.get("unilabos.devices.workstation.GN.base_opcua_client")
+        note = getattr(mod, "trace_note", None) if mod else None
+        if note:
+            note(name, value, True, "")
         return True
 
     def write(self, name: str, value: Any) -> bool:

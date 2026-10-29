@@ -1,9 +1,12 @@
 """
 锁紧模块设备驱动。
 
-协议：opcua_gn1.4.0.csv「锁紧模块」（前缀 Lock_）；握手与 gn_quick_carrier_exchange 一致：
-    清 CompleteFB → 写参 → Lock_CmdType → Lock_CmdTrig=1 → 等 Lock_CompleteFB=1 → 清零。
-    CompleteFB：1=成功，2=失败（看 Lock_ScrewResult）。
+协议：OPC_UA协议1.4.1.xlsx「点位表」（前缀 Lock_），节点表 opcua_gn1.4.1.csv。
+    握手：写本步参数 → Lock_CmdType → 确认 Lock_CompleteFB=0 → Lock_CmdTrig=1
+    → 等 CompleteFB。1=成功，2=失败。
+    1.4.1 点位表里预锁只保留 Lock_PreTurnsSet（×0.1 圈，Type=15 必写）。
+    Lock_PreTorqueLimit / Lock_FinalTorqueSet / Lock_ScrewResult / Lock_TorqueFB / Lock_AngleFB
+    已从点位表删除，驱动不再写入。
 
 对外仅暴露 execute_command（Lock_CmdType + 写参）；测试流程预设供本地调试。
 
@@ -15,10 +18,8 @@
     13=夹爪夹紧 14=夹爪松开
     15=电批预锁(按圈数,不锁死) 16=复位
 
-电批写参（×比例见 CSV / 协议「锁紧预锁说明」）：
+电批写参（×比例见 CSV）：
     pre_turns → Lock_PreTurnsSet（×0.1 圈，Type=15 必写）
-    pre_torque_limit → Lock_PreTorqueLimit（×0.001 N.m，Type=15 必写）
-    final_torque → Lock_FinalTorqueSet（×0.001 N.m，Type=11 必写；Type=15 不写）
 """
 
 import os
@@ -30,27 +31,15 @@ from typing import Optional
 
 from unilabos.utils.log import logger
 from unilabos.registry.decorators import action, device, not_action
-from unilabos.device_comms.opcua_client.node.uniopcua import DataType, NodeType
-from unilabos.devices.workstation.GN.base_opcua_client import OpcUaNode
+from unilabos.device_comms.opcua_client.node.uniopcua import DataType
 from unilabos.devices.workstation.GN.gn_station_base import GNStationClient
 
 # CSV 写 DOUBLE，汇川 OPC 实际多为 FLOAT(REAL)；按 Double 写会 BadTypeMismatch
 _JAW_FLOAT_NODES = ("Lock_JawPosition", "Lock_JawForce")
 
-_OPC_NS = "ns=4;s=|var|Inovance-X86-Linux.Application.OPC_UA."
-# 1.4.0 电批点位：工站若先加载旧 CSV，在此强制注册，避免 PreTurns 等节点缺失
-_SCREW_OPC_NODES = (
-    OpcUaNode(name="Lock_PreTurnsSet", node_type=NodeType.VARIABLE, node_id=_OPC_NS + "Lock_PreTurnsSet", data_type=DataType.INT16),
-    OpcUaNode(name="Lock_PreTorqueLimit", node_type=NodeType.VARIABLE, node_id=_OPC_NS + "Lock_PreTorqueLimit", data_type=DataType.INT16),
-    OpcUaNode(name="Lock_FinalTorqueSet", node_type=NodeType.VARIABLE, node_id=_OPC_NS + "Lock_FinalTorqueSet", data_type=DataType.INT16),
-    OpcUaNode(name="Lock_ScrewResult", node_type=NodeType.VARIABLE, node_id=_OPC_NS + "Lock_ScrewResult", data_type=DataType.INT16),
-    OpcUaNode(name="Lock_TorqueFB", node_type=NodeType.VARIABLE, node_id=_OPC_NS + "Lock_TorqueFB", data_type=DataType.INT16),
-    OpcUaNode(name="Lock_AngleFB", node_type=NodeType.VARIABLE, node_id=_OPC_NS + "Lock_AngleFB", data_type=DataType.INT16),
-)
-
 DEFAULT_CSV_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "opcua_gn1.4.0.csv",
+    "opcua_gn1.4.1.csv",
 )
 # 注册表 init 仍引用旧名 xlsx_path，与 csv_path 同义
 DEFAULT_XLSX_PATH = DEFAULT_CSV_PATH
@@ -138,27 +127,26 @@ TEST_FLOW_PRESETS = [
         x_speed=500, y_speed=500, z1_speed=500, z2_speed=500,
         jaw_position=0.0, jaw_force=0.0,
     )),
-    ("6.预锁（2.0圈/0.30N.m）", LockCommand.SCREW_PRE, dict(
+    ("6.预锁（2.0圈）", LockCommand.SCREW_PRE, dict(
         x_pos=1270, y_pos=2030, z1_pos=0, z2_pos=1065,
         x_speed=500, y_speed=500, z1_speed=500, z2_speed=500,
-        pre_turns=20, pre_torque_limit=300,
+        pre_turns=20,
     )),
-    ("7.终锁（0.60N.m）", LockCommand.SCREW_FINAL, dict(
+    ("7.终锁", LockCommand.SCREW_FINAL, dict(
         x_pos=1270, y_pos=2030, z1_pos=0, z2_pos=1065,
         x_speed=500, y_speed=500, z1_speed=500, z2_speed=500,
-        final_torque=600,
     )),
 ]
 
 
 _EXECUTE_CMD_DOC = (
-    "按 Lock_CmdType 执行 opcua_gn1.4.0 指令。"
+    "按 Lock_CmdType 执行 opcua_gn1.4.1 指令。"
     "1=X左 2=X右 3=Y左 4=Y右 5=Z1左 6=Z1右 7=Z2左 8=Z2右 "
     "9=夹爪夹取 10=夹爪放置 11=电批终锁 12=电批拧松 13=夹爪夹紧 14=夹爪松开 "
     "15=电批预锁 16=复位。"
     "轴运动写对应 PosSet/Speed；夹取/放置写 jaw_position/jaw_force；"
-    "预锁写 pre_turns/pre_torque_limit（勿写 final_torque）；终锁写 final_torque。"
-    "CompleteFB=1 成功，=2 失败（见 Lock_ScrewResult）。"
+    "预锁只写 pre_turns（Lock_PreTurnsSet）。"
+    "CompleteFB=1 成功，=2 失败。"
 )
 
 
@@ -166,9 +154,9 @@ _EXECUTE_CMD_DOC = (
     id="gn_locking_mechanism",
     display_name="锁紧模块",
     category=["workstation"],
-    description="GN 锁紧模块：opcua_gn1.4.0，支持预锁/终锁与 CompleteFB 成败判定",
+    description="GN 锁紧模块：opcua_gn1.4.1，预锁写圈数，按 CompleteFB 判定成败",
     icon="",
-    version="2.2.0",
+    version="2.3.0",
 )
 class LockingMechanismDevice(GNStationClient):
     """锁紧模块设备类（OPC 前缀 Lock_，通过 self.plc 共享 GN 工站单例 OPC UA 会话）。"""
@@ -219,8 +207,6 @@ class LockingMechanismDevice(GNStationClient):
             *args,
             **kwargs,
         )
-        # 确保 1.4.0 电批节点已注册（工站先加载旧 CSV 时仍可找到 PreTurns 等）
-        self.register_node_list(list(_SCREW_OPC_NODES))
         self._command_lock = threading.Lock()
         self._fix_jaw_node_dtypes()
 
@@ -239,8 +225,6 @@ class LockingMechanismDevice(GNStationClient):
         jaw_position: Optional[float] = None,
         jaw_force: Optional[float] = None,
         pre_turns: Optional[int] = None,
-        pre_torque_limit: Optional[int] = None,
-        final_torque: Optional[int] = None,
         timeout: float = 180.0,
     ) -> dict:
         """唯一注册动作：写参 → CmdType → CmdTrig=1 → 等 CompleteFB==1 → 清指令。"""
@@ -251,18 +235,12 @@ class LockingMechanismDevice(GNStationClient):
             )
         if timeout is None or float(timeout) <= 0:
             timeout = 180.0
-        self._validate_screw_params(
-            cmd,
-            pre_turns=pre_turns,
-            pre_torque_limit=pre_torque_limit,
-            final_torque=final_torque,
-        )
+        self._validate_screw_params(cmd, pre_turns=pre_turns)
         setpoints = self._build_setpoints(
             x_pos=x_pos, y_pos=y_pos, z1_pos=z1_pos, z2_pos=z2_pos,
             x_speed=x_speed, y_speed=y_speed, z1_speed=z1_speed, z2_speed=z2_speed,
             jaw_position=jaw_position, jaw_force=jaw_force,
-            pre_turns=pre_turns, pre_torque_limit=pre_torque_limit,
-            final_torque=final_torque,
+            pre_turns=pre_turns,
             cmd_type=cmd,
         )
         return self._run(
@@ -301,29 +279,11 @@ class LockingMechanismDevice(GNStationClient):
         cmd: int,
         *,
         pre_turns: Optional[int],
-        pre_torque_limit: Optional[int],
-        final_torque: Optional[int],
     ) -> None:
         pre_turns = self._positive_int(pre_turns)
-        pre_torque_limit = self._positive_int(pre_torque_limit)
-        final_torque = self._positive_int(final_torque)
         if cmd == int(LockCommand.SCREW_PRE):
             if pre_turns is None:
                 raise ValueError("电批预锁(CmdType=15) 必须写 pre_turns>0（×0.1圈，如20=2.0圈）")
-            if pre_torque_limit is None:
-                raise ValueError(
-                    "电批预锁(CmdType=15) 必须写 pre_torque_limit>0（×0.001N.m，如300=0.300N.m）"
-                )
-            # 协议：预锁不写 FinalTorqueSet；仅当同时传入终锁扭矩时才校验大小关系
-            if final_torque is not None and pre_torque_limit >= final_torque:
-                raise ValueError(
-                    f"预锁扭矩上限({pre_torque_limit}) 必须 < 终锁扭矩({final_torque})"
-                )
-        if cmd == int(LockCommand.SCREW_FINAL):
-            if final_torque is None:
-                raise ValueError(
-                    "电批终锁(CmdType=11) 必须写 final_torque>0（×0.001N.m，如600=0.600N.m）"
-                )
 
     @not_action
     def _fix_jaw_node_dtypes(self) -> None:
@@ -349,19 +309,10 @@ class LockingMechanismDevice(GNStationClient):
         jaw_position: Optional[float] = None,
         jaw_force: Optional[float] = None,
         pre_turns: Optional[int] = None,
-        pre_torque_limit: Optional[int] = None,
-        final_torque: Optional[int] = None,
         cmd_type: Optional[int] = None,
     ) -> dict:
-        # 预锁(15)按协议不写 FinalTorqueSet；终锁(11)不写预锁圈数/上限
+        # 1.4.1 点位表没有扭矩上限 / 终锁扭矩点，预锁只写圈数
         pre_turns_v = self._positive_int(pre_turns)
-        pre_limit_v = self._positive_int(pre_torque_limit)
-        final_v = self._positive_int(final_torque)
-        if cmd_type == int(LockCommand.SCREW_PRE):
-            final_v = None
-        elif cmd_type == int(LockCommand.SCREW_FINAL):
-            pre_turns_v = None
-            pre_limit_v = None
         mapping = {
             "Lock_XPosSet": x_pos,
             "Lock_YPosSet": y_pos,
@@ -374,8 +325,6 @@ class LockingMechanismDevice(GNStationClient):
             "Lock_JawPosition": self._optional_float(jaw_position),
             "Lock_JawForce": self._optional_float(jaw_force),
             "Lock_PreTurnsSet": pre_turns_v,
-            "Lock_PreTorqueLimit": pre_limit_v,
-            "Lock_FinalTorqueSet": final_v,
         }
         return {node: val for node, val in mapping.items() if val is not None}
 
@@ -413,11 +362,12 @@ class LockingMechanismDevice(GNStationClient):
         allow_position_fallback: bool,
         timeout: float,
     ) -> dict:
-        """写 CmdType → CmdTrig=1，等到 CompleteFB==1，再把两者清回 0。=2 判失败。"""
+        """写 CmdType → 确认 CompleteFB=0 → CmdTrig=1。=1 成功；=2 且 Result≠6 失败。"""
         if timeout <= 0:
             raise ValueError("timeout 必须大于 0")
         if not self.set_node_value(self.CMD_TYPE_NODE, int(cmd_type)):
             raise ValueError(f"Lock_CmdType={cmd_type} 写入失败")
+        self._ensure_complete_fb_idle()
         if not self.set_node_value(self.CMD_TRIG_NODE, 1):
             raise ValueError("Lock_CmdTrig=1 写入失败")
 
@@ -461,6 +411,26 @@ class LockingMechanismDevice(GNStationClient):
         if int(cmd_type) in self._SCREW_COMMANDS:
             result.update(self._read_screw_feedback())
         return result
+
+    @not_action
+    def _ensure_complete_fb_idle(self) -> None:
+        """触发前 CompleteFB 必须为 0。残留的 1/2 先清掉，点位表虽标 R，现场允许上位写 0。"""
+        value = self.get_node_value(self.COMPLETE_NODE, force_read=True)
+        try:
+            iv = int(value) if value is not None else 0
+        except (TypeError, ValueError):
+            iv = 0
+        if iv == 0:
+            return
+        logger.info(f"Lock_CompleteFB={value!r}，触发前清 0")
+        self.set_node_value(self.COMPLETE_NODE, 0)
+        again = self.get_node_value(self.COMPLETE_NODE, force_read=True)
+        try:
+            iv = int(again) if again is not None else 0
+        except (TypeError, ValueError):
+            iv = 0
+        if iv != 0:
+            raise ValueError(f"触发前 Lock_CompleteFB 必须为 0，当前={again!r}")
 
     @not_action
     def _wait_complete_fb(

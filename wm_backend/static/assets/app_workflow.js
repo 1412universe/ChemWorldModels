@@ -420,6 +420,7 @@
         '<div class="n-title">' + esc(disp.label) + '</div>' +
         '<div class="n-sub">' + sub + '</div>' +
       '</div>' +
+      (n.disabled ? '<span class="n-badge off" title="运行时跳过，沿连线走向下一节点">禁用</span>' : '') +
       (n._embed ? '<span class="n-badge embed" title="跟随模版「' + esc(n._embed.templateName || '') + '」，改模版后这里一起变">模版</span>' : '') +
       (disp.kind === 'group' ? '<span class="n-badge" style="background:#94a3b8">分组</span>'
         : disp.kind === 'script' ? '<span class="n-badge" style="background:#64748b">脚本</span>'
@@ -573,15 +574,21 @@
       var x1 = a.x + a.w, y1 = a.y + PORT_DY;
       var x2 = b.x, y2 = b.y + PORT_DY;
       var dx = Math.max(40, Math.abs(x2 - x1) * 0.45);
+      var dAttr = 'M' + x1 + ' ' + y1 +
+        ' C' + (x1 + dx) + ' ' + y1 + ',' + (x2 - dx) + ' ' + y2 + ',' + x2 + ' ' + y2;
+      var hit = document.createElementNS(ns, 'path');
+      hit.setAttribute('d', dAttr);
+      hit.setAttribute('class', 'wfedge-hit');
+      hit.dataset.edge = edgeId(e);
+      svg.appendChild(hit);
       var path = document.createElementNS(ns, 'path');
-      path.setAttribute('d', 'M' + x1 + ' ' + y1 +
-        ' C' + (x1 + dx) + ' ' + y1 + ',' + (x2 - dx) + ' ' + y2 + ',' + x2 + ' ' + y2);
+      path.setAttribute('d', dAttr);
+      path.dataset.edge = edgeId(e);
       var k = edgeKind(e);
       var cls = 'wfedge' + (k === 'parallel' ? ' parallel' : k === 'material' ? ' material' : '');
       if (state.selected && state.selected.type === 'edge' && state.selected.id === edgeId(e)) cls += ' selected';
       path.setAttribute('class', cls);
       path.dataset.id = edgeId(e);
-      path.style.pointerEvents = 'stroke';
       svg.appendChild(path);
       state.edgeSvgMap.push({ id: edgeId(e), el: path });
     });
@@ -2005,10 +2012,10 @@
       notes.push('ℹ 配平之后先接 9320 的 auto-create_protocol 创建协议，协议建好后再接 transfer_liquid，最后 auto-run_protocol。不能把 transfer_liquid 直接接在配平后面。');
     }
     if (n.device_name === 'gn_locking_mechanism' && (n.param || {}).cmd_type === 11) {
-      notes.push('ℹ 终锁(11)：需先完成四角预锁(15)，且终锁扭矩必须大于预锁扭矩上限；孔顺序 1→3→2→4。');
+      notes.push('ℹ 终锁(11)：需先完成四角预锁(15)；孔顺序 1→3→2→4。');
     }
     if (n.device_name === 'gn_locking_mechanism' && (n.param || {}).cmd_type === 15) {
-      notes.push('ℹ 预锁(15)：必须写预锁圈数 + 预锁扭矩上限；四颗螺丝共用圈数。');
+      notes.push('ℹ 预锁(15)：必须写 pre_turns（×0.1圈，四颗螺丝共用）。');
     }
     return {
       preds: preds, succs: succs, fanout: succs.length, fanin: preds.length,
@@ -2585,6 +2592,15 @@
         beginDrag(node.dataset.uuid, additive, cx, cy);
         return 'drag';
       }
+      var edgeIdHit = tgt && tgt.dataset && tgt.dataset.edge;
+      if (edgeIdHit) {
+        state.selected = { type: 'edge', id: edgeIdHit };
+        state.selectedIds = {};
+        renderEdges();
+        showProps();
+        expandPropsPanel();
+        return 'none';
+      }
       if (ev.shiftKey || state.marqueeMode) { beginMarquee(cx, cy); return 'marquee'; }
       beginPan(cx, cy); select(null);
       return 'pan';
@@ -2748,10 +2764,43 @@
       if (ev.pointerId in touches) endTouch(ev);
     });
 
+    function closeNodeMenu() {
+      var old = document.getElementById('wf-node-menu');
+      if (old) old.remove();
+    }
+    function showNodeMenu(ev, n) {
+      closeNodeMenu();
+      var menu = el('div', 'wf-node-menu');
+      menu.id = 'wf-node-menu';
+      menu.innerHTML = '<button type="button">' + (n.disabled ? '启用此节点' : '禁用此节点') + '</button>';
+      menu.style.left = Math.min(ev.clientX, window.innerWidth - 160) + 'px';
+      menu.style.top = Math.min(ev.clientY, window.innerHeight - 48) + 'px';
+      document.body.appendChild(menu);
+      menu.querySelector('button').addEventListener('click', function () {
+        pushUndo();
+        n.disabled = !n.disabled;
+        renderNodes();
+        if (state.selected && state.selected.id === n.uuid) showProps();
+        afterChange();
+        closeNodeMenu();
+      });
+    }
+    document.addEventListener('pointerdown', function (ev) {
+      var menu = document.getElementById('wf-node-menu');
+      if (menu && !menu.contains(ev.target)) closeNodeMenu();
+    });
     wrap.addEventListener('contextmenu', function (ev) {
       var t = ev.target;
-      if (t && t.closest && t.closest('#wfed-run, .n-title, .n-sub, .wfnode-prow, input, textarea')) return;
+      var node = t && t.closest ? t.closest('.wfnode') : null;
+      if (node) {
+        ev.preventDefault();
+        var n = findNode(node.dataset.uuid);
+        if (n && n.type !== 'Group') showNodeMenu(ev, n);
+        return;
+      }
+      if (t && t.closest && t.closest('#wfed-run, input, textarea')) return;
       ev.preventDefault();
+      closeNodeMenu();
     });
 
     // 滚轮缩放
@@ -2959,10 +3008,14 @@
       if (mod && ev.key.toLowerCase() === 'v') { clipPaste(); return; }
       if (ev.key === 'Delete' || ev.key === 'Backspace') {
         if (state.selected && state.selected.type === 'edge') {
+          ev.preventDefault();
           pushUndo();
           state.wf.data.edges = state.wf.data.edges.filter(function (x) { return edgeId(x) !== state.selected.id; });
           state.selected = null; renderEdges(); showProps(); updateStats(); afterChange();
-        } else deleteSelected();
+        } else if (Object.keys(state.selectedIds).length) {
+          ev.preventDefault();
+          deleteSelected();
+        }
       }
       if (ev.key === 'Escape') {
         state.selected = null; state.selectedIds = {};
@@ -3079,7 +3132,11 @@
   function normalizeNode(n) {
     if (!n.pose || !n.pose.position) n.pose = basePose(60 + Math.random() * 300, 60 + Math.random() * 200);
     if (!n.param && n.type !== 'Group') n.param = {};
-    // 补齐 1.4.0 协议新增参数（如锁紧预锁/终锁），并归一 station 别名
+    // 1.4.1 点位表已删除的锁紧参数，旧节点里残留的键不再下发
+    if (n.device_name === 'gn_locking_mechanism' && n.param) {
+      delete n.param.pre_torque_limit;
+      delete n.param.final_torque;
+    }
     var a = actionOfNode(n);
     if (a && a.params) {
       Object.keys(a.params).forEach(function (k) {

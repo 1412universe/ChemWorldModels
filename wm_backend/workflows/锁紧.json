@@ -1,0 +1,81 @@
+{
+  "target_lab_uuid": "17ae2c83-04fd-4e25-ba72-46e8efb78591",
+  "name": "锁紧",
+  "data": {
+    "workflow_uuid": "7b04b1a0-0673-4211-8942-0b68676adf3f",
+    "workflow_name": "锁紧",
+    "nodes": [
+      {
+        "uuid": "8ac07ac1-d349-49a3-b452-bdd782fe06f1",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 60,
+            "y": 56,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 0,
+          "y_pos": 0,
+          "z1_pos": 0,
+          "z2_pos": "",
+          "x_speed": "",
+          "y_speed": "",
+          "z1_speed": 0,
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 5,
+          "pre_torque_limit": 10,
+          "final_torque": 15,
+          "timeout": 180,
+          "cmd_type": 15
+        },
+        "footer": "",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      }
+    ],
+    "edges": [],
+    "embeds": [
+      {
+        "id": "b27cea0b-270e-4379-940f-ca8d9e7ba193",
+        "template_id": "cec56e8d-272f-492a-a05a-639cba95e092",
+        "dx": 300,
+        "dy": 0
+      }
+    ]
+  }
+}

@@ -26,7 +26,7 @@ from . import sim_plc
 # ----------------------------------------------------------------------
 # 构造参数名：数组里写的是「用来接收节点表 CSV 的形参名」。
 #   驱动之间不统一 —— 有的叫 csv_path，有的叫 xlsx_path（名字骗人，实际接的是 CSV）。
-#   各驱动默认表已统一为 wm_action/opcua_gn1.4.0.csv；station 仍显式传入同一份。
+#   各驱动默认表已统一为 wm_action/opcua_gn1.4.1.csv；station 仍显式传入同一份。
 # ----------------------------------------------------------------------
 DEVICE_SPECS: Dict[str, Dict[str, Any]] = {
     "gn_locking_mechanism": {

@@ -17,7 +17,7 @@ AI 驱动的化学世界模型 —— 面向光热催化（OCM 甲烷偶联）�
 
 ## 硬件对接协议
 
-GN 工站 OPC UA 节点表对标 **`opcua_gn1.4.0.csv`**（见 `wm_action/` 目录），配套 PLC/机器人 Modbus TCP 协议 1.2。
+GN 工站 OPC UA 节点表对标 **`opcua_gn1.4.1.csv`**（见 `wm_action/` 目录），配套 PLC/机器人 Modbus TCP 协议 1.2。
 
 ## 快速启动
 

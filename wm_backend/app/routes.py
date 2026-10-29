@@ -994,9 +994,37 @@ def workflow_runs():
 
 @router.get("/api/datalog")
 def datalog_list():
-    """已落盘的工作流运行日志（新→旧）。xlsx 在 data/Datalog_Workflow。"""
-    from .run_datalog import list_runs, DATALOG_DIR
-    return {"ok": True, "dir": DATALOG_DIR, "runs": list_runs()}
+    """已落盘日志：按工作流汇总。xlsx 在 data/Datalog_Workflow。"""
+    from .run_datalog import list_runs, list_workflows, DATALOG_DIR
+    return {
+        "ok": True,
+        "dir": DATALOG_DIR,
+        "workflows": list_workflows(),
+        "runs": list_runs(),
+    }
+
+
+@router.get("/api/datalog/workflow/{workflow_name}")
+def datalog_workflow(workflow_name: str):
+    from .run_datalog import workflow_detail
+    hit = workflow_detail(workflow_name)
+    if not hit:
+        return {"ok": False, "error": "没有这份工作流日志"}
+    hit["ok"] = True
+    return hit
+
+
+@router.get("/api/datalog/workflow/{workflow_name}/xlsx")
+def datalog_workflow_xlsx(workflow_name: str):
+    from .run_datalog import workflow_xlsx_path
+    path = workflow_xlsx_path(workflow_name)
+    if not path:
+        return {"ok": False, "error": "xlsx 不存在"}
+    return FileResponse(
+        path,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filename=os.path.basename(path),
+    )
 
 
 @router.get("/api/datalog/{run_id}")

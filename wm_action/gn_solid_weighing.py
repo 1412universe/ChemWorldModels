@@ -1,7 +1,7 @@
 """
 固体加样 设备驱动
 
-协议：opcua_gn1.4.0.csv「固体加样」（前缀 Solid_）。
+协议：opcua_gn1.4.1.csv「固体加样」（前缀 Solid_）。
 
 对外仅暴露 execute_command（Solid_CmdType + 写参）；测试流程 yaml 预设供本地调试。
 """
@@ -21,7 +21,7 @@ from unilabos.devices.workstation.GN.gn_station_base import GNStationClient
 
 DEFAULT_XLSX_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "opcua_gn1.4.0.csv",
+    "opcua_gn1.4.1.csv",
 )
 
 # 加料(CmdType=11) 重量容差：目标 ±0.5% 视为完成

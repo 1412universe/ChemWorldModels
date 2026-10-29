@@ -310,7 +310,54 @@ class GNStation:
     # ---------------- 执行 ----------------
     def run_node(self, node: Dict[str, Any],
                  ctx: Optional[Dict[str, Any]] = None) -> Tuple[bool, Dict[str, Any]]:
-        """执行一个工作流节点 → (ok, info)。"""
+        """执行一个工作流节点 → (ok, info)。失败时带上 PLC 写点记录。"""
+        try:
+            from unilabos.devices.workstation.GN.base_opcua_client import (
+                format_plc_report, trace_begin, trace_end,
+            )
+        except Exception:
+            format_plc_report = trace_begin = trace_end = None
+        if trace_begin:
+            trace_begin()
+        try:
+            ok, info = self._run_node_body(node, ctx)
+        except Exception as exc:                            # noqa: BLE001
+            ok, info = False, {"error": "%s: %s" % (type(exc).__name__, exc), "phase": "call"}
+        rows, plan = trace_end() if trace_end else ([], [])
+        if isinstance(info, dict) and not ok and not info.get("error_log"):
+            reason = str(info.get("error") or "执行失败")
+            warns = info.get("warnings") or []
+            if warns:
+                reason += "；" + "；".join(str(w) for w in warns)
+            if format_plc_report:
+                info["error_log"] = format_plc_report(reason, rows, plan)
+            else:
+                info["error_log"] = "原因：" + reason
+        return ok, info
+
+    def _arm_plc_plan(self, driver) -> None:
+        """_run(setpoints=...) 里计划要写的点，失败时用来标出还没执行到的。"""
+        if driver is None or getattr(driver, "_plc_plan_armed", False):
+            return
+        orig = getattr(driver, "_run", None)
+        if not callable(orig):
+            return
+
+        def wrapped(*args, **kwargs):
+            planned = kwargs.get("setpoints")
+            if isinstance(planned, dict):
+                try:
+                    from unilabos.devices.workstation.GN.base_opcua_client import trace_plan
+                    trace_plan(planned)
+                except Exception:
+                    pass
+            return orig(*args, **kwargs)
+
+        driver._run = wrapped
+        driver._plc_plan_armed = True
+
+    def _run_node_body(self, node: Dict[str, Any],
+                       ctx: Optional[Dict[str, Any]] = None) -> Tuple[bool, Dict[str, Any]]:
         ctx = ctx or {}
         t0 = time.time()
         self._sync_mode()
@@ -387,6 +434,7 @@ class GNStation:
                                        error="驱动 %s 上没有可调用动作 %s"
                                              % (device_id, method_name))
                 kwargs = dict(call["kwargs"])
+                self._arm_plc_plan(driver)
                 kwargs, tw = _apply_timeout(fn, kwargs)
                 warnings += tw
                 result = fn(**kwargs)

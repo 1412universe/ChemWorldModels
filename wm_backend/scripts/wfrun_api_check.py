@@ -220,7 +220,7 @@ def main():
     fails.append(not ok("驱动按 1.4.0 声明 240 个点位（无静默丢点）",
                         pr2.get("declared_nodes") == 240, str(pr2.get("declared_nodes"))))
     fails.append(not ok("real 探针用的也是 1.4.0 节点表",
-                        "opcua_gn1.4.0.csv" in str(pr2.get("node_csv") or ""),
+                        "opcua_gn1.4.1.csv" in str(pr2.get("node_csv") or ""),
                         str(pr2.get("node_csv"))))
 
     print("13) real+simulate：节点真跑驱动代码路径（不碰硬件）")

@@ -223,12 +223,6 @@ PARAM_META = {
     # --- 1.4.0 新增：锁紧预锁/终锁（表②「1.握手 / 2.新增点位 / 3.CmdType」） ---
     "pre_turns": _p("预锁圈数", "0.1圈", "W",
                     "Lock_PreTurnsSet。20=2.0圈；四颗螺丝共用；Type=15(预锁)必写，≤0 拒收", 1, 100),
-    "pre_torque_limit": _p("预锁扭矩上限", "0.001N·m", "W",
-                           "Lock_PreTorqueLimit。300=0.300N·m；圈数未满但已顶死即停，防预锁变锁死；"
-                           "Type=15 必写，且必须小于终锁目标扭矩", 1, 600),
-    "final_torque": _p("终锁目标扭矩", "0.001N·m", "W",
-                       "Lock_FinalTorqueSet。600=0.600N·m，对应电批 E12C；Type=11(终锁)必写，"
-                       "且必须大于预锁扭矩上限", 1, 1200),
 
     # --- 机械手 ---
     "station": _p("目标工站编号", "1~10", "W",
@@ -272,21 +266,20 @@ STATION_ALIAS = {
 
 # ---------- 5. 锁紧四角盖工艺流程（表② 4 小节，可直接作为默认配方） ----------
 LOCK_CAP_RECIPE = [
-    {"step": 1, "type": 15, "hole": 1, "pre_turns": 20, "pre_torque_limit": 300, "expect": "带上，不锁死"},
-    {"step": 2, "type": 15, "hole": 3, "pre_turns": 20, "pre_torque_limit": 300, "expect": "对角"},
-    {"step": 3, "type": 15, "hole": 2, "pre_turns": 20, "pre_torque_limit": 300, "expect": ""},
-    {"step": 4, "type": 15, "hole": 4, "pre_turns": 20, "pre_torque_limit": 300, "expect": "四角都已贴合"},
-    {"step": 5, "type": 11, "hole": 1, "final_torque": 600, "expect": "锁死"},
-    {"step": 6, "type": 11, "hole": 3, "final_torque": 600, "expect": ""},
-    {"step": 7, "type": 11, "hole": 2, "final_torque": 600, "expect": ""},
-    {"step": 8, "type": 11, "hole": 4, "final_torque": 600, "expect": "整盖完成"},
+    {"step": 1, "type": 15, "hole": 1, "pre_turns": 20, "expect": "带上，不锁死"},
+    {"step": 2, "type": 15, "hole": 3, "pre_turns": 20, "expect": "对角"},
+    {"step": 3, "type": 15, "hole": 2, "pre_turns": 20, "expect": ""},
+    {"step": 4, "type": 15, "hole": 4, "pre_turns": 20, "expect": "四角都已贴合"},
+    {"step": 5, "type": 11, "hole": 1, "expect": "锁死"},
+    {"step": 6, "type": 11, "hole": 3, "expect": ""},
+    {"step": 7, "type": 11, "hole": 2, "expect": ""},
+    {"step": 8, "type": 11, "hole": 4, "expect": "整盖完成"},
 ]
 
 # 锁紧互锁规则（表② 1·3·6 小节），供前端/后端校验提示
 LOCK_INTERLOCKS = [
     "同一时刻只允许一条锁紧指令（下发前校验 CompleteFB=0）",
-    "CmdType=15 预锁必须写预锁圈数 + 预锁扭矩上限；Type=11 终锁必须写终锁目标扭矩",
-    "终锁目标扭矩必须大于预锁扭矩上限",
+    "CmdType=15 预锁必须写 pre_turns>0（×0.1圈）；1.4.1 没有预锁扭矩上限和终锁目标扭矩",
     "孔顺序必须对角：孔1→孔3→孔2→孔4，禁止邻边 1-2-3-4",
     "必须四颗预锁全部结束后再终锁，禁止同一颗 15 完立刻 11",
     "CmdTrig 必须 0→1 触发，不得长期置 1",
@@ -308,10 +301,7 @@ def actions_for(dev):
 def extra_params_for(dev, cmd_type=None, name=None):
     """返回权威协议里存在、但真实工作流未出现、需要补进节点库的参数键。"""
     extra = {}
-    # 锁紧模块的预锁/终锁参数（1.4.0 新增点位）
-    if dev == "gn_locking_mechanism":
-        if cmd_type == 15:
-            extra = {"pre_turns": 20, "pre_torque_limit": 300}
-        elif cmd_type == 11:
-            extra = {"final_torque": 600}
+    # 锁紧预锁只保留圈数。1.4.1 点位表已删除扭矩上限和终锁扭矩。
+    if dev == "gn_locking_mechanism" and cmd_type == 15:
+        extra = {"pre_turns": 20}
     return extra

@@ -6,16 +6,16 @@
     "workflow_name": "demo",
     "nodes": [
       {
-        "uuid": "7998d943-5e9e-4660-a546-b0f62f1eed96",
+        "uuid": "50682d8f-c446-433b-9bd3-a636e97da76b",
         "parent_uuid": "",
-        "name": "reset",
+        "name": "auto-execute_command",
         "type": "ILab",
         "icon": "",
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 60,
-            "y": 56,
+            "x": -50,
+            "y": 30,
             "z": 0
           },
           "position_3d": {
@@ -42,19 +42,100 @@
           "cross_section_type": "rectangle"
         },
         "param": {
-          "timeout": 120
+          "x_pos": "",
+          "y_pos": "",
+          "z1_pos": "",
+          "z2_pos": "",
+          "x_speed": "",
+          "y_speed": "",
+          "z1_speed": "",
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 5,
+          "timeout": 180,
+          "cmd_type": 15
         },
         "footer": "",
-        "device_name": "PRCXI",
+        "device_name": "gn_locking_mechanism",
         "disabled": false,
         "minimized": false,
         "lab_node_type": "Device",
         "template_uuid": "",
-        "template_name": "reset",
-        "resource_name": "PRCXI"
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "4a120e6f-438a-4cd1-ac56-c1196a884bf3",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 270,
+            "y": 30,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": "",
+          "y_pos": "",
+          "z1_pos": "",
+          "z2_pos": "",
+          "x_speed": "",
+          "y_speed": "",
+          "z1_speed": "",
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": "",
+          "timeout": 180,
+          "cmd_type": 16
+        },
+        "footer": "",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
       }
     ],
-    "edges": [],
+    "edges": [
+      {
+        "source_node_uuid": "50682d8f-c446-433b-9bd3-a636e97da76b",
+        "target_node_uuid": "4a120e6f-438a-4cd1-ac56-c1196a884bf3",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      }
+    ],
     "embeds": [],
     "as_template": true
   }
