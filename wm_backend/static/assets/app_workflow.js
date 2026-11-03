@@ -2388,11 +2388,9 @@
     return r;
   }
 
-  // ---------- 自动布局（rank 分层 + 折行分带） ----------
-  // 参考 CWM-Lab/frontend/src/lib/workflowGraphLayout.ts 的 rank + ranksPerBand：
-  // 单纯按 rank 从左到右排，长链工作流会拉成一条几千像素的横线，
-  // 适应画布后缩放到 40%~50%，字全糊了。所以这里把 rank 折成若干「带」，
-  // 并让相邻带反向排列（蛇形），使一段连续流程在视觉上首尾相接。
+  // ---------- 自动布局（按连线拓扑分层，层内按边序/重心排，不按旧坐标乱排） ----------
+  // 列 = 最长路径 rank（沿边的执行先后）；行 = 沿出边 BFS 发现序 + 父节点重心，减少交叉。
+  // 长链折成多带蛇形，避免拉成一条超长横线。
   var LAYOUT = { COL: 300, ROW: 186, X0: 60, Y0: 56, BAND_GAP: 34 };
 
   function autoLayout(opts) {
@@ -2400,28 +2398,104 @@
     var nodes = state.wf.data.nodes, edges = state.wf.data.edges;
     if (!nodes.length) return;
     if (!opts.silent) pushUndo();
-    clearNotes();   // 布局后「已缩放到 xx%」的旧提示就过期了
+    clearNotes();
 
-    var indeg = {}, children = {};
-    nodes.forEach(function (n) { indeg[n.uuid] = 0; children[n.uuid] = []; });
-    edges.forEach(function (e) {
-      if (indeg[e.target_node_uuid] === undefined) return;
-      indeg[e.target_node_uuid]++;
-      if (children[e.source_node_uuid]) children[e.source_node_uuid].push(e.target_node_uuid);
+    var uuidOk = {};
+    nodes.forEach(function (n) { if (n && n.uuid) uuidOk[n.uuid] = 1; });
+
+    var indeg = {}, children = {}, parents = {};
+    nodes.forEach(function (n) {
+      indeg[n.uuid] = 0;
+      children[n.uuid] = [];
+      parents[n.uuid] = [];
     });
-    // rank = 最长路径（Kahn 拓扑），环内节点保持 rank 0
+    // 严格按 edges 数组顺序建邻接 = 「连线顺序」
+    edges.forEach(function (e) {
+      if (!e) return;
+      var s = e.source_node_uuid, t = e.target_node_uuid;
+      if (!uuidOk[s] || !uuidOk[t]) return;
+      indeg[t]++;
+      children[s].push(t);
+      parents[t].push(s);
+    });
+
+    var linked = {};
+    edges.forEach(function (e) {
+      if (!e) return;
+      if (uuidOk[e.source_node_uuid]) linked[e.source_node_uuid] = 1;
+      if (uuidOk[e.target_node_uuid]) linked[e.target_node_uuid] = 1;
+    });
+
+    // rank = 沿边最长路径（Kahn）；环内未入队的节点保持 0
     var rank = {}, q = [];
-    nodes.forEach(function (n) { rank[n.uuid] = 0; if (!indeg[n.uuid]) q.push(n.uuid); });
+    nodes.forEach(function (n) {
+      rank[n.uuid] = 0;
+      if (!indeg[n.uuid]) q.push(n.uuid);
+    });
+    // 起点也按「作为某条边的 source 首次出现」排序，贴近连线书写顺序
+    var srcFirst = {};
+    edges.forEach(function (e, ei) {
+      var s = e && e.source_node_uuid;
+      if (s && uuidOk[s] && srcFirst[s] === undefined) srcFirst[s] = ei;
+    });
+    q.sort(function (a, b) {
+      var fa = srcFirst[a], fb = srcFirst[b];
+      if (fa === undefined && fb === undefined) return 0;
+      if (fa === undefined) return 1;
+      if (fb === undefined) return -1;
+      return fa - fb;
+    });
+
     var seen = {};
     while (q.length) {
-      var u = q.shift(); seen[u] = 1;
-      children[u].forEach(function (v) {
-        rank[v] = Math.max(rank[v] || 0, rank[u] + 1);
+      var u = q.shift();
+      if (seen[u]) continue;
+      seen[u] = 1;
+      (children[u] || []).forEach(function (v) {
+        rank[v] = Math.max(rank[v] || 0, (rank[u] || 0) + 1);
         indeg[v]--;
         if (indeg[v] === 0) q.push(v);
       });
     }
-    nodes.forEach(function (n) { if (!seen[n.uuid]) rank[n.uuid] = rank[n.uuid] || 0; });
+    nodes.forEach(function (n) {
+      if (!seen[n.uuid]) rank[n.uuid] = rank[n.uuid] || 0;
+    });
+
+    // 沿边 BFS 发现序：同层上下位置主依据（不是旧 x/y，也不是设备名）
+    // Kahn 已把 indeg 清零，用 parents 长度还原入度找真正起点
+    var discover = {}, di = 0;
+    var bq = [];
+    nodes.forEach(function (n) {
+      if (linked[n.uuid] && !(parents[n.uuid] || []).length) bq.push(n.uuid);
+    });
+    bq.sort(function (a, b) {
+      var fa = srcFirst[a], fb = srcFirst[b];
+      if (fa === undefined && fb === undefined) return 0;
+      if (fa === undefined) return 1;
+      if (fb === undefined) return -1;
+      return fa - fb;
+    });
+    while (bq.length) {
+      var u2 = bq.shift();
+      if (discover[u2] !== undefined) continue;
+      discover[u2] = di++;
+      (children[u2] || []).forEach(function (v) {
+        if (discover[v] === undefined) bq.push(v);
+      });
+    }
+    // 孤立节点 / 未遍历到的：排在连线节点之后
+    nodes.forEach(function (n) {
+      if (discover[n.uuid] === undefined) discover[n.uuid] = di++;
+    });
+
+    // 无连线的孤立节点单独放到最后一列之后，避免和流程起点挤在一起
+    var maxLinkedRank = 0;
+    nodes.forEach(function (n) {
+      if (linked[n.uuid]) maxLinkedRank = Math.max(maxLinkedRank, rank[n.uuid] || 0);
+    });
+    nodes.forEach(function (n) {
+      if (!linked[n.uuid]) rank[n.uuid] = maxLinkedRank + 1;
+    });
 
     var byRank = {}, rankKeys = [];
     nodes.forEach(function (n) {
@@ -2430,36 +2504,57 @@
       byRank[r].push(n);
     });
     rankKeys.sort(function (a, b) { return a - b; });
-    var nR = rankKeys.length;
-    rankKeys.forEach(function (r) {
-      byRank[r].sort(function (a, b) {
-        if (a.device_name === b.device_name) return 0;
-        return (a.device_name || '') < (b.device_name || '') ? -1 : 1;
-      });
-    });
 
-    // 每行节点数 = 该 rank 的节点数；带高按带内最多节点数算
+    function baryOf(n, prevList) {
+      var idx = {};
+      prevList.forEach(function (p, i) { idx[p.uuid] = i; });
+      var ps = parents[n.uuid] || [];
+      var sum = 0, c = 0;
+      ps.forEach(function (p) {
+        if (idx[p] !== undefined) { sum += idx[p]; c++; }
+      });
+      return c ? (sum / c) : 1e6;
+    }
+
+    // 先按发现序，再多趟重心排序（顺着边减少交叉）
+    rankKeys.forEach(function (r) {
+      byRank[r].sort(function (a, b) { return discover[a.uuid] - discover[b.uuid]; });
+    });
+    var pass, ri;
+    for (pass = 0; pass < 4; pass++) {
+      for (ri = 1; ri < rankKeys.length; ri++) {
+        var prev = byRank[rankKeys[ri - 1]];
+        var cur = byRank[rankKeys[ri]];
+        cur.sort(function (a, b) {
+          var ba = baryOf(a, prev), bb = baryOf(b, prev);
+          if (ba !== bb) return ba - bb;
+          return discover[a.uuid] - discover[b.uuid];
+        });
+      }
+    }
+
+    var nR = rankKeys.length;
     var rowOf = {};
     rankKeys.forEach(function (r) { rowOf[r] = byRank[r].length; });
 
-    // 选 ranksPerBand：让内容长宽比接近画布长宽比（折行后最省缩放）
     var cr = wrap.getBoundingClientRect();
     var canvasAR = (cr.width || 1200) / (cr.height || 800);
     var best = { rpb: nR, score: Infinity };
-    for (var rpb = 1; rpb <= nR; rpb++) {
-      var bands = Math.ceil(nR / rpb), maxRows = 1;
+    for (var rpbTry = 1; rpbTry <= nR; rpbTry++) {
+      var bands = Math.ceil(nR / rpbTry), maxRows = 1;
       for (var bi = 0; bi < bands; bi++) {
         var mx = 0;
-        for (var k = bi * rpb; k < Math.min(nR, (bi + 1) * rpb); k++) mx = Math.max(mx, rowOf[rankKeys[k]]);
+        for (var k = bi * rpbTry; k < Math.min(nR, (bi + 1) * rpbTry); k++) {
+          mx = Math.max(mx, rowOf[rankKeys[k]]);
+        }
         maxRows = Math.max(maxRows, mx || 1);
       }
-      var W = rpb * LAYOUT.COL, H = bands * (maxRows * LAYOUT.ROW + LAYOUT.BAND_GAP);
+      var W = rpbTry * LAYOUT.COL, H = bands * (maxRows * LAYOUT.ROW + LAYOUT.BAND_GAP);
       var score = Math.abs((W / H) - canvasAR) + 0.12 * Math.abs(Math.log(W / H) - Math.log(canvasAR));
-      if (score < best.score) best = { rpb: rpb, score: score };
+      if (score < best.score) best = { rpb: rpbTry, score: score };
     }
     var rpb = opts.ranksPerBand || best.rpb;
 
-    // 逐带摆放；奇数带反向，让流程蛇形衔接
     var y = LAYOUT.Y0;
     for (var b = 0; b * rpb < nR; b++) {
       var idxs = [];
@@ -2470,8 +2565,10 @@
         var rankIdx = (b % 2 === 1) ? (idxs.length - 1 - jj) : jj;
         var rk = rankKeys[i];
         var colNodes = byRank[rk];
-        var offset = (maxRows2 - colNodes.length) / 2;   // 短列在带内居中
+        var offset = (maxRows2 - colNodes.length) / 2;
         colNodes.forEach(function (n, ii) {
+          if (!n.pose) n.pose = {};
+          if (!n.pose.position) n.pose.position = { x: 0, y: 0, z: 0 };
           n.pose.position.x = LAYOUT.X0 + rankIdx * LAYOUT.COL;
           n.pose.position.y = y + (offset + ii) * LAYOUT.ROW;
         });
@@ -2483,8 +2580,8 @@
     fitView();
     setTimeout(fitView, 60);
     if (!opts.silent) {
-      note('ok', '已自动布局', nR + ' 个层级折成 ' + Math.ceil(nR / rpb) + ' 带（每带 ' + rpb +
-        ' 级），同设备节点靠拢、并行分支并列。', 4200);
+      note('ok', '已按连线顺序布局', nR + ' 个拓扑层级 · 折成 ' + Math.ceil(nR / rpb) +
+        ' 带（每带 ' + rpb + ' 级）；同层按边序/重心排列，不按旧坐标。', 4200);
     }
     return { ranks: nR, ranksPerBand: rpb, bands: Math.ceil(nR / rpb) };
   }
