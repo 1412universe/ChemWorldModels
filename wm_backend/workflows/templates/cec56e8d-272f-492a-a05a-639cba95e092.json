@@ -1,9 +1,9 @@
 {
   "target_lab_uuid": "75fb74df-2e98-4fc6-91e6-8992aa39e7ca",
-  "name": "demo",
+  "name": "锁紧",
   "data": {
     "workflow_uuid": "cec56e8d-272f-492a-a05a-639cba95e092",
-    "workflow_name": "demo",
+    "workflow_name": "锁紧",
     "nodes": [
       {
         "uuid": "50682d8f-c446-433b-9bd3-a636e97da76b",
@@ -14,8 +14,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -50,
-            "y": 30,
+            "x": 360,
+            "y": 56,
             "z": 0
           },
           "position_3d": {
@@ -42,13 +42,13 @@
           "cross_section_type": "rectangle"
         },
         "param": {
-          "x_pos": "",
-          "y_pos": "",
-          "z1_pos": "",
+          "x_pos": 500,
+          "y_pos": 10,
+          "z1_pos": null,
           "z2_pos": "",
           "x_speed": "",
           "y_speed": "",
-          "z1_speed": "",
+          "z1_speed": null,
           "z2_speed": "",
           "jaw_position": "",
           "jaw_force": "",
@@ -74,8 +74,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 270,
-            "y": 30,
+            "x": 60,
+            "y": 276,
             "z": 0
           },
           "position_3d": {
@@ -124,12 +124,80 @@
         "template_uuid": "",
         "template_name": "auto-execute_command",
         "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "9c689b17-924a-4b79-8088-f5553fa07281",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 60,
+            "y": 56,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 300,
+          "y_pos": 100,
+          "z1_pos": "",
+          "z2_pos": "",
+          "x_speed": "",
+          "y_speed": "",
+          "z1_speed": "",
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 5,
+          "timeout": 180,
+          "cmd_type": 15
+        },
+        "footer": "",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
       }
     ],
     "edges": [
       {
         "source_node_uuid": "50682d8f-c446-433b-9bd3-a636e97da76b",
         "target_node_uuid": "4a120e6f-438a-4cd1-ac56-c1196a884bf3",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "9c689b17-924a-4b79-8088-f5553fa07281",
+        "target_node_uuid": "50682d8f-c446-433b-9bd3-a636e97da76b",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",

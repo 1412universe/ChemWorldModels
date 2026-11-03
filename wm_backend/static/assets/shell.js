@@ -39,6 +39,7 @@
   var ctrlBtns = (theme === 'photo') ? [
     '      <button id="btn-neb">⚛ NEB 路径</button>',
     '      <button id="btn-play" class="primary">▶ 运行</button>',
+    '      <button id="btn-worldmodel" class="wm-toolbar" title="世界模型预演：条件→产物 + 物理约束">🌍 世界模型</button>',
     '      <label style="margin-left:6px;font-size:12px;cursor:pointer;user-select:none"><input type="checkbox" id="chk-bo" style="vertical-align:middle"> 纯BO模式</label>',
     '      <button id="btn-step">⏭ 单步</button>',
     '      <button id="btn-exp-csv" class="exp">⬇ 配方CSV</button>',

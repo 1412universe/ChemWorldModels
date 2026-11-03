@@ -1127,100 +1127,50 @@ def _select_pd_p25(g, y_max):
     return top, trace, stop, proof
 
 def run_closed_loop(master_path=MASTER):
-    wb = openpyxl.load_workbook(master_path, data_only=True)
-    P = _load_laws(wb)
-    metals, sup_table = _load_descriptors(wb)
-    ws = wb["主表"]
-    rows = list(ws.iter_rows(values_only=True))
-    hdr = list(rows[0])
+    """Pd–P25：3 负载 × 3 条件；硬门槛 μ_sel≥SEL_MIN，软门槛加权 UCB。"""
+    from .bo_pd_p25 import SEL_MIN, recommend_3x3, write_bo_xlsx
 
-    def col(part):
-        for i, h in enumerate(hdr):
-            if h and part in str(h):
-                return i
-        raise KeyError(part)
+    result = recommend_3x3(master_path)
+    if not result.get("ok"):
+        return {
+            "ok": False,
+            "error": result.get("error") or "BO 失败",
+            "top": [],
+            "proof": {},
+            "stop_reason": result.get("error") or "",
+            "rounds": 0,
+            "systems": 0,
+            "save_dir": os.path.dirname(master_path),
+            "save_name": "",
+        }
 
-    ix = {
-        "metal": col("金属"),
-        "load": col("负载量"),
-        "sup": col("载体"),
-        "lpd": col("光强"),
-        "T": col("温度"),
-        "ch4": col("CH4流量"),
-        "o2": col("O2流量"),
-        "ar": col("Ar流量"),
-        "y": col("时空产率"),
-        "sel": col("C2+选择性"),
-        "o2_in": col("进料"),
-        "o2_out": col("尾气"),
-        "c2h4": col("C2H4浓度"),
-        "c2h6": col("C2H6浓度"),
-        "co2": col("CO2浓度"),
-    }
-    groups = {}
-    seen = set()
-    for r in rows[1:]:
-        try:
-            y = float(r[ix["y"]])
-            sel = float(r[ix["sel"]])
-        except (TypeError, ValueError):
-            continue
-        if y <= 0 or sel <= 0:
-            continue
-        cond = _cond_from_row(r, ix)
-        if cond is None:
-            continue
-        metal = str(r[ix["metal"]]).strip()
-        support = _clean_sup(r[ix["sup"]])
-        if metal in ("0", "", "NA"):
-            continue
-        key = (metal, support)
-        g = groups.get(key)
-        if g is None:
-            g = groups[key] = {
-                "metal": metal,
-                "support": support,
-                "loads": [],
-                "obs": [],
-                "sels": [],
-                "seen": {},
-            }
-        g["loads"].append(r[ix["load"]])
-        g["sels"].append(sel)
-        oi = _num(r[ix["o2_in"]])
-        if oi is not None:
-            cond["o2_in"] = oi
-        k = _key(metal, support, cond, r[ix["load"]])
-        seen.add(k)
-        prev = g["seen"].get(k)
-        if prev is None or y > prev["y"]:
-            g["seen"][k] = {
-                "cond": cond, "y": y, "sel": sel, "z": None, "load": r[ix["load"]],
-                "o2_in": oi, "o2_out": _num(r[ix["o2_out"]]),
-                "c2h4": _num(r[ix["c2h4"]]), "c2h6": _num(r[ix["c2h6"]]), "co2": _num(r[ix["co2"]]),
-            }
-    ret_load, ret_flow, allz = _load_retention()
-    for g in groups.values():
-        g["obs"] = list(g["seen"].values())
-        for ob in g["obs"]:
-            ob["z"] = _lookup_z(ret_load, ret_flow, g["metal"], g["support"], ob["load"], ob["cond"])
+    top = []
+    for row in result.get("top") or []:
+        item = dict(row)
+        item.setdefault("metal", "Pd")
+        item.setdefault("support", "P25")
+        # 前端「光功率」列：无相对功率时用光强展示
+        if item.get("power") is None and item.get("lpd") is not None:
+            item["power"] = None  # 保留；UI 读 lpd
+        top.append(item)
 
-    y_max = max((ob["y"] for g in groups.values() for ob in g["obs"]), default=0.0)
-    pd_groups = [g for g in groups.values() if _is_pd_p25(g["metal"], g["support"])]
-    if not pd_groups:
-        top, trace, stop_reason, proof = [], [], "主表里没有 Pd-P25，定不出当前最优。", {}
-    else:
-        pd_groups.sort(key=lambda g: -len(g["obs"]))
-        top, trace, stop_reason, proof = _select_pd_p25(pd_groups[0], y_max)
-    save_dir, save_name = _write_top8(top, stop_reason, len(trace), proof)
+    stop_reason = result.get("stop_reason") or ""
+    proof = result.get("proof") or {}
+    save_dir, save_name = _write_top8(top, stop_reason, 0, proof)
+    try:
+        write_bo_xlsx(result)
+    except Exception:
+        pass
     return {
         "ok": True,
-        "rounds": len(trace),
+        "rounds": 0,
         "stop_reason": stop_reason,
         "top": top,
-        "trace": trace,
+        "trace": [],
         "proof": proof,
-        "systems": len(groups),
+        "systems": result.get("n_train") or 0,
+        "sel_min": result.get("sel_min", SEL_MIN),
+        "groups": result.get("groups") or [],
         "save_dir": save_dir,
         "save_name": save_name,
     }
@@ -1243,31 +1193,29 @@ def _write_top8(top, stop_reason, rounds, proof=None):
     for row in top:
         ws.append([
             row.get("group") or "新配方",
-            row["rank"], row["metal"], row["support"], row["loading"],
-            row["ch4"], row["o2"], row["ar"], row.get("mass"), row.get("power"),
+            row["rank"], row.get("metal", "Pd"), row.get("support", "P25"), row["loading"],
+            row["ch4"], row["o2"], row["ar"], row.get("mass"), row.get("power") or row.get("lpd"),
             row.get("o2_in"), row["y"], row.get("sel"), row.get("z"),
             row.get("score"), row.get("ucb"), row.get("gap"),
             row.get("o2_in"), row.get("o2_out"),
             row.get("c2h4"), row.get("c2h6"), row.get("co2"),
-            row["reason"],
+            row.get("reason"),
         ])
     note = wb.create_sheet("说明")
-    note.append(["目标", "选择性>84 且 保持率>95% 的前提下产率最高；采集分=产率期望改进×两个门槛的概率"])
+    note.append(["目标", "Pd–P25：3负载×3条件；硬门槛 μ_sel≥sel_min 剔除；软门槛 score=UCB_y×clip((μ_sel−sel_min)/(100−sel_min),0,1)"])
     note.append(["当前最优负载", proof.get("load")])
     note.append(["门槛内最高产率", proof.get("ystar")])
-    note.append(["选择性门槛", ">84"])
-    note.append(["保持率门槛", ">95%"])
-    note.append(["进料氧%", proof.get("o2_in")])
-    note.append(["预测产率超过主表最高的格数", proof.get("n_above")])
+    note.append(["选择性硬门槛", proof.get("sel_min", 40)])
+    note.append(["训练点数", proof.get("n_train")])
+    note.append(["负载档数", proof.get("n_loadings")])
     note.append(["当前最优选择性", proof.get("selstar")])
     note.append(["当前最优保持率", proof.get("zstar")])
     note.append(["甲烷", proof.get("ch4")])
-    note.append(["1%氧气", proof.get("o2")])
+    note.append(["氧气", proof.get("o2")])
     note.append(["氩气", proof.get("ar")])
+    note.append(["光强mW/cm2", proof.get("lpd")])
     note.append(["相对光功率%", proof.get("power")])
-    note.append(["催化剂质量mg", proof.get("mass")])
-    note.append(["网格格数", proof.get("n_cells")])
-    note.append(["上界仍更高的格数", proof.get("n_open")])
+    note.append(["硬门槛通过的推荐数", proof.get("n_open")])
     note.append(["旁边组数", proof.get("near")])
     note.append(["远处组数", proof.get("far")])
     note.append(["已经整片压住的负载", "、".join(proof.get("certified") or [])])

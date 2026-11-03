@@ -123,6 +123,11 @@
   function openDrawer() { drawer.classList.add('open'); document.body.classList.add('run-open'); syncDrawerHeight(); }
   function closeDrawer() { drawer.classList.remove('open'); document.body.classList.remove('run-open'); syncDrawerHeight(); }
   $('run-close').addEventListener('click', closeDrawer);
+  // 点击运行区后聚焦，触控板 / 滚轮上下滑内容（画布缩放不再抢事件）
+  drawer.addEventListener('pointerdown', function (ev) {
+    if (ev.target && ev.target.closest && ev.target.closest('button, input, select, textarea, a')) return;
+    try { drawer.focus({ preventScroll: true }); } catch (e) { try { drawer.focus(); } catch (e2) { } }
+  });
 
   // ---------------------------------------------------------------- 预检
   function preflight() {
@@ -237,6 +242,9 @@
     stopRunUi(true);
     setHoldUi(true, false);
     if (btnRun) { btnRun.disabled = true; btnRun.classList.add('busy'); }
+    if (window.__WF_TWIN && window.__WF_TWIN.onStart) {
+      try { window.__WF_TWIN.onStart(); } catch (e) { }
+    }
 
     // 先把所有节点刷成「待执行」，让状态图层立刻可见
     var idx = nodeIndex();
@@ -254,6 +262,9 @@
         lanesEl.innerHTML = '<div class="props-note err" style="margin:8px 0"><b>无法启动运行</b><br/>' +
           esc(j.error || '未知错误') + '</div>';
         stopRunUi(false);
+        if (window.__WF_TWIN && window.__WF_TWIN.hide) {
+          try { window.__WF_TWIN.hide(); } catch (e) { }
+        }
         return;
       }
       run = { run_id: j.run_id, es: null, snap: null, tmax: 1, poll: null };
@@ -264,6 +275,9 @@
       lanesEl.innerHTML = '<div class="props-note err" style="margin:8px 0">' + esc(e.message || e) +
         '<br/>请确认后端 wm_backend 服务正在运行。</div>';
       stopRunUi(false);
+      if (window.__WF_TWIN && window.__WF_TWIN.hide) {
+        try { window.__WF_TWIN.hide(); } catch (e2) { }
+      }
     });
   }
 
@@ -317,6 +331,9 @@
           ' · 墙钟 ' + fmtDur(j.summary.wall_clock) +
           (j.summary.speedup ? ' · 加速比 ' + j.summary.speedup + '×' : ''));
       } else { setSub('运行结束'); }
+      if (window.__WF_TWIN && window.__WF_TWIN.onDone) {
+        try { window.__WF_TWIN.onDone(lastSnap || j); } catch (e) { }
+      }
     });
     es.onerror = function () {
       // EventSource 自动重连；若运行已结束或后端不可达则退化为轮询
@@ -386,6 +403,14 @@
       setHoldUi(true, false);
     }
     if (snap.finished) stopRunUi(false);
+
+    // 3) 总览-510 孪生浮窗
+    if (window.__WF_TWIN) {
+      try {
+        if (snap.finished && window.__WF_TWIN.onDone) window.__WF_TWIN.onDone(snap);
+        else if (window.__WF_TWIN.update) window.__WF_TWIN.update(snap);
+      } catch (e) { }
+    }
   }
 
   function pausedNodeNames(snap) {

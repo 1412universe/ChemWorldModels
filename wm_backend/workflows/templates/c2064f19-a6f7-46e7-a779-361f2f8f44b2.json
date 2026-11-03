@@ -1,0 +1,986 @@
+{
+  "target_lab_uuid": "803298d7-ba98-4cd5-a546-b7ca08b4cb12",
+  "name": "从9320到堆栈三次取枪头",
+  "data": {
+    "workflow_uuid": "c2064f19-a6f7-46e7-a779-361f2f8f44b2",
+    "workflow_name": "从9320到堆栈三次取枪头",
+    "nodes": [
+      {
+        "uuid": "60922dcf-0c3e-454e-8e9c-83c8c2d5299f",
+        "parent_uuid": "",
+        "name": "pick",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 3651.3047,
+            "y": -2591.2485,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 1,
+          "station": "nine9320",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
+        "template_name": "pick",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "0351205d-d763-4005-9891-145304c0479a",
+        "parent_uuid": "",
+        "name": "place",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 3955.8582,
+            "y": -2594.7864,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 74,
+          "station": "stack",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
+        "template_name": "place",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "cafe26ea-d8f6-4e7a-861e-9e53dd52ca4f",
+        "parent_uuid": "",
+        "name": "auto-run_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 3359.639,
+            "y": -2596.3918,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "protocol_id": null
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
+        "template_name": "auto-run_protocol",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "16a6ca3a-0f09-4fee-baae-5fe24c72ee3c",
+        "parent_uuid": "",
+        "name": "auto-create_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2732.4946,
+            "y": -2594.7622,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "none_keys": [],
+          "protocol_date": "",
+          "protocol_name": "",
+          "protocol_type": "",
+          "protocol_author": "",
+          "protocol_version": "",
+          "protocol_description": ""
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
+        "template_name": "auto-create_protocol",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "6900440d-d9cd-4b6b-9393-6d7d6cc64e5d",
+        "parent_uuid": "",
+        "name": "auto-create_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 4272.8105,
+            "y": -2593.0483,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "none_keys": [],
+          "protocol_date": "",
+          "protocol_name": "",
+          "protocol_type": "",
+          "protocol_author": "",
+          "protocol_version": "",
+          "protocol_description": ""
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
+        "template_name": "auto-create_protocol",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "32c81ac6-020d-4abd-9c4f-df99f74edc2c",
+        "parent_uuid": "",
+        "name": "auto-run_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 4910.6577,
+            "y": -2599.29,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "protocol_id": null
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
+        "template_name": "auto-run_protocol",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "986e30a6-0a17-4dc8-a1e9-176009bbc7b8",
+        "parent_uuid": "",
+        "name": "pick",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 5235.9727,
+            "y": -2598.0417,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 1,
+          "station": "nine9320",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
+        "template_name": "pick",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "72362a67-98a4-4269-ade3-01264c7c1b33",
+        "parent_uuid": "",
+        "name": "place",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 5585.605,
+            "y": -2594.2966,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 75,
+          "station": "stack",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
+        "template_name": "place",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "76b89780-3ec9-42d6-bdbe-803ef2acafa5",
+        "parent_uuid": "",
+        "name": "auto-run_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 6565.695,
+            "y": -2596.7935,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "protocol_id": null
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
+        "template_name": "auto-run_protocol",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "1123a895-94b1-4887-a0ff-6933f5740494",
+        "parent_uuid": "",
+        "name": "pick",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 6878.9263,
+            "y": -2598.0417,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 1,
+          "station": "nine9320",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
+        "template_name": "pick",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "9a9f0666-f071-4dae-97be-97f6c0201f22",
+        "parent_uuid": "",
+        "name": "auto-create_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 5901.5825,
+            "y": -2596.7935,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "none_keys": [],
+          "protocol_date": "",
+          "protocol_name": "",
+          "protocol_type": "",
+          "protocol_author": "",
+          "protocol_version": "",
+          "protocol_description": ""
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
+        "template_name": "auto-create_protocol",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "ef61d943-2452-4ac3-a554-c2e685a3be2a",
+        "parent_uuid": "",
+        "name": "move_plate",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 3053.763,
+            "y": -2592.5017,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "to": 16,
+          "from": 15,
+          "force": 5,
+          "plate": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips2",
+              "name": "PRCXI_1250uL_Tips2",
+              "uuid": "695548f2-3e97-4913-a2c5-e19b3b07cac9"
+            }
+          ],
+          "hierarchy": 1,
+          "get_direction": "",
+          "pickup_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "put_direction": "",
+          "drop_direction": "",
+          "resource_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pickup_direction": "",
+          "put_down_position": 2,
+          "destination_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pinch_it_up_position": 2,
+          "intermediate_locations": [],
+          "pickup_distance_from_top": 0
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
+        "template_name": "move_plate",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "1743435a-eca7-4027-9cdc-7b1d2271c876",
+        "parent_uuid": "",
+        "name": "move_plate",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 6226.1987,
+            "y": -2595.545,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "to": 16,
+          "from": 11,
+          "force": 5,
+          "plate": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips1",
+              "name": "PRCXI_1250uL_Tips1",
+              "uuid": "2c525d62-d238-48d5-892a-993e5c0065d7"
+            }
+          ],
+          "hierarchy": 1,
+          "get_direction": "",
+          "pickup_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "put_direction": "",
+          "drop_direction": "",
+          "resource_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pickup_direction": "",
+          "put_down_position": 2,
+          "destination_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pinch_it_up_position": 2,
+          "intermediate_locations": [],
+          "pickup_distance_from_top": 0
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
+        "template_name": "move_plate",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "f1e7b478-fc84-49ea-b36f-7825ecdb3cbe",
+        "parent_uuid": "",
+        "name": "move_plate",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 4582.3467,
+            "y": -2594.2966,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "to": 16,
+          "from": 12,
+          "force": 5,
+          "plate": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell5",
+              "name": "PRCXI_96_DeepWell5",
+              "uuid": "e74c153c-a29f-4653-a665-b9e1cc1711a9"
+            }
+          ],
+          "hierarchy": 1,
+          "get_direction": "",
+          "pickup_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "put_direction": "",
+          "drop_direction": "",
+          "resource_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pickup_direction": "",
+          "put_down_position": 2,
+          "destination_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pinch_it_up_position": 2,
+          "intermediate_locations": [],
+          "pickup_distance_from_top": 0
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
+        "template_name": "move_plate",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "f151b991-1956-4308-8130-e5722d6ef401",
+        "parent_uuid": "",
+        "name": "place",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 7191.009,
+            "y": -2595.545,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 76,
+          "station": "stack",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
+        "template_name": "place",
+        "resource_name": "gn_robotic_arm"
+      }
+    ],
+    "edges": [
+      {
+        "source_node_uuid": "60922dcf-0c3e-454e-8e9c-83c8c2d5299f",
+        "target_node_uuid": "0351205d-d763-4005-9891-145304c0479a",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "16a6ca3a-0f09-4fee-baae-5fe24c72ee3c",
+        "target_node_uuid": "ef61d943-2452-4ac3-a554-c2e685a3be2a",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "ef61d943-2452-4ac3-a554-c2e685a3be2a",
+        "target_node_uuid": "cafe26ea-d8f6-4e7a-861e-9e53dd52ca4f",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "cafe26ea-d8f6-4e7a-861e-9e53dd52ca4f",
+        "target_node_uuid": "60922dcf-0c3e-454e-8e9c-83c8c2d5299f",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "0351205d-d763-4005-9891-145304c0479a",
+        "target_node_uuid": "6900440d-d9cd-4b6b-9393-6d7d6cc64e5d",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "6900440d-d9cd-4b6b-9393-6d7d6cc64e5d",
+        "target_node_uuid": "f1e7b478-fc84-49ea-b36f-7825ecdb3cbe",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "f1e7b478-fc84-49ea-b36f-7825ecdb3cbe",
+        "target_node_uuid": "32c81ac6-020d-4abd-9c4f-df99f74edc2c",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "32c81ac6-020d-4abd-9c4f-df99f74edc2c",
+        "target_node_uuid": "986e30a6-0a17-4dc8-a1e9-176009bbc7b8",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "986e30a6-0a17-4dc8-a1e9-176009bbc7b8",
+        "target_node_uuid": "72362a67-98a4-4269-ade3-01264c7c1b33",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "72362a67-98a4-4269-ade3-01264c7c1b33",
+        "target_node_uuid": "9a9f0666-f071-4dae-97be-97f6c0201f22",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "9a9f0666-f071-4dae-97be-97f6c0201f22",
+        "target_node_uuid": "1743435a-eca7-4027-9cdc-7b1d2271c876",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "1743435a-eca7-4027-9cdc-7b1d2271c876",
+        "target_node_uuid": "76b89780-3ec9-42d6-bdbe-803ef2acafa5",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "76b89780-3ec9-42d6-bdbe-803ef2acafa5",
+        "target_node_uuid": "1123a895-94b1-4887-a0ff-6933f5740494",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "1123a895-94b1-4887-a0ff-6933f5740494",
+        "target_node_uuid": "f151b991-1956-4308-8130-e5722d6ef401",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      }
+    ],
+    "embeds": []
+  }
+}

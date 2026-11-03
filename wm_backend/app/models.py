@@ -94,6 +94,21 @@ class ChatReq(BaseModel):
     api_key: str | None = None          # 覆盖 API Key（本地通常留空；外部自定义可填）
 
 
+class WorkflowAgentReq(BaseModel):
+    """工作流编辑器 Agent：基于 unilab-workflow-builder skill 批量生成 / 修改。"""
+    message: str
+    history: list[dict] | None = None
+    workflow: dict | None = None        # 当前画布完整 JSON
+    model: str | None = None
+    base_url: str | None = None
+    api_key: str | None = None
+
+
+class WorkflowValidateReq(BaseModel):
+    """用 unilab-workflow-builder skill 校验器验收工作流。"""
+    workflow: dict
+
+
 class WorkflowReq(BaseModel):
     """CWM-Lab 工作流生成请求：前端把 AI 理论最优条件 POST 给后端，
     后端调用 unilab-workflow-builder skill 的 prcxi_factory.py 生成合规工作流 JSON。"""

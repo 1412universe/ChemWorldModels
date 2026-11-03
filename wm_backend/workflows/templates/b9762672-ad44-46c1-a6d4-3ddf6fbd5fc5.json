@@ -1,0 +1,2082 @@
+{
+  "target_lab_uuid": "803298d7-ba98-4cd5-a546-b7ca08b4cb12",
+  "name": "8通道加样",
+  "data": {
+    "workflow_uuid": "b9762672-ad44-46c1-a6d4-3ddf6fbd5fc5",
+    "workflow_name": "8通道加样",
+    "nodes": [
+      {
+        "uuid": "6d159a77-e039-40fc-a12c-2dc475360707",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -1789.8739,
+            "y": -1804.6262,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -94,
+          "y_pos": 650,
+          "timeout": 6000,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 3600,
+          "door_speed": 150,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 7239,
+          "material_z_pos": 136000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 300
+        },
+        "footer": "Step8-R7: 加AA 211.34mg @X-571",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "ea14be85-1306-42a3-beb2-de32b4863283",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 6768.9854,
+            "y": -2464.8071,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 19,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R6: 放回3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "67e9c76a-da98-4c15-8b1a-c908e3bed0a4",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1088.113,
+            "y": -2357.6094,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 9,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R2: 取3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "912e44e7-456c-4984-a2ed-b126e63806c6",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 5719.854,
+            "y": -2461.6604,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 19,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R5: 放回3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "f5b1bf8d-e024-4f39-89ed-766395eae034",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 658.74896,
+            "y": -1816.4678,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -80,
+          "y_pos": 2100,
+          "timeout": 180,
+          "x_speed": 300,
+          "y_speed": 300,
+          "cmd_type": 13,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 2050,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 0,
+          "gripper_z_speed": 300,
+          "material_z_speed": 0
+        },
+        "footer": "放回料架",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "3f593e99-4601-4791-a49d-1fe194c83568",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -1343.6134,
+            "y": -2352.7073,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 0,
+          "y_pos": 0,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 20,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 0,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "aea26f8d-14bc-4068-9cf3-d6385bd59ed7",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 223.46957,
+            "y": -1831.1718,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -1840,
+          "y_pos": 1790,
+          "timeout": 180,
+          "x_speed": 300,
+          "y_speed": 300,
+          "cmd_type": 12,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 930,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 0,
+          "gripper_z_speed": 300,
+          "material_z_speed": 0
+        },
+        "footer": "-夹取加样工位",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "3b62e7a2-57d9-4664-a971-a88fa90c5d4a",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 3166.02,
+            "y": -2446.4148,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 19,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R3: 放回3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "cbc85019-4b57-47cf-bde2-add126d0ff79",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 4921.4253,
+            "y": -2458.2524,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 9,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R5: 取3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "400699a4-8dc6-448f-b7c1-e97ce5480d8d",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 6072.697,
+            "y": -2453.3284,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 9,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R6: 取3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "e9874f8a-7332-488e-b634-da3c5f607757",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1869.9227,
+            "y": -2379.9912,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 19,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R2: 放回3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "35dbc688-c132-4439-b8a1-49d1ec3546d9",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2573.9727,
+            "y": -2422.9531,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -454,
+          "y_pos": 650,
+          "timeout": 600,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 3600,
+          "door_speed": 150,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 3822,
+          "material_z_pos": 136000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 300
+        },
+        "footer": "Step8-R3: 加AA 211.34mg @X-607",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "1eed1afd-7d78-439d-8913-eea01370a503",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -51.391075,
+            "y": -2362.9302,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 9,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R1: 取3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "ca3f3b12-7ffa-4e78-9b0b-69ffeac5e675",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 4036.0063,
+            "y": -2439.3264,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -364,
+          "y_pos": 650,
+          "timeout": 600,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 3600,
+          "door_speed": 150,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 4676,
+          "material_z_pos": 136000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 300
+        },
+        "footer": "Step8-R4: 加AA 211.34mg @X-598",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "df5c6bc8-9b2a-4416-9801-bb515a5816bf",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 5321.373,
+            "y": -2468.0955,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -274,
+          "y_pos": 650,
+          "timeout": 6000,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 3600,
+          "door_speed": 150,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 2861,
+          "material_z_pos": 136000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 300
+        },
+        "footer": "Step8-R5: 加AA 211.34mg @X-589",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "8e20f669-4608-4a8d-8666-d58f406cbaec",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -1290.6688,
+            "y": -1844.5464,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3084,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 19,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R7: 放回3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "6f7f2779-327d-4938-861e-5f9b3bdffc22",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -888.70795,
+            "y": -2348.5093,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -80,
+          "y_pos": 2100,
+          "timeout": 180,
+          "x_speed": 300,
+          "y_speed": 300,
+          "cmd_type": 12,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 2050,
+          "volune_weight": 0,
+          "material_z_pos": 0,
+          "gripper_z_speed": 300,
+          "material_z_speed": 0
+        },
+        "footer": "夹取料架",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "94e3da7b-0a50-4a37-a483-dc23f6ce00d9",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 330.4667,
+            "y": -2360.0354,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -634,
+          "y_pos": 650,
+          "timeout": 600,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 3600,
+          "door_speed": 150,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 2113,
+          "material_z_pos": 136000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 300
+        },
+        "footer": "Step8-R1: 加AA 211.34mg @X-625",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "7643cc42-03ed-45c8-b371-8eb9eb7bb2f1",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1505.0833,
+            "y": -2399.0945,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -544,
+          "y_pos": 650,
+          "timeout": 600,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 3600,
+          "door_speed": 150,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 2968,
+          "material_z_pos": 136000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 300
+        },
+        "footer": "Step8-R2: 加AA 211.34mg @X-616",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "e2ef95b3-4a5a-4efa-b194-0ae009c42b94",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2227.2205,
+            "y": -2412.3433,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 9,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R3: 取3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "4f1043d6-1f48-4ec7-a6d5-1d2004119a95",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 4344.3916,
+            "y": -2419.9648,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 19,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R4: 放回3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "24f65a6e-d5a9-4975-a054-19298d9495e9",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 6412.4453,
+            "y": -2463.1843,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -184,
+          "y_pos": 650,
+          "timeout": 6000,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 3600,
+          "door_speed": 150,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 2125,
+          "material_z_pos": 136000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 300
+        },
+        "footer": "Step8-R6: 加AA 211.34mg @X-580",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "153dcd8d-d6ed-4753-94b6-c39474f5223e",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 7126.353,
+            "y": -2471.7097,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 9,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R7: 取3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "6f81b8ec-6889-4d92-8a77-605fe917c154",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -940.3472,
+            "y": -1891.5187,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 9,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R8: 取3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "9c3f39f8-518d-48df-8dea-6cfb2c737359",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 684.7238,
+            "y": -2366.6924,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 19,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R1: 放回3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "2fa08d55-81a7-49f5-a428-10c1e4090cf0",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -477.43155,
+            "y": -1805.2976,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -4,
+          "y_pos": 650,
+          "timeout": 6000,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 3600,
+          "door_speed": 150,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 8093,
+          "material_z_pos": 136000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 300
+        },
+        "footer": "Step8-R8: 加AA 211.34mg @X-562",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "b47b1d90-d2f3-48e0-b92f-a1a6ff0b2cd9",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1093.0345,
+            "y": -1833.3489,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 0,
+          "y_pos": 0,
+          "timeout": 180,
+          "x_speed": 0,
+          "y_speed": 0,
+          "cmd_type": 20,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 0,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "固体加样-复位",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "2552f4c9-127f-410e-bedd-b0b221463999",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 3594.9697,
+            "y": -2429.2607,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 9,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R4: 取3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "af111e7c-1391-48cd-8528-e86b49f05e83",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -100.46099,
+            "y": -1835.671,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -3094,
+          "y_pos": 210,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 19,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 239000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "Step8-R8: 放回3号桶AA",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "078390ef-e6f5-4dce-a357-93f12725c305",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -457.733,
+            "y": -2366.582,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -1840,
+          "y_pos": 1790,
+          "timeout": 180,
+          "x_speed": 300,
+          "y_speed": 300,
+          "cmd_type": 13,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 930,
+          "remove_static": 0,
+          "volune_weight": 0,
+          "material_z_pos": 0,
+          "gripper_z_speed": 300,
+          "material_z_speed": 0
+        },
+        "footer": "放置加样工位",
+        "device_name": "gn_solid_weighing",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      }
+    ],
+    "edges": [
+      {
+        "source_node_uuid": "6f7f2779-327d-4938-861e-5f9b3bdffc22",
+        "target_node_uuid": "078390ef-e6f5-4dce-a357-93f12725c305",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "aea26f8d-14bc-4068-9cf3-d6385bd59ed7",
+        "target_node_uuid": "f5b1bf8d-e024-4f39-89ed-766395eae034",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "f5b1bf8d-e024-4f39-89ed-766395eae034",
+        "target_node_uuid": "b47b1d90-d2f3-48e0-b92f-a1a6ff0b2cd9",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "078390ef-e6f5-4dce-a357-93f12725c305",
+        "target_node_uuid": "1eed1afd-7d78-439d-8913-eea01370a503",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "1eed1afd-7d78-439d-8913-eea01370a503",
+        "target_node_uuid": "94e3da7b-0a50-4a37-a483-dc23f6ce00d9",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "94e3da7b-0a50-4a37-a483-dc23f6ce00d9",
+        "target_node_uuid": "9c3f39f8-518d-48df-8dea-6cfb2c737359",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "9c3f39f8-518d-48df-8dea-6cfb2c737359",
+        "target_node_uuid": "67e9c76a-da98-4c15-8b1a-c908e3bed0a4",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "67e9c76a-da98-4c15-8b1a-c908e3bed0a4",
+        "target_node_uuid": "7643cc42-03ed-45c8-b371-8eb9eb7bb2f1",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "7643cc42-03ed-45c8-b371-8eb9eb7bb2f1",
+        "target_node_uuid": "e9874f8a-7332-488e-b634-da3c5f607757",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "e9874f8a-7332-488e-b634-da3c5f607757",
+        "target_node_uuid": "e2ef95b3-4a5a-4efa-b194-0ae009c42b94",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "e2ef95b3-4a5a-4efa-b194-0ae009c42b94",
+        "target_node_uuid": "35dbc688-c132-4439-b8a1-49d1ec3546d9",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "35dbc688-c132-4439-b8a1-49d1ec3546d9",
+        "target_node_uuid": "3b62e7a2-57d9-4664-a971-a88fa90c5d4a",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "3b62e7a2-57d9-4664-a971-a88fa90c5d4a",
+        "target_node_uuid": "2552f4c9-127f-410e-bedd-b0b221463999",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "2552f4c9-127f-410e-bedd-b0b221463999",
+        "target_node_uuid": "ca3f3b12-7ffa-4e78-9b0b-69ffeac5e675",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "ca3f3b12-7ffa-4e78-9b0b-69ffeac5e675",
+        "target_node_uuid": "4f1043d6-1f48-4ec7-a6d5-1d2004119a95",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "4f1043d6-1f48-4ec7-a6d5-1d2004119a95",
+        "target_node_uuid": "cbc85019-4b57-47cf-bde2-add126d0ff79",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "cbc85019-4b57-47cf-bde2-add126d0ff79",
+        "target_node_uuid": "df5c6bc8-9b2a-4416-9801-bb515a5816bf",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "df5c6bc8-9b2a-4416-9801-bb515a5816bf",
+        "target_node_uuid": "912e44e7-456c-4984-a2ed-b126e63806c6",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "912e44e7-456c-4984-a2ed-b126e63806c6",
+        "target_node_uuid": "400699a4-8dc6-448f-b7c1-e97ce5480d8d",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "400699a4-8dc6-448f-b7c1-e97ce5480d8d",
+        "target_node_uuid": "24f65a6e-d5a9-4975-a054-19298d9495e9",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "24f65a6e-d5a9-4975-a054-19298d9495e9",
+        "target_node_uuid": "ea14be85-1306-42a3-beb2-de32b4863283",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "ea14be85-1306-42a3-beb2-de32b4863283",
+        "target_node_uuid": "153dcd8d-d6ed-4753-94b6-c39474f5223e",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "153dcd8d-d6ed-4753-94b6-c39474f5223e",
+        "target_node_uuid": "6d159a77-e039-40fc-a12c-2dc475360707",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "6d159a77-e039-40fc-a12c-2dc475360707",
+        "target_node_uuid": "8e20f669-4608-4a8d-8666-d58f406cbaec",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "8e20f669-4608-4a8d-8666-d58f406cbaec",
+        "target_node_uuid": "6f81b8ec-6889-4d92-8a77-605fe917c154",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "6f81b8ec-6889-4d92-8a77-605fe917c154",
+        "target_node_uuid": "2fa08d55-81a7-49f5-a428-10c1e4090cf0",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "2fa08d55-81a7-49f5-a428-10c1e4090cf0",
+        "target_node_uuid": "af111e7c-1391-48cd-8528-e86b49f05e83",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "af111e7c-1391-48cd-8528-e86b49f05e83",
+        "target_node_uuid": "aea26f8d-14bc-4068-9cf3-d6385bd59ed7",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "3f593e99-4601-4791-a49d-1fe194c83568",
+        "target_node_uuid": "6f7f2779-327d-4938-861e-5f9b3bdffc22",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "af111e7c-1391-48cd-8528-e86b49f05e83",
+        "target_node_uuid": "b47b1d90-d2f3-48e0-b92f-a1a6ff0b2cd9",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      }
+    ],
+    "embeds": []
+  }
+}

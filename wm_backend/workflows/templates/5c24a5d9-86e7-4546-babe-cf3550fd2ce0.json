@@ -1,0 +1,86 @@
+{
+  "target_lab_uuid": "b7991ad7-fa7f-4e25-be6c-db301c8d5cde",
+  "name": "9320",
+  "data": {
+    "workflow_uuid": "5c24a5d9-86e7-4546-babe-cf3550fd2ce0",
+    "workflow_name": "9320",
+    "nodes": [
+      {
+        "uuid": "e8e5fbd7-974a-4c2e-8194-ca2df5aee898",
+        "parent_uuid": "",
+        "name": "transfer_liquid",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 0,
+            "y": 240,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "asp_flow_rates": "[100]",
+          "asp_vols": "[780]",
+          "blow_out_air_volume": "[]",
+          "blow_out_air_volume_before": "[]",
+          "delays": "[]",
+          "dis_flow_rates": "[100]",
+          "dis_vols": "[780]",
+          "dispensing_method": "[]",
+          "hover_below_liquid_level": "[]",
+          "is_96_well": true,
+          "liquid_height": "[]",
+          "mix_liquid_height": 0,
+          "mix_rate": 0,
+          "mix_stage": "none",
+          "mix_times": 0,
+          "mix_vol": 0,
+          "none_keys": "[]",
+          "offsets": "[]",
+          "post_air_volume": "[]",
+          "post_discharge_pause_time_ms": "[]",
+          "sources": "[{\"id\": \"/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_3\", \"name\": \"PRCXI_96_DeepWell_3\", \"uuid\": \"f260b8ba-a629-42ea-8340-548d765b4479\"}]",
+          "spread": "wide",
+          "targets": "[{\"id\": \"/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell5\", \"name\": \"PRCXI_96_DeepWell5\", \"uuid\": \"e74c153c-a29f-4653-a665-b9e1cc1711a9\"}]",
+          "tip_racks": "[{\"id\": \"/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips1\", \"name\": \"PRCXI_1250uL_Tips1\", \"uuid\": \"a2c7801f-bef0-4007-b650-73ad32f04778\"}]",
+          "touch_tip": false,
+          "use_channels": "[]",
+          "z_start_point_offset_height": "[]"
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "transfer_liquid",
+        "resource_name": "PRCXI"
+      }
+    ],
+    "edges": [],
+    "embeds": []
+  }
+}

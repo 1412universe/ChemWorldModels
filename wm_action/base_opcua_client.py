@@ -102,9 +102,15 @@ def format_plc_report(error: str, rows, plan) -> str:
         attempted.add(name)
         missed.append("%s=%s（未执行到）" % (name, _trace_fmt(value)))
     lines = ["原因：" + (error or "执行失败")]
-    lines.append("已写入PLC：" + ("；".join(written) if written else "无"))
+    # 每个点位单独一行，避免「已写入PLC：a=1；b=2；…」整段挤在一行把表格撑爆
+    if written:
+        lines.append("已写入PLC：")
+        lines.extend(written)
+    else:
+        lines.append("已写入PLC：无")
     if missed:
-        lines.append("未写入PLC：" + "；".join(missed))
+        lines.append("未写入PLC：")
+        lines.extend(missed)
     elif not written:
         lines.append("未写入PLC：没有写点记录")
     else:

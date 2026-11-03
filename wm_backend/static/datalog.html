@@ -51,12 +51,21 @@
   }
   .dl-table-wrap::-webkit-scrollbar-track,
   .dl-list::-webkit-scrollbar-track{ background:#e2e8f0; border-radius:8px; }
-  table.dl{ border-collapse:collapse; font-size:12px; background:#fff; min-width:100%; }
-  table.dl th, table.dl td{ border:1px solid #e5eaf1; padding:5px 7px; white-space:nowrap; text-align:left; }
+  table.dl{
+    border-collapse:collapse; font-size:12px; background:#fff;
+    width:max-content; max-width:none; table-layout:auto;
+  }
+  table.dl th, table.dl td{
+    border:1px solid #e5eaf1; padding:5px 7px; text-align:left;
+    white-space:nowrap; width:auto; max-width:none; vertical-align:top;
+  }
   table.dl th{ position:sticky; top:0; background:#334155; color:#fff; font-weight:600; z-index:1; }
-  table.dl td.dl-run{ white-space:nowrap; font-weight:600; color:#1e293b; background:#f8fafc; }
-  table.dl td.dl-err{ white-space:pre-wrap; min-width:280px; max-width:460px; vertical-align:top; }
-  table.dl td.dl-wrap{ white-space:pre-wrap; max-width:280px; vertical-align:top; }
+  table.dl td.dl-run{ font-weight:600; color:#1e293b; background:#f8fafc; }
+  table.dl td.dl-err,
+  table.dl td.dl-wrap{
+    white-space:normal; word-break:break-word; overflow-wrap:anywhere;
+    max-width:22rem; max-height:14rem; overflow:auto; line-height:1.35;
+  }
   .dl-empty{ color:#94a3b8; padding:28px 8px; font-size:13px; }
   .dl-bar a.btn{ text-decoration:none; border:1px solid #6366f1; background:#6366f1; color:#fff; border-radius:8px; padding:4px 10px; font-size:12px; }
   .dl-bar button{ border:1px solid #d7dde8; background:#fff; border-radius:8px; padding:4px 10px; cursor:pointer; }
@@ -95,6 +104,33 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
     });
   }
+  /** 展示侧软换行：；分段 + 超长连续段切开，避免一格撑满横向 */
+  function softBreak(s, maxLen) {
+    maxLen = maxLen || 48;
+    s = String(s == null ? '' : s);
+    if (!s) return s;
+    s = s.replace(/；/g, '；\n').replace(/; /g, ';\n');
+    return s.split('\n').map(function (line) {
+      line = line.replace(/\s+$/, '');
+      if (!line) return '';
+      var out = [], rest = line;
+      while (rest.length > maxLen) {
+        var cut = maxLen, win = rest.slice(0, maxLen + 1);
+        ['、', '，', ',', ' ', '=', '：', ':'].some(function (sep) {
+          var i = win.lastIndexOf(sep);
+          if (i >= Math.floor(maxLen / 3)) {
+            cut = i + (sep === '=' || sep === '：' || sep === ':' ? 0 : 1);
+            return true;
+          }
+          return false;
+        });
+        out.push(rest.slice(0, cut).replace(/\s+$/, ''));
+        rest = rest.slice(cut).replace(/^\s+/, '');
+      }
+      if (rest) out.push(rest);
+      return out.join('\n');
+    }).filter(Boolean).join('\n');
+  }
   function renderWfs() {
     var box = document.getElementById('dl-wfs');
     if (!workflows.length) {
@@ -132,11 +168,24 @@
       var html = '<table class="dl"><thead><tr>' + cols.map(function (c) { return '<th>' + esc(c) + '</th>'; }).join('') + '</tr></thead><tbody>';
       rows.forEach(function (row) {
         html += '<tr>' + cols.map(function (c) {
+          var val = row[c];
+          var wrapCols = {
+            '报错日志':1, '设定与结果':1, '节点':1, '取值来源':1,
+            '设备':1, '动作':1, '状态':1,
+            '开始时间':1, '结束时间':1, '耗时_秒':1,
+            '实际称量_g':1, '实际移液_uL':1,
+            '烘干时间':1, '烘干温度':1, '离心时间':1, '震荡时间':1, '超声时间':1,
+            '吸放方向':1, '枪头位':1, '吸液板位':1, '放液板位':1
+          };
+          var wrap = !!wrapCols[c];
           var cls = '';
           if (c === '运行') cls = ' class="dl-run"';
           else if (c === '报错日志') cls = ' class="dl-err"';
-          else if (c === '设定与结果' || c === '节点') cls = ' class="dl-wrap"';
-          return '<td' + cls + '>' + esc(row[c]) + '</td>';
+          else if (wrap) cls = ' class="dl-wrap"';
+          // 换行必须落成 <br>：td 默认 nowrap 时，纯文本里的 \n 会被挤成「一整行」
+          var text = wrap ? softBreak(val) : String(val == null ? '' : val);
+          var body = wrap ? esc(text).replace(/\n/g, '<br>') : esc(text);
+          return '<td' + cls + '>' + body + '</td>';
         }).join('') + '</tr>';
       });
       html += '</tbody></table>';

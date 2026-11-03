@@ -72,3 +72,6 @@ obj/
 
 # ===== Sync tool temp files =====
 .README.md.*
+
+# Local skill symlink (real copy lives in wm_backend/skills/)
+skills/

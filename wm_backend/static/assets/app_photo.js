@@ -2863,47 +2863,55 @@ function _boRows(rows){
   const td = 'padding:7px 8px;white-space:nowrap';
   const head = `<tr style="text-align:left">
     <th style="${th}">#</th>
-    <th style="${th}">来源</th>
     <th style="${th}">负载</th>
+    <th style="${th}">类型</th>
     <th style="${th}">甲烷</th>
-    <th style="${th}">氧气</th>
+    <th style="${th}">1%氧气</th>
     <th style="${th}">氩气</th>
-    <th style="${th}">进料氧%</th>
-    <th style="${th}">质量 mg</th>
+    <th style="${th}">质量mg</th>
     <th style="${th}">光功率</th>
-    <th style="${th}">产率</th>
-    <th style="${th}">选择性</th>
-    <th style="${th}">保持率</th>
-    <th style="${th}">采集分</th>
-    <th style="${th}">上界</th>
-    <th style="${th}">高出当前最优</th>
-    <th style="${th}">C2H4</th>
-    <th style="${th}">C2H6</th>
-    <th style="${th}">CO2</th>
+    <th style="${th}">μ_y</th>
+    <th style="${th}">μ_sel</th>
+    <th style="${th}">UCB</th>
+    <th style="${th}">score</th>
+    <th style="${th}">p_C2H4</th>
+    <th style="${th}">p_C2H6</th>
+    <th style="${th}">p_C2</th>
+    <th style="${th}">sel_C2H4</th>
+    <th style="${th}">sel_C2H6</th>
+    <th style="${th}">sel_C2</th>
     <th style="${th}">说明</th>
   </tr>`;
   let html = `<table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:16px">${head}`;
   rows.forEach(c=>{
+    const muY = c.mu_y!=null?c.mu_y:c.y;
+    const muSel = c.mu_sel!=null?c.mu_sel:c.sel;
+    const p4 = c.p_c2h4!=null?c.p_c2h4:c.c2h4;
+    const p6 = c.p_c2h6!=null?c.p_c2h6:c.c2h6;
+    const p2 = c.p_c2!=null?c.p_c2:muY;
+    const s4 = c.sel_c2h4;
+    const s6 = c.sel_c2h6;
+    const s2 = c.sel_c2!=null?c.sel_c2:muSel;
     html += `<tr style="border-top:1px solid #eee">
       <td style="${td};font-weight:700;color:#2a4d9e">${c.rank}</td>
-      <td style="${td}">${_esc(c.group||'')}</td>
       <td style="${td}">${_esc(c.loading)}%</td>
+      <td style="${td}">${_esc(c.kind||c.group||'')}</td>
       <td style="${td}">${_boNum(c.ch4,0)}</td>
       <td style="${td}">${_boNum(c.o2,0)}</td>
       <td style="${td}">${_boNum(c.ar,0)}</td>
-      <td style="${td}">${c.o2_in==null?'—':Number(c.o2_in).toFixed(1)}</td>
       <td style="${td}">${c.mass==null?'—':c.mass}</td>
-      <td style="${td}">${c.power==null?'—':c.power+'%'}</td>
-      <td style="${td}">${c.y==null?'—':Math.round(c.y)}</td>
-      <td style="${td}">${c.sel==null?'—':Number(c.sel).toFixed(1)}</td>
-      <td style="${td}">${c.z==null?'—':Number(c.z).toFixed(3)}</td>
-      <td style="${td}">${c.score==null?'—':(Math.abs(c.score)<100?Number(c.score).toFixed(1):Math.round(c.score))}</td>
+      <td style="${td}">${c.power!=null?c.power+'%':'—'}</td>
+      <td style="${td};font-weight:700">${muY==null?'—':Math.round(muY)}</td>
+      <td style="${td}">${muSel==null?'—':Number(muSel).toFixed(1)}</td>
       <td style="${td};font-weight:700;color:#c0392b">${c.ucb==null?'—':Math.round(c.ucb)}</td>
-      <td style="${td}">${c.gap==null?'—':Math.round(c.gap)}</td>
-      <td style="${td}">${c.c2h4==null?'—':Number(c.c2h4).toFixed(1)}</td>
-      <td style="${td}">${c.c2h6==null?'—':Number(c.c2h6).toFixed(1)}</td>
-      <td style="${td}">${c.co2==null?'—':Number(c.co2).toFixed(1)}</td>
-      <td style="padding:7px 8px;color:#333;line-height:1.45;min-width:180px">${_esc(c.reason)}</td>
+      <td style="${td}">${c.score==null?'—':(Math.abs(c.score)<100?Number(c.score).toFixed(1):Math.round(c.score))}</td>
+      <td style="${td}">${p4==null?'—':Math.round(p4)}</td>
+      <td style="${td}">${p6==null?'—':Math.round(p6)}</td>
+      <td style="${td}">${p2==null?'—':Math.round(p2)}</td>
+      <td style="${td}">${s4==null?'—':Number(s4).toFixed(1)}</td>
+      <td style="${td}">${s6==null?'—':Number(s6).toFixed(1)}</td>
+      <td style="${td}">${s2==null?'—':Number(s2).toFixed(1)}</td>
+      <td style="padding:7px 8px;color:#333;line-height:1.45;min-width:160px">${_esc(c.reason)}</td>
     </tr>`;
   });
   return html + `</table>`;
@@ -2920,7 +2928,7 @@ async function runPureBO(){
   loopState = 'idle';
   if(bp) bp.textContent = '⏸ 暂停';
   try {
-    log('ai','① 文献学习：最优负载加最近三档，每档一条实测、一条周围两步的期望改进。');
+    log('ai','① 文献学习：3 条理论最优 + 27 条未知空间探索（含负载量），score=μ_y×(μ_sel/100)。');
     const req = fetch('/api/bo/closed-loop', {method:'POST'}).then(r=>r.json());
     await _boWalk('literature', 0, '① 文献学习');
     const j = await req;
@@ -2928,7 +2936,8 @@ async function runPureBO(){
     if(!j.ok) throw new Error(j.error || '闭环失败');
     const top = j.top || [];
     const proof = j.proof || {};
-    log('ok', `门槛内产率最高 ${proof.ystar==null?'—':Math.round(proof.ystar)}，${proof.load||''}% Pd-P25，甲烷 ${_boNum(proof.ch4,0)}，1%氧气 ${_boNum(proof.o2,0)}，氩气 ${_boNum(proof.ar,0)}，光功率 ${proof.power==null?'—':proof.power+'%'}，选择性 ${proof.selstar==null?'—':Number(proof.selstar).toFixed(1)}%，保持率 ${proof.zstar==null?'—':(proof.zstar*100).toFixed(1)}%。附近过线的有 ${proof.n_open||0} 组。推荐 ${top.length} 组。`);
+    const selMin = (j.sel_min!=null?j.sel_min:(proof.sel_min!=null?proof.sel_min:40));
+    log('ok', `门槛内产率最高 ${proof.ystar==null?'—':Math.round(proof.ystar)}，${proof.load||''}% Pd-P25，甲烷 ${_boNum(proof.ch4,0)}，1%氧气 ${_boNum(proof.o2,0)}，氩气 ${_boNum(proof.ar,0)}，光功率 ${proof.power==null?'—':proof.power+'%'}，质量 ${proof.mass==null?'—':proof.mass+'mg'}，选择性 ${proof.selstar==null?'—':Number(proof.selstar).toFixed(1)}%。硬门槛通过 ${proof.n_open||0} 组。推荐 ${top.length} 组（3×3）。`);
     if(_boAbort) return;
     await _boWalk('gn_solid', 1, '② 虚拟合成');
     if(_boAbort) return;
@@ -2936,23 +2945,22 @@ async function runPureBO(){
     if(_boAbort) return;
     await _boWalk('gc', 2, '③ 实验反馈');
     if(_boAbort) return;
-    log('ai', '④ 网格证明：' + (j.stop_reason || '扫描结束。'));
-    await _boWalk('ai', 3, '④ 网格证明');
+    log('ai', '④ 条件级 BO：' + (j.stop_reason || '扫描结束。'));
+    await _boWalk('ai', 3, '④ 条件级 BO');
     if(_boAbort) return;
     const bt = document.getElementById('bo-modal-title');
-    if(bt) bt.textContent = '纯 BO · 八组推荐';
+    if(bt) bt.textContent = '纯 BO · 3最优 + 27探索';
     let html = `<div style="color:#444;margin-bottom:14px;font-size:13px;line-height:1.6;background:#f7f8fb;border-radius:8px;padding:12px 14px">
-      <div style="font-weight:700;color:#1a1a1a;margin-bottom:6px">门槛内产率最高　${_esc(proof.load)}% Pd-P25　甲烷 ${_boNum(proof.ch4,0)}　1%氧气 ${_boNum(proof.o2,0)}　氩气 ${_boNum(proof.ar,0)} mL/min　光功率 ${proof.power==null?'—':proof.power+'%'}　产率 ${proof.ystar==null?'—':Math.round(proof.ystar)}　选择性 ${proof.selstar==null?'—':Number(proof.selstar).toFixed(1)}%　保持率 ${proof.zstar==null?'—':(proof.zstar*100).toFixed(1)}%</div>
-      选择性要大于 84，保持率要大于 95%。甲烷不超过 100，进料氧 1%。采集分 = 产率期望改进 × 选择性超过 84 的概率 × 保持率超过 95% 的概率。负载是当前最优和对数负载上最近的三档。每档一条合格实测，没有就把最优条件移过去；另一条只在周围两步里按采集分挑。共 ${top.length} 组。
-      其中产率上界更高、两个概率都不低于一半的有 <b>${proof.n_open||0}</b> 组。
+      <div style="font-weight:700;color:#1a1a1a;margin-bottom:6px">门槛内产率最高　${_esc(proof.load)}% Pd-P25　甲烷 ${_boNum(proof.ch4,0)}　1%氧气 ${_boNum(proof.o2,0)}　氩气 ${_boNum(proof.ar,0)} mL/min　光功率 ${proof.power==null?'—':proof.power+'%'}　质量 ${proof.mass==null?'—':proof.mass+' mg'}　产率 ${proof.ystar==null?'—':Math.round(proof.ystar)}　选择性 ${proof.selstar==null?'—':Number(proof.selstar).toFixed(1)}%</div>
+      目标：冲产率 &gt; 40000（当前最高约 40077）。硬门槛 μ_sel ≥ ${selMin}%；score = μ_y × (μ_sel/100)。结构：<b>3 条理论最优</b>（高产实测锚定）+ <b>27 条未知空间探索</b>（负载量 × CH4/O2/Ar/光功率一并拉开）。可行域：甲烷 / 1%氧气 / 氩气 0–100 mL/min，质量 1–20 mg，相对光功率 0–100%，进料氧 1%。共 ${top.length} 组；硬门槛通过 <b>${proof.n_open||0}</b> 组。训练点 ${proof.n_train||j.systems||'—'} 条。
       <div style="margin-top:8px">保存目录：<code style="background:#fff;padding:2px 6px;border-radius:3px">${_esc(j.save_dir||'')}</code>　文件名：<code style="background:#fff;padding:2px 6px;border-radius:3px">${_esc(j.save_name||'')}</code></div>
     </div>`;
-    html += `<div style="font-weight:700;margin:4px 0 8px">八组推荐</div>`;
-    html += `<div style="color:#666;font-size:12.5px;margin-bottom:8px">旧配方是门槛内产率最高的实测。转移是该负载没有合格实测时沿用最优条件。附近是周围两步里采集分最高的一格。采集分一列，旧配方填的是产率。流速单位 mL/min。</div>`;
-    html += top.length ? _boRows(top) : `<div style="color:#666;margin-bottom:12px">没有可比较的新格子。</div>`;
+    html += `<div style="font-weight:700;margin:4px 0 8px">推荐（3 理论最优 + 27 探索）</div>`;
+    html += `<div style="color:#666;font-size:12.5px;margin-bottom:8px">μ_y=预测产率，μ_sel=预测选择性；score=μ_y×(μ_sel/100)。前 3 条为理论最优锚定；后 27 条铺开负载与条件的未知空间。</div>`;
+    html += top.length ? _boRows(top) : `<div style="color:#666;margin-bottom:12px">没有可用推荐。</div>`;
     document.getElementById('bo-modal-body').innerHTML = html;
     document.getElementById('bo-modal').style.display = 'flex';
-    log('ok', `弹窗已给出网格证明表，共 ${top.length} 组待做实验。`);
+    log('ok', `弹窗已给出 3×3 推荐，共 ${top.length} 组待做实验。`);
   } catch(e) {
     log('warn','❌ 纯 BO 失败：'+(e&&e.message||e));
     alert('纯 BO 失败：'+(e&&e.message||e));
@@ -4855,3 +4863,40 @@ async function exportUniLabWorkflow(){
   if(btn) btn.addEventListener('click', exportUniLabWorkflow);
 })();
 
+
+/* ========== 世界模型 3D 虚跑桥（供 wf_worldmodel.js 调用） ========== */
+window.__CWM_SCENE = {
+  ready(){ return !!(use3d && world3d); },
+  world(){ return world3d; },
+  hasDev(k){ return !!(DEV && DEV[k]); },
+  goto(key){
+    if(!DEV[key]) return false;
+    try{
+      activeDevice = key;
+      setCharTarget(key);
+      char.hold = true;
+      if(world3d){
+        if(world3d.focusDevice) world3d.focusDevice(key);
+        if(world3d.setDeviceStatus) world3d.setDeviceStatus(key, 'busy');
+      }
+      try{ spawnBurst(key); }catch(_){}
+      return true;
+    }catch(e){ return false; }
+  },
+  clearBusy(){
+    try{
+      if(!world3d || !world3d.setDeviceStatus) return;
+      Object.keys(DEV||{}).forEach(k=>{
+        try{ world3d.setDeviceStatus(k, 'idle'); }catch(_){}
+      });
+    }catch(_){}
+  },
+  setStatus(key, st){
+    try{ if(world3d && world3d.setDeviceStatus) world3d.setDeviceStatus(key, st); }catch(_){}
+  },
+  hold(on){ try{ char.hold = !!on; }catch(_){} },
+  log(cls, msg){ try{ log(cls, msg); }catch(_){} },
+  toast(msg){
+    try{ log('ai', msg); }catch(_){}
+  }
+};

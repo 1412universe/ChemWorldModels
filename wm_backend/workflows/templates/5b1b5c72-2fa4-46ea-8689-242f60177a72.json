@@ -1,0 +1,619 @@
+{
+  "target_lab_uuid": "803298d7-ba98-4cd5-a546-b7ca08b4cb12",
+  "name": "COF合成中的三次移液操作",
+  "data": {
+    "workflow_uuid": "5b1b5c72-2fa4-46ea-8689-242f60177a72",
+    "workflow_name": "COF合成中的三次移液操作",
+    "nodes": [
+      {
+        "uuid": "55407470-e621-40d4-a2bd-7081f2f81bfc",
+        "parent_uuid": "",
+        "name": "auto-run_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1776.61,
+            "y": 100.65477,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "protocol_id": null
+        },
+        "footer": "第5步-加入催化剂",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
+        "template_name": "auto-run_protocol",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "ccbfad3a-d6de-4df0-afcf-bee25733f2c9",
+        "parent_uuid": "",
+        "name": "titration_liquid",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1194.2795,
+            "y": 99.237434,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "offsets": null,
+          "sources": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_2",
+              "name": "PRCXI_96_DeepWell_2",
+              "uuid": "39051c8a-0180-4516-88e1-fa7ec724f453"
+            }
+          ],
+          "targets": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_shake",
+              "name": "PRCXI_96_DeepWell_shake",
+              "uuid": "a2e75ff7-6b1a-494a-8b18-0b6d93619a11"
+            }
+          ],
+          "asp_vols": [
+            100
+          ],
+          "dis_vols": [
+            100
+          ],
+          "none_keys": [],
+          "tip_racks": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips1",
+              "name": "PRCXI_1250uL_Tips1",
+              "uuid": "2c525d62-d238-48d5-892a-993e5c0065d7"
+            }
+          ],
+          "is_96_well": true,
+          "repeat_count": 1,
+          "use_channels": [],
+          "cycle_delay_s": 0,
+          "liquid_height": [],
+          "asp_flow_rates": [
+            300
+          ],
+          "dis_flow_rates": [
+            300
+          ],
+          "post_air_volume": null,
+          "dispensing_method": [
+            "BottleNeck"
+          ],
+          "blow_out_air_volume": [
+            20
+          ],
+          "hover_below_liquid_level": null,
+          "blow_out_air_volume_before": [],
+          "z_start_point_offset_height": null,
+          "post_discharge_pause_time_ms": null
+        },
+        "footer": "COF第5步: 加催化剂 100µL → 96孔板 (枪头T11),T8->T3",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
+        "template_name": "titration_liquid",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "6a7b3467-9e24-46ac-9c59-b50f4ab0ddcb",
+        "parent_uuid": "",
+        "name": "move_plate",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 202.2408,
+            "y": 99.281845,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "to": 3,
+          "from": 16,
+          "force": 5,
+          "plate": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell5",
+              "name": "PRCXI_96_DeepWell5",
+              "uuid": "e74c153c-a29f-4653-a665-b9e1cc1711a9"
+            }
+          ],
+          "hierarchy": 1,
+          "get_direction": "",
+          "pickup_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "put_direction": "",
+          "drop_direction": "",
+          "resource_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pickup_direction": "",
+          "put_down_position": 1,
+          "destination_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pinch_it_up_position": 1,
+          "intermediate_locations": [],
+          "pickup_distance_from_top": 0
+        },
+        "footer": "T16->T3",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
+        "template_name": "move_plate",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "bc174ea0-a184-4cb9-85d5-db3215fa6cb1",
+        "parent_uuid": "",
+        "name": "titration_liquid",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 869.9421,
+            "y": 96.74217,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "offsets": null,
+          "sources": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_nest_1_troughplate2",
+              "name": "PRCXI_nest_1_troughplate2",
+              "uuid": "8e1cb526-32c4-4c6c-bb22-6faa81e209c5"
+            }
+          ],
+          "targets": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_shake",
+              "name": "PRCXI_96_DeepWell_shake",
+              "uuid": "a2e75ff7-6b1a-494a-8b18-0b6d93619a11"
+            }
+          ],
+          "asp_vols": [
+            500
+          ],
+          "dis_vols": [
+            500
+          ],
+          "none_keys": [],
+          "tip_racks": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips3",
+              "name": "PRCXI_1250uL_Tips3",
+              "uuid": "0014ea7c-9743-452a-96ab-5407f475a32c"
+            }
+          ],
+          "is_96_well": true,
+          "repeat_count": 1,
+          "use_channels": [],
+          "cycle_delay_s": 0,
+          "liquid_height": [],
+          "asp_flow_rates": [
+            300
+          ],
+          "dis_flow_rates": [
+            300
+          ],
+          "post_air_volume": null,
+          "dispensing_method": [
+            "BottleNeck"
+          ],
+          "blow_out_air_volume": [
+            20
+          ],
+          "hover_below_liquid_level": null,
+          "blow_out_air_volume_before": [],
+          "z_start_point_offset_height": null,
+          "post_discharge_pause_time_ms": null
+        },
+        "footer": "COF第4步: 加溶剂2 500µL → 96孔板 (枪头T12),T10->T3",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
+        "template_name": "titration_liquid",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "00428aaf-d750-4356-ab7d-1f65aaa24849",
+        "parent_uuid": "",
+        "name": "move_plate",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1485.7601,
+            "y": 91.47127,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "to": 16,
+          "from": 3,
+          "force": 5,
+          "plate": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_shake",
+              "name": "PRCXI_96_DeepWell_shake",
+              "uuid": "a2e75ff7-6b1a-494a-8b18-0b6d93619a11"
+            }
+          ],
+          "hierarchy": 1,
+          "get_direction": "",
+          "pickup_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "put_direction": "",
+          "drop_direction": "",
+          "resource_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pickup_direction": "",
+          "put_down_position": 1,
+          "destination_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pinch_it_up_position": 1,
+          "intermediate_locations": [],
+          "pickup_distance_from_top": 0
+        },
+        "footer": "T3->T16",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
+        "template_name": "move_plate",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "b884fe6d-8bfe-437c-961f-2819e530ecc8",
+        "parent_uuid": "",
+        "name": "titration_liquid",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 530,
+            "y": 97.22222,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "offsets": null,
+          "sources": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_nest_1_troughplate3",
+              "name": "PRCXI_nest_1_troughplate3",
+              "uuid": "dd9a0925-8aa7-44c0-a1bc-7dc9776ee6e0"
+            }
+          ],
+          "targets": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_shake",
+              "name": "PRCXI_96_DeepWell_shake",
+              "uuid": "a2e75ff7-6b1a-494a-8b18-0b6d93619a11"
+            }
+          ],
+          "asp_vols": [
+            500
+          ],
+          "dis_vols": [
+            500
+          ],
+          "none_keys": [],
+          "tip_racks": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips2",
+              "name": "PRCXI_1250uL_Tips2",
+              "uuid": "695548f2-3e97-4913-a2c5-e19b3b07cac9"
+            }
+          ],
+          "is_96_well": true,
+          "repeat_count": 1,
+          "use_channels": [],
+          "cycle_delay_s": 0,
+          "liquid_height": [],
+          "asp_flow_rates": [
+            300
+          ],
+          "dis_flow_rates": [
+            300
+          ],
+          "post_air_volume": null,
+          "dispensing_method": [
+            "BottleNeck"
+          ],
+          "blow_out_air_volume": [
+            20
+          ],
+          "hover_below_liquid_level": null,
+          "blow_out_air_volume_before": [],
+          "z_start_point_offset_height": null,
+          "post_discharge_pause_time_ms": null
+        },
+        "footer": "COF第3步: 加溶剂1 500µL → 96孔板 (枪头T15)，T6->T3",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
+        "template_name": "titration_liquid",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "c7ec088c-49e4-4895-9aef-5c4640253565",
+        "parent_uuid": "",
+        "name": "auto-create_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -165.04697,
+            "y": 95.2535,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "none_keys": [],
+          "protocol_date": "",
+          "protocol_name": "",
+          "protocol_type": "",
+          "protocol_author": "",
+          "protocol_version": "",
+          "protocol_description": ""
+        },
+        "footer": "第3步-加入溶剂1",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
+        "template_name": "auto-create_protocol",
+        "resource_name": "liquid_handler.prcxi"
+      }
+    ],
+    "edges": [
+      {
+        "source_node_uuid": "b884fe6d-8bfe-437c-961f-2819e530ecc8",
+        "target_node_uuid": "bc174ea0-a184-4cb9-85d5-db3215fa6cb1",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "bc174ea0-a184-4cb9-85d5-db3215fa6cb1",
+        "target_node_uuid": "ccbfad3a-d6de-4df0-afcf-bee25733f2c9",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "c7ec088c-49e4-4895-9aef-5c4640253565",
+        "target_node_uuid": "6a7b3467-9e24-46ac-9c59-b50f4ab0ddcb",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "6a7b3467-9e24-46ac-9c59-b50f4ab0ddcb",
+        "target_node_uuid": "b884fe6d-8bfe-437c-961f-2819e530ecc8",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "ccbfad3a-d6de-4df0-afcf-bee25733f2c9",
+        "target_node_uuid": "00428aaf-d750-4356-ab7d-1f65aaa24849",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "00428aaf-d750-4356-ab7d-1f65aaa24849",
+        "target_node_uuid": "55407470-e621-40d4-a2bd-7081f2f81bfc",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      }
+    ],
+    "embeds": []
+  }
+}

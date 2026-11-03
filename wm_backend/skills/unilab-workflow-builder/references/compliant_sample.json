@@ -1,0 +1,1217 @@
+{
+  "target_lab_uuid": "803298d7-ba98-4cd5-a546-b7ca08b4cb12",
+  "name": "compliant_sample",
+  "data": {
+    "nodes": [
+      {
+        "uuid": "9c835463-0c9b-472f-8c92-594dcee2a189",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 200.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "固体加样复位-开始",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing",
+        "param": {
+          "cmd_type": 20,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "gripper_z_speed": 0,
+          "material_z_pos": 0,
+          "material_z_speed": 0,
+          "timeout": 180,
+          "volune_weight": 0,
+          "x_pos": 0,
+          "x_speed": 0,
+          "y_pos": 0,
+          "y_speed": 0
+        }
+      },
+      {
+        "uuid": "692b9ffe-2653-4b9b-b28d-290e60ad9c88",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 460.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "料筒加样#1",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing",
+        "param": {
+          "x_pos": 0,
+          "y_pos": 1150,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "volune_weight": 1280,
+          "material_z_pos": 234000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        }
+      },
+      {
+        "uuid": "542a91c6-030e-4c30-9ad5-751aba0501ec",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 720.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "料筒加样#2",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing",
+        "param": {
+          "x_pos": 0,
+          "y_pos": 1150,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "volune_weight": 1280,
+          "material_z_pos": 234000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        }
+      },
+      {
+        "uuid": "d6a0e15a-94aa-485f-a260-2eb2a7b78343",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 980.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "固体加样复位-结束",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing",
+        "param": {
+          "cmd_type": 20,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "gripper_z_speed": 0,
+          "material_z_pos": 0,
+          "material_z_speed": 0,
+          "timeout": 180,
+          "volune_weight": 0,
+          "x_pos": 0,
+          "x_speed": 0,
+          "y_pos": 0,
+          "y_speed": 0
+        }
+      },
+      {
+        "uuid": "4872c353-7186-4035-9777-caf5fabb7759",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1240.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "离心机复位-开始",
+        "device_name": "gn_centrifuge",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge",
+        "param": {
+          "cmd_type": 8,
+          "inner_z_pos": 0,
+          "plate_no": 0,
+          "rpm": 0,
+          "time_minutes": 0,
+          "timeout": 120,
+          "y_pos": 0,
+          "y_speed": 0,
+          "z_pos": 0,
+          "z_speed": 0
+        }
+      },
+      {
+        "uuid": "4e68d054-104a-4c3c-b397-ff900adefa10",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1500.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "离心机复位-1前",
+        "device_name": "gn_centrifuge",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge",
+        "param": {
+          "cmd_type": 8,
+          "inner_z_pos": 0,
+          "plate_no": 0,
+          "rpm": 0,
+          "time_minutes": 0,
+          "timeout": 120,
+          "y_pos": 0,
+          "y_speed": 0,
+          "z_pos": 0,
+          "z_speed": 0
+        }
+      },
+      {
+        "uuid": "38b24c73-91b5-4176-93c1-630f6371645c",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1760.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "离心加载板",
+        "device_name": "gn_centrifuge",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge",
+        "param": {
+          "cmd_type": 7,
+          "inner_z_pos": 3600,
+          "plate_no": 3,
+          "rpm": 0,
+          "time_minutes": 0,
+          "timeout": 120,
+          "y_pos": -2160,
+          "y_speed": 300,
+          "z_pos": 1050,
+          "z_speed": 300
+        }
+      },
+      {
+        "uuid": "63cec85a-3e1d-42db-aab2-92f294889192",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2020.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "离心机复位-1后",
+        "device_name": "gn_centrifuge",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge",
+        "param": {
+          "cmd_type": 8,
+          "inner_z_pos": 0,
+          "plate_no": 0,
+          "rpm": 0,
+          "time_minutes": 0,
+          "timeout": 120,
+          "y_pos": 0,
+          "y_speed": 0,
+          "z_pos": 0,
+          "z_speed": 0
+        }
+      },
+      {
+        "uuid": "e170ea12-4801-4f88-9034-53d2a168ba23",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2280.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "离心机复位-结束",
+        "device_name": "gn_centrifuge",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge",
+        "param": {
+          "cmd_type": 8,
+          "inner_z_pos": 0,
+          "plate_no": 0,
+          "rpm": 0,
+          "time_minutes": 0,
+          "timeout": 120,
+          "y_pos": 0,
+          "y_speed": 0,
+          "z_pos": 0,
+          "z_speed": 0
+        }
+      },
+      {
+        "uuid": "5394ba67-5e3b-43a0-bece-1f233845bc93",
+        "parent_uuid": "",
+        "name": "auto-create_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2540.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "协议创建",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
+        "template_name": "auto-create_protocol",
+        "resource_name": "liquid_handler.prcxi",
+        "param": {
+          "none_keys": [],
+          "protocol_date": "",
+          "protocol_name": "",
+          "protocol_type": "",
+          "protocol_author": "",
+          "protocol_version": "",
+          "protocol_description": ""
+        }
+      },
+      {
+        "uuid": "4f335d6a-e9df-44f4-a377-520fedfbbd7f",
+        "parent_uuid": "",
+        "name": "move_plate",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2800.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "T16->T15",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
+        "template_name": "move_plate",
+        "resource_name": "liquid_handler.prcxi",
+        "param": {
+          "to": 15,
+          "from": 16,
+          "force": 5,
+          "plate": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell5",
+              "name": "PRCXI_96_DeepWell5",
+              "uuid": "e74c153c-a29f-4653-a665-b9e1cc1711a9"
+            }
+          ],
+          "hierarchy": 1,
+          "get_direction": "",
+          "pickup_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "put_direction": "",
+          "drop_direction": "",
+          "resource_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pickup_direction": "",
+          "put_down_position": 2,
+          "destination_offset": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "pinch_it_up_position": 2,
+          "intermediate_locations": [],
+          "pickup_distance_from_top": 0
+        }
+      },
+      {
+        "uuid": "3680eeee-9bd3-40b0-bf13-49c0935ed4fd",
+        "parent_uuid": "",
+        "name": "titration_liquid",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 3060.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "加液",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
+        "template_name": "titration_liquid",
+        "resource_name": "liquid_handler.prcxi",
+        "param": {
+          "offsets": null,
+          "sources": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell5",
+              "name": "PRCXI_96_DeepWell5",
+              "uuid": "e74c153c-a29f-4653-a665-b9e1cc1711a9"
+            }
+          ],
+          "targets": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell5",
+              "name": "PRCXI_96_DeepWell5",
+              "uuid": "e74c153c-a29f-4653-a665-b9e1cc1711a9"
+            }
+          ],
+          "asp_vols": [
+            10000
+          ],
+          "dis_vols": [
+            10000
+          ],
+          "none_keys": [],
+          "tip_racks": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell5",
+              "name": "PRCXI_96_DeepWell5",
+              "uuid": "e74c153c-a29f-4653-a665-b9e1cc1711a9"
+            }
+          ],
+          "is_96_well": true,
+          "repeat_count": 2,
+          "use_channels": [],
+          "cycle_delay_s": 10,
+          "liquid_height": null,
+          "asp_flow_rates": [
+            300
+          ],
+          "dis_flow_rates": [
+            300
+          ],
+          "post_air_volume": null,
+          "dispensing_method": [
+            "BottleNeck"
+          ],
+          "blow_out_air_volume": [
+            20
+          ],
+          "hover_below_liquid_level": null,
+          "blow_out_air_volume_before": [],
+          "z_start_point_offset_height": null,
+          "post_discharge_pause_time_ms": null
+        }
+      },
+      {
+        "uuid": "00c970ef-4cde-4e46-be35-f558f277020b",
+        "parent_uuid": "",
+        "name": "auto-run_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 3320.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "协议执行",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
+        "template_name": "auto-run_protocol",
+        "resource_name": "liquid_handler.prcxi",
+        "param": {
+          "protocol_id": null
+        }
+      },
+      {
+        "uuid": "8514c0a7-df07-4bfc-ad1c-bc1689d7837c",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 3580.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "堆栈复位-开始",
+        "device_name": "gn_rotary_stack",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "6b08ef44-bf4f-45f5-ae28-414a4011c1d7",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_rotary_stack",
+        "param": {
+          "r_pos": 0,
+          "z_pos": 0,
+          "r_speed": 0,
+          "timeout": 120,
+          "z_speed": 0,
+          "cmd_type": 7
+        }
+      },
+      {
+        "uuid": "7b25e689-218a-4b61-9801-0c88f30a211f",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 3840.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "堆栈复位-1前",
+        "device_name": "gn_rotary_stack",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "6b08ef44-bf4f-45f5-ae28-414a4011c1d7",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_rotary_stack",
+        "param": {
+          "r_pos": 0,
+          "z_pos": 0,
+          "r_speed": 0,
+          "timeout": 120,
+          "z_speed": 0,
+          "cmd_type": 7
+        }
+      },
+      {
+        "uuid": "f50a8456-74ee-46bd-a34b-c31bdda08453",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 4100.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "堆栈旋转(示例)",
+        "device_name": "gn_rotary_stack",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "6b08ef44-bf4f-45f5-ae28-414a4011c1d7",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_rotary_stack",
+        "param": {
+          "r_pos": 1,
+          "z_pos": 0,
+          "r_speed": 0,
+          "timeout": 120,
+          "z_speed": 0,
+          "cmd_type": 7
+        }
+      },
+      {
+        "uuid": "28690d71-e8f3-49e2-8ffa-b168a0d1f415",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 4360.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "堆栈复位-1后",
+        "device_name": "gn_rotary_stack",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "6b08ef44-bf4f-45f5-ae28-414a4011c1d7",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_rotary_stack",
+        "param": {
+          "r_pos": 0,
+          "z_pos": 0,
+          "r_speed": 0,
+          "timeout": 120,
+          "z_speed": 0,
+          "cmd_type": 7
+        }
+      },
+      {
+        "uuid": "9b6efeda-c136-4be4-acc6-3dd92d05879f",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 4620.0,
+            "y": 0.0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "footer": "堆栈复位-结束",
+        "device_name": "gn_rotary_stack",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "6b08ef44-bf4f-45f5-ae28-414a4011c1d7",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_rotary_stack",
+        "param": {
+          "r_pos": 0,
+          "z_pos": 0,
+          "r_speed": 0,
+          "timeout": 120,
+          "z_speed": 0,
+          "cmd_type": 7
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source_node_uuid": "9c835463-0c9b-472f-8c92-594dcee2a189",
+        "target_node_uuid": "692b9ffe-2653-4b9b-b28d-290e60ad9c88",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "692b9ffe-2653-4b9b-b28d-290e60ad9c88",
+        "target_node_uuid": "542a91c6-030e-4c30-9ad5-751aba0501ec",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "542a91c6-030e-4c30-9ad5-751aba0501ec",
+        "target_node_uuid": "d6a0e15a-94aa-485f-a260-2eb2a7b78343",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "d6a0e15a-94aa-485f-a260-2eb2a7b78343",
+        "target_node_uuid": "4872c353-7186-4035-9777-caf5fabb7759",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "4872c353-7186-4035-9777-caf5fabb7759",
+        "target_node_uuid": "4e68d054-104a-4c3c-b397-ff900adefa10",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "4e68d054-104a-4c3c-b397-ff900adefa10",
+        "target_node_uuid": "38b24c73-91b5-4176-93c1-630f6371645c",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "38b24c73-91b5-4176-93c1-630f6371645c",
+        "target_node_uuid": "63cec85a-3e1d-42db-aab2-92f294889192",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "63cec85a-3e1d-42db-aab2-92f294889192",
+        "target_node_uuid": "e170ea12-4801-4f88-9034-53d2a168ba23",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "e170ea12-4801-4f88-9034-53d2a168ba23",
+        "target_node_uuid": "5394ba67-5e3b-43a0-bece-1f233845bc93",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "5394ba67-5e3b-43a0-bece-1f233845bc93",
+        "target_node_uuid": "4f335d6a-e9df-44f4-a377-520fedfbbd7f",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "4f335d6a-e9df-44f4-a377-520fedfbbd7f",
+        "target_node_uuid": "3680eeee-9bd3-40b0-bf13-49c0935ed4fd",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "3680eeee-9bd3-40b0-bf13-49c0935ed4fd",
+        "target_node_uuid": "00c970ef-4cde-4e46-be35-f558f277020b",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "00c970ef-4cde-4e46-be35-f558f277020b",
+        "target_node_uuid": "8514c0a7-df07-4bfc-ad1c-bc1689d7837c",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "8514c0a7-df07-4bfc-ad1c-bc1689d7837c",
+        "target_node_uuid": "7b25e689-218a-4b61-9801-0c88f30a211f",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "7b25e689-218a-4b61-9801-0c88f30a211f",
+        "target_node_uuid": "f50a8456-74ee-46bd-a34b-c31bdda08453",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "f50a8456-74ee-46bd-a34b-c31bdda08453",
+        "target_node_uuid": "28690d71-e8f3-49e2-8ffa-b168a0d1f415",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "28690d71-e8f3-49e2-8ffa-b168a0d1f415",
+        "target_node_uuid": "9b6efeda-c136-4be4-acc6-3dd92d05879f",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      }
+    ]
+  }
+}

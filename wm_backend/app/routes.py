@@ -26,7 +26,7 @@ from .llm import check_available, strategize, strategize_with_timeout, get_model
 from . import inference_log
 from .models import (CandidateReq, NextReq, PredictResp, ExportReq, ExportResp,
                      SimReq, SimResp, EvaluateReq, AcquisitionReq, ChatReq,
-                     WorkflowReq, WorkflowResp)
+                     WorkflowReq, WorkflowResp, WorkflowAgentReq, WorkflowValidateReq)
 from .data import REALDATA_DIR, DATA_DIR as _WM_DATA_DIR
 
 router = APIRouter()
@@ -376,6 +376,51 @@ def generate_workflow_endpoint(req: WorkflowReq):
     except Exception as e:
         logger.exception("generate_workflow failed")
         return WorkflowResp(ok=False, error=str(e))
+
+
+@router.get("/api/workflow-agent/skill")
+def workflow_agent_skill_info():
+    """确认 unilab-workflow-builder skill 是否挂载。"""
+    from . import workflow_agent as wa
+    root = wa.skill_root()
+    return {
+        "ok": bool(root),
+        "skill": str(root) if root else None,
+        "name": "unilab-workflow-builder",
+        "has_validate": bool(root and (root / "scripts" / "validate_workflow.py").is_file()),
+        "has_factory": bool(root and (root / "scripts" / "prcxi_factory.py").is_file()),
+    }
+
+
+@router.post("/api/workflow-agent")
+def workflow_agent_endpoint(req: WorkflowAgentReq):
+    """工作流编辑器 Agent：加载 skill，批量生成/修改当前工作流。"""
+    from . import workflow_agent as wa
+    msg = (req.message or "").strip()
+    if not msg:
+        return JSONResponse(status_code=400, content={"ok": False, "error": "消息为空"})
+    try:
+        out = wa.run_agent(
+            msg,
+            history=req.history,
+            workflow=req.workflow,
+            model=req.model,
+            base_url=req.base_url,
+            api_key=req.api_key,
+        )
+        return out
+    except Exception as e:
+        logger.exception("workflow_agent failed")
+        return JSONResponse(status_code=500, content={"ok": False, "error": str(e)[:400]})
+
+
+@router.post("/api/workflow-validate")
+def workflow_validate_endpoint(req: WorkflowValidateReq):
+    """用 unilab-workflow-builder skill 校验器验收。"""
+    from . import workflow_agent as wa
+    if not req.workflow:
+        return {"ok": False, "problems": ["缺少 workflow"], "summary": ""}
+    return wa.validate_workflow_doc(req.workflow)
 
 
 @router.get("/inference-log")
@@ -1635,6 +1680,43 @@ def bo_closed_loop():
         return run_closed_loop()
     except Exception as e:
         logger.exception("bo closed loop")
+        return {"ok": False, "error": str(e)[:300]}
+
+
+@router.get("/api/worldmodel/catalog")
+def worldmodel_catalog():
+    """金属/载体下拉与历史组合清单。"""
+    try:
+        from .worldmodel_preview import catalog
+        return {"ok": True, **catalog()}
+    except Exception as e:
+        logger.exception("worldmodel catalog")
+        return {"ok": False, "error": str(e)[:300]}
+
+
+@router.post("/api/worldmodel/preview")
+def worldmodel_preview(body: dict | None = None):
+    """世界模型预演：历史锚点 + 条件模拟 + 微动力学 + 物理约束 → 可做/高风险/别做。"""
+    body = body or {}
+    try:
+        from .worldmodel_preview import preview
+
+        def _f(key, default):
+            v = body.get(key)
+            return float(v) if v is not None and v != "" else float(default)
+
+        return preview(
+            metal=str(body.get("metal") or "Pd"),
+            support=str(body.get("support") or "P25(TiO2)"),
+            ch4=_f("ch4", 69.0),
+            o2=_f("o2", 1.0),
+            ar=_f("ar", 10.0),
+            o2_pct=_f("o2_pct", 1.0),
+            loading=_f("loading", 1.0),
+            light=_f("light", 100.0),
+        )
+    except Exception as e:
+        logger.exception("worldmodel preview")
         return {"ok": False, "error": str(e)[:300]}
 
 

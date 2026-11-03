@@ -99,13 +99,77 @@ def _safe(name: str) -> str:
     return (s or "workflow")[:40]
 
 
-def _join(parts: List[Any], sep: str = "\n") -> str:
+def _join(parts: List[Any], sep: str = "\n", keep_empty: bool = True) -> str:
+    """把多节点字段收成一格。keep_empty=True 时用 — 占位，保证与「节点」行一一对应。"""
     out = []
     for p in parts:
         if p is None or p == "":
+            if keep_empty:
+                out.append("—")
             continue
         out.append(str(p))
+    # 全空时不要剩一堆 —
+    if keep_empty and out and all(x == "—" for x in out):
+        return ""
     return sep.join(out)
+
+
+# 收成一行后常含多行文本的列：xlsx / 页面都要按换行展示
+_WRAP_COLS = (
+    "节点", "设备", "动作", "状态",
+    "开始时间", "结束时间", "耗时_秒",
+    "实际称量_g", "实际移液_uL",
+    "烘干时间", "烘干温度", "离心时间", "震荡时间", "超声时间",
+    "吸放方向", "枪头位", "吸液板位", "放液板位",
+    "取值来源", "设定与结果", "报错日志",
+)
+_LONG_TEXT_COLS = ("节点", "设备", "动作", "状态", "设定与结果", "报错日志", "取值来源")
+
+
+def soft_break_text(text: Any, max_len: int = 48) -> str:
+    """把超长连续段拆成多行，避免表格自适应后被撑得很宽。
+
+    · 先把「；」等常见同级分隔改成换行
+    · 再对仍超过 max_len 的行按标点/等号附近切开
+    """
+    s = str(text if text is not None else "").strip()
+    if not s:
+        return ""
+    s = (
+        s.replace("；", "；\n")
+        .replace("; ", ";\n")
+        .replace("；\n\n", "；\n")
+    )
+    out: List[str] = []
+    for raw in s.splitlines():
+        line = raw.rstrip()
+        if not line.strip():
+            continue
+        while len(line) > max_len:
+            cut = max_len
+            window = line[: max_len + 1]
+            for sep in ("、", "，", ",", " ", "=", "：", ":"):
+                i = window.rfind(sep)
+                if i >= max_len // 3:
+                    cut = i + (0 if sep in ("=", "：", ":") else 1)
+                    break
+            chunk = line[:cut].rstrip()
+            if chunk:
+                out.append(chunk)
+            line = line[cut:].lstrip()
+            if not line:
+                break
+        if line:
+            out.append(line)
+    return "\n".join(out)
+
+
+def _format_long_fields(row: Dict[str, Any]) -> Dict[str, Any]:
+    out = dict(row)
+    for c in _LONG_TEXT_COLS:
+        if c in out and out[c] not in (None, ""):
+            out[c] = soft_break_text(out[c])
+    return out
 
 
 def _measure(node: Dict[str, Any], info: Dict[str, Any], state: str) -> Dict[str, str]:
@@ -196,22 +260,22 @@ def _measure(node: Dict[str, Any], info: Dict[str, Any], state: str) -> Dict[str
     if msg:
         bits.append(str(msg))
     row["取值来源"] = "、".join(sources)
-    row["设定与结果"] = "；".join(bits)
+    row["设定与结果"] = soft_break_text("\n".join(bits) if bits else "")
     return row
 
 
 def _error_cell(info: Dict[str, Any], state: str, fallback: str = "") -> str:
     text = str(info.get("error_log") or "").strip()
     if text:
-        return text
+        return soft_break_text(text)
     if state == "skipped":
         return "已禁用，沿连线跳到下一节点"
     err = str(info.get("error") or "").strip()
     if state == "failed" or err:
-        return "原因：" + (err or "执行失败")
+        return soft_break_text("原因：" + (err or "执行失败"))
     if state == "canceled":
-        return str(info.get("reason") or "已取消")
-    return _backfill_error(state, fallback)
+        return soft_break_text(str(info.get("reason") or "已取消"))
+    return soft_break_text(_backfill_error(state, fallback))
 
 
 def _backfill_error(state: str, summary: str) -> str:
@@ -305,13 +369,13 @@ def collapse_run_row(
         return out
     if n == 1:
         out.update({c: node_rows[0].get(c, "") for c in NODE_COLUMNS})
-        return out
+        return _format_long_fields(out)
     for c in NODE_COLUMNS:
         if c == "运行ID":
             out[c] = node_rows[0].get("运行ID") or ""
         else:
             out[c] = _join([r.get(c, "") for r in node_rows])
-    return out
+    return _format_long_fields(out)
 
 
 def build_rows(run: Any) -> List[Dict[str, Any]]:
@@ -376,16 +440,30 @@ def _write_xlsx(path: str, rows: List[Dict[str, Any]]) -> None:
         cell.font = head_font
         cell.fill = head_fill
         cell.alignment = Alignment(vertical="center")
+    wrap_align = Alignment(wrap_text=True, vertical="top")
     for r, row in enumerate(rows, 2):
+        max_lines = 1
         for c, name in enumerate(COLUMNS, 1):
-            cell = ws.cell(r, c, row.get(name, ""))
-            if name in (RUN_COL, "报错日志", "设定与结果", "节点"):
-                cell.alignment = Alignment(wrap_text=True, vertical="top")
+            val = row.get(name, "")
+            cell = ws.cell(r, c, val)
+            if name == RUN_COL or name in _WRAP_COLS:
+                cell.alignment = wrap_align
+                if isinstance(val, str) and val:
+                    max_lines = max(max_lines, val.count("\n") + 1)
+        # Excel 默认不按换行撑高行；给一个可看完若干行的高度，过长封顶
+        ws.row_dimensions[r].height = min(220, max(18, 14 * min(max_lines, 12)))
     widths = {
         RUN_COL: 36,
-        "报错日志": 56,
-        "设定与结果": 40,
-        "节点": 28,
+        "报错日志": 48,
+        "设定与结果": 42,
+        "节点": 32,
+        "设备": 18,
+        "动作": 22,
+        "状态": 12,
+        "开始时间": 20,
+        "结束时间": 20,
+        "耗时_秒": 10,
+        "取值来源": 12,
         "运行ID": 14,
     }
     for i, name in enumerate(COLUMNS, 1):
@@ -537,16 +615,16 @@ def workflow_detail(workflow_name: str) -> Optional[Dict[str, Any]]:
         return {
             "workflow_name": name,
             "xlsx": workflow_xlsx_name(name),
-            "records": rows,
+            "records": [_format_long_fields(r) for r in rows],
             "columns": COLUMNS,
         }
-    # 保证列齐全、报错日志补全
+    # 保证列齐全、报错日志补全；展示时再软换行，旧表超长一行也能看
     fixed = []
     for rec in rows:
         row = {c: rec.get(c, "") for c in COLUMNS}
         if not row.get("报错日志"):
             row["报错日志"] = _backfill_error(str(row.get("状态") or ""), str(row.get("设定与结果") or ""))
-        fixed.append(row)
+        fixed.append(_format_long_fields(row))
     return {
         "workflow_name": name,
         "xlsx": os.path.basename(path),

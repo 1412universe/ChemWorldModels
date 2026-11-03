@@ -1,0 +1,986 @@
+{
+  "target_lab_uuid": "803298d7-ba98-4cd5-a546-b7ca08b4cb12",
+  "name": "堆栈到固体加样结束到离心管处",
+  "data": {
+    "workflow_uuid": "64f8490f-b9d0-4ef6-a52c-2afd2928723f",
+    "workflow_name": "堆栈到固体加样结束到离心管处",
+    "nodes": [
+      {
+        "uuid": "576d6b3d-4832-482b-947d-244ab6703f65",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1580.5372,
+            "y": 889.5147,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -1900,
+          "y_pos": 2220,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 18,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "volune_weight": 0,
+          "material_z_pos": 235000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "[联动全流程] 10/66 固体加样-放料筒向里",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "8a81b37f-033e-4b60-b824-4df1fe8a3440",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1151.7864,
+            "y": 757.19104,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -610,
+          "y_pos": 410,
+          "timeout": 600,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 3700,
+          "door_speed": 150,
+          "gripper_z_pos": 0,
+          "volune_weight": 5,
+          "material_z_pos": 139000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 300
+        },
+        "footer": "料筒加样",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "00e4ee6c-6520-4f5e-a17d-abb7c0c773f1",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 184.5954,
+            "y": 1415.8579,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 0,
+          "y_pos": 0,
+          "timeout": 180,
+          "x_speed": 0,
+          "y_speed": 0,
+          "cmd_type": 20,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "volune_weight": 0,
+          "material_z_pos": 0,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "固体加样-复位",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "89c7fcb7-5909-4a77-a893-7b7b5a3994e6",
+        "parent_uuid": "",
+        "name": "pick",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1333.0776,
+            "y": -117.63123,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 1,
+          "station": "stack",
+          "timeout": 30000,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "机械臂-从堆栈取样",
+        "device_name": "gn_robotic_arm",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
+        "template_name": "pick",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "78956851-c310-48f7-82d6-bc31fdc917b2",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 161.96107,
+            "y": 652.725,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -1750,
+          "y_pos": 1560,
+          "timeout": 180,
+          "x_speed": 300,
+          "y_speed": 300,
+          "cmd_type": 13,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 1100,
+          "volune_weight": 0,
+          "material_z_pos": 0,
+          "gripper_z_speed": 300,
+          "material_z_speed": 0
+        },
+        "footer": "放置加样工位",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "8b2ebe20-4b6f-4f63-ba79-8422c17f1ee4",
+        "parent_uuid": "",
+        "name": "place",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1739.4174,
+            "y": -33.799484,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 1,
+          "station": "solid",
+          "timeout": 30000,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "机械臂-放入固体加样仪",
+        "device_name": "gn_robotic_arm",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
+        "template_name": "place",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "36e67bf8-94b5-45a2-a1ca-9812caefb307",
+        "parent_uuid": "",
+        "name": "place",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1283.0846,
+            "y": 1459.5544,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 1,
+          "station": "tube",
+          "timeout": 30000,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "[联动全流程] 15/66 机械臂-放入离心管液体处理仪",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
+        "template_name": "place",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "137ecde0-3f4e-4699-a3c2-543d924a3642",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 752.0293,
+            "y": 644.968,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -1900,
+          "y_pos": 2220,
+          "timeout": 180,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 10,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 0,
+          "volune_weight": 0,
+          "material_z_pos": 235000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 0
+        },
+        "footer": "取料筒向外",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "da42e9e8-c479-4bf3-831a-830f24a777fc",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1498.9445,
+            "y": 579.9434,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -520,
+          "y_pos": 410,
+          "timeout": 600,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 3700,
+          "door_speed": 150,
+          "gripper_z_pos": 0,
+          "volune_weight": 5,
+          "material_z_pos": 139000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 300
+        },
+        "footer": "料筒加样",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "cd7a17b8-2404-40a6-a5dc-054e151808f0",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1852.7435,
+            "y": 579.9434,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -430,
+          "y_pos": 410,
+          "timeout": 600,
+          "x_speed": 500,
+          "y_speed": 500,
+          "cmd_type": 11,
+          "door_pos": 3700,
+          "door_speed": 150,
+          "gripper_z_pos": 0,
+          "volune_weight": 5,
+          "material_z_pos": 139000,
+          "gripper_z_speed": 0,
+          "material_z_speed": 300
+        },
+        "footer": "料筒加样",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "10040523-9af6-4444-8f91-1e3b1bd9812f",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2309.975,
+            "y": 84.167656,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 10,
+          "y_pos": 2100,
+          "timeout": 180,
+          "x_speed": 300,
+          "y_speed": 300,
+          "cmd_type": 12,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 2100,
+          "volune_weight": 0,
+          "material_z_pos": 0,
+          "gripper_z_speed": 300,
+          "material_z_speed": 0
+        },
+        "footer": "夹取料架",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "2522e052-28aa-4e10-a353-b12deb8dfff1",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2005.6761,
+            "y": 917.05414,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": -1730,
+          "y_pos": 1540,
+          "timeout": 180,
+          "x_speed": 300,
+          "y_speed": 300,
+          "cmd_type": 12,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 1130,
+          "volune_weight": 0,
+          "material_z_pos": 0,
+          "gripper_z_speed": 300,
+          "material_z_speed": 0
+        },
+        "footer": "[联动全流程] 11/66 固体加样-夹取加样工位",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      },
+      {
+        "uuid": "65e35759-b45e-4ee2-82b4-578572a8fc91",
+        "parent_uuid": "",
+        "name": "pick",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 807.6518,
+            "y": 1451.4292,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 1,
+          "station": "solid",
+          "timeout": 30000,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "[联动全流程] 14/66 机械臂-从固体加样仪取样",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
+        "template_name": "pick",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "f9551447-0a0e-4ae0-b722-280d4cb37155",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 992.4276,
+            "y": -114.912674,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "r_pos": 0,
+          "z_pos": 0,
+          "r_speed": 0,
+          "timeout": 120,
+          "z_speed": 0,
+          "cmd_type": 7
+        },
+        "footer": "堆栈复位",
+        "device_name": "gn_rotary_stack",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "6b08ef44-bf4f-45f5-ae28-414a4011c1d7",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_rotary_stack"
+      },
+      {
+        "uuid": "cb524c05-e3b3-4ed3-805e-5a06d4e2819d",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2448.5645,
+            "y": 985.61334,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 20,
+          "y_pos": 2100,
+          "timeout": 180,
+          "x_speed": 300,
+          "y_speed": 300,
+          "cmd_type": 13,
+          "door_pos": 0,
+          "door_speed": 0,
+          "gripper_z_pos": 2180,
+          "volune_weight": 0,
+          "material_z_pos": 0,
+          "gripper_z_speed": 300,
+          "material_z_speed": 0
+        },
+        "footer": "[联动全流程] 12/66 固体加样-放回料架",
+        "device_name": "gn_solid_weighing",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_solid_weighing"
+      }
+    ],
+    "edges": [
+      {
+        "source_node_uuid": "89c7fcb7-5909-4a77-a893-7b7b5a3994e6",
+        "target_node_uuid": "8b2ebe20-4b6f-4f63-ba79-8422c17f1ee4",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "8b2ebe20-4b6f-4f63-ba79-8422c17f1ee4",
+        "target_node_uuid": "10040523-9af6-4444-8f91-1e3b1bd9812f",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "10040523-9af6-4444-8f91-1e3b1bd9812f",
+        "target_node_uuid": "78956851-c310-48f7-82d6-bc31fdc917b2",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "78956851-c310-48f7-82d6-bc31fdc917b2",
+        "target_node_uuid": "137ecde0-3f4e-4699-a3c2-543d924a3642",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "137ecde0-3f4e-4699-a3c2-543d924a3642",
+        "target_node_uuid": "8a81b37f-033e-4b60-b824-4df1fe8a3440",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "576d6b3d-4832-482b-947d-244ab6703f65",
+        "target_node_uuid": "2522e052-28aa-4e10-a353-b12deb8dfff1",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "2522e052-28aa-4e10-a353-b12deb8dfff1",
+        "target_node_uuid": "cb524c05-e3b3-4ed3-805e-5a06d4e2819d",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "cb524c05-e3b3-4ed3-805e-5a06d4e2819d",
+        "target_node_uuid": "00e4ee6c-6520-4f5e-a17d-abb7c0c773f1",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "00e4ee6c-6520-4f5e-a17d-abb7c0c773f1",
+        "target_node_uuid": "65e35759-b45e-4ee2-82b4-578572a8fc91",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "65e35759-b45e-4ee2-82b4-578572a8fc91",
+        "target_node_uuid": "36e67bf8-94b5-45a2-a1ca-9812caefb307",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "f9551447-0a0e-4ae0-b722-280d4cb37155",
+        "target_node_uuid": "89c7fcb7-5909-4a77-a893-7b7b5a3994e6",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "8a81b37f-033e-4b60-b824-4df1fe8a3440",
+        "target_node_uuid": "da42e9e8-c479-4bf3-831a-830f24a777fc",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "da42e9e8-c479-4bf3-831a-830f24a777fc",
+        "target_node_uuid": "cd7a17b8-2404-40a6-a5dc-054e151808f0",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "cd7a17b8-2404-40a6-a5dc-054e151808f0",
+        "target_node_uuid": "576d6b3d-4832-482b-947d-244ab6703f65",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      }
+    ],
+    "embeds": []
+  }
+}

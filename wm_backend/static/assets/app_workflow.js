@@ -2189,6 +2189,84 @@
     renderNodes(); showProps(); updateStats(); afterChange();
   }
 
+  // ---------- 清理：孤立节点 / 禁用相关连线 ----------
+  function _applyNodeEdgeCleanup(nextNodes, nextEdges, removedEdges) {
+    var removedNodeIds = {};
+    var keepSet = {};
+    (nextNodes || []).forEach(function (n) { if (n && n.uuid) keepSet[n.uuid] = 1; });
+    (state.wf.data.nodes || []).forEach(function (n) {
+      if (n && n.uuid && !keepSet[n.uuid]) removedNodeIds[n.uuid] = 1;
+    });
+    state.wf.data.nodes = nextNodes;
+    state.wf.data.edges = nextEdges;
+    Object.keys(removedNodeIds).forEach(function (id) { delete state.selectedIds[id]; });
+    if (state.selected && state.selected.id && removedNodeIds[state.selected.id]) {
+      state.selected = null;
+    }
+    renderNodes();
+    showProps();
+    updateStats();
+    afterChange();
+    return {
+      ok: true,
+      removedEdges: removedEdges || 0,
+      removedNodes: Object.keys(removedNodeIds).length,
+      keptNodes: nextNodes.length,
+      keptEdges: nextEdges.length
+    };
+  }
+
+  /** 只删两侧都没有连线的孤立节点；不动任何现有连线 */
+  function removeIsolatedNodesOnly() {
+    var nodes = state.wf.data.nodes || [];
+    var edges = state.wf.data.edges || [];
+    if (!nodes.length) {
+      return { ok: true, removedEdges: 0, removedNodes: 0, keptNodes: 0, keptEdges: edges.length };
+    }
+    pushUndo();
+    var linked = {};
+    edges.forEach(function (e) {
+      if (!e) return;
+      linked[e.source_node_uuid] = 1;
+      linked[e.target_node_uuid] = 1;
+    });
+    var keptNodes = [];
+    nodes.forEach(function (n) {
+      if (n && linked[n.uuid]) keptNodes.push(n);
+    });
+    return _applyNodeEdgeCleanup(keptNodes, edges.slice(), 0);
+  }
+
+  /** 删禁用节点相关连线，再删因此产生的孤立节点 */
+  function pruneOrphansAndDisabledEdges() {
+    var nodes = state.wf.data.nodes || [];
+    var edges = state.wf.data.edges || [];
+    if (!nodes.length && !edges.length) {
+      return { ok: true, removedEdges: 0, removedNodes: 0, keptNodes: 0, keptEdges: 0 };
+    }
+    pushUndo();
+    var disabled = {};
+    nodes.forEach(function (n) {
+      if (n && n.disabled) disabled[n.uuid] = 1;
+    });
+    var beforeE = edges.length;
+    edges = edges.filter(function (e) {
+      return e && !disabled[e.source_node_uuid] && !disabled[e.target_node_uuid];
+    });
+    var removedEdges = beforeE - edges.length;
+    var linked = {};
+    edges.forEach(function (e) {
+      if (!e) return;
+      linked[e.source_node_uuid] = 1;
+      linked[e.target_node_uuid] = 1;
+    });
+    var keptNodes = [];
+    nodes.forEach(function (n) {
+      if (n && linked[n.uuid]) keptNodes.push(n);
+    });
+    return _applyNodeEdgeCleanup(keptNodes, edges, removedEdges);
+  }
+
   // ---------- 校验 ----------
   function validate() {
     var nodes = state.wf.data.nodes, edges = state.wf.data.edges;
@@ -2791,8 +2869,10 @@
       ev.preventDefault();
     });
 
-    // 滚轮缩放
+    // 滚轮缩放；运行抽屉内交给原生滚动（触控板 / 滚轮）
     wrap.addEventListener('wheel', function (ev) {
+      var t = ev.target;
+      if (t && t.closest && t.closest('#wfed-run')) return;
       ev.preventDefault();
       var cr = wrap.getBoundingClientRect();
       setZoom(state.view.scale * (ev.deltaY < 0 ? 1.12 : 0.9), ev.clientX - cr.left, ev.clientY - cr.top);
@@ -4221,6 +4301,9 @@
 
   function parseWorkflowText(text) {
     var obj;
+    // 去掉 UTF-8 BOM；空内容直接说清楚，避免被当成「格式不对」
+    text = String(text == null ? '' : text).replace(/^\uFEFF/, '');
+    if (!text.trim()) throw new Error('文件内容为空');
     try { obj = JSON.parse(text); }
     catch (e) {
       throw new Error('JSON 语法错误：' + (e && e.message ? e.message : e));
@@ -4245,14 +4328,28 @@
     return { dx: (cMaxX + 140) - aMinX, dy: cMinY - aMinY };
   }
 
-  /** 真正落地导入。mode: 'replace' 替换画布 | 'append' 追加到当前画布 */
+  function fileStem(name) {
+    return String(name || '').replace(/\.json$/i, '').trim() || '导入的工作流';
+  }
+  /** 按文件名新建一条工作流：新 uuid + 名称 = 文件名（去 .json）。 */
+  function asNewWorkflow(wf, fileName) {
+    if (!wf || !wf.data) return wf;
+    var nm = fileStem(fileName);
+    wf.data.workflow_uuid = uid();
+    wf.name = nm;
+    wf.data.workflow_name = nm;
+    return wf;
+  }
+
+  /** 真正落地导入。mode: 'new' 新建为工作流 | 'replace' 替换画布 | 'append' 追加到当前画布 */
   function doImport(res, mode) {
     if (!res || !res.wf) return false;
     var wf = JSON.parse(JSON.stringify(res.wf));
+    if (mode === 'new' && res.sourceFile) asNewWorkflow(wf, res.sourceFile);
     putTemplate(wf);
     var cur = state.wf.data.nodes;
 
-    if (mode === 'replace') {
+    if (mode === 'new' || mode === 'replace') {
       var go = function () {
         pushUndo();
         // openWorkflow 内部会清空 undo/redo 栈；导入属于「一步可撤销」的操作，
@@ -4263,14 +4360,15 @@
         state.undo = ku; state.redo = kr;
         hideImportMenu();
         var body = [wf.name, wf.data.nodes.length + ' 节点 / ' + wf.data.edges.length + ' 连线'];
+        if (mode === 'new') body.push('已按文件名加入左侧工作流列表');
         if (res.fixes.length) body.push('自动修复 ' + res.fixes.length + ' 项（见预览）');
-        note('ok', '已导入 · 替换画布', body);
+        note('ok', mode === 'new' ? '已新建工作流' : '已导入 · 替换画布', body);
       };
       if (cur.length) {
-        askConfirm('替换当前画布？',
-          ['当前画布有 ' + cur.length + ' 个节点、' + state.wf.data.edges.length + ' 条连线，导入会清空它们。',
+        askConfirm(mode === 'new' ? '新建并打开这份工作流？' : '替换当前画布？',
+          ['当前画布有 ' + cur.length + ' 个节点、' + state.wf.data.edges.length + ' 条连线，打开后会离开当前编辑。',
             '导入后可 Ctrl+Z 撤销。'],
-          go, '替换并导入');
+          go, mode === 'new' ? '新建并打开' : '替换并导入');
       } else go();
       return true;
     }
@@ -4391,8 +4489,12 @@
       h.push('</div>');
     }
 
-    h.push('<div class="imp-act">' +
-      '<button class="imp-go" id="import-replace">替换画布</button>' +
+    h.push('<div class="imp-act">');
+    if (res.sourceFile) {
+      h.push('<button class="imp-go" id="import-as-new" title="以文件名「' +
+        esc(fileStem(res.sourceFile)) + '」新建一条工作流并打开">新建为工作流</button>');
+    }
+    h.push('<button class="imp-go' + (res.sourceFile ? ' alt' : '') + '" id="import-replace">替换画布</button>' +
       '<button class="imp-go alt" id="import-append">追加到当前画布</button>' +
       '</div>');
     box.innerHTML = h.join('');
@@ -4411,7 +4513,8 @@
     document.getElementById('import-menu').classList.remove('hidden');
   }
 
-  function importFromText(text, label) {
+  function importFromText(text, label, opts) {
+    opts = opts || {};
     var res;
     try { res = parseWorkflowText(text); }
     catch (e) {
@@ -4419,6 +4522,11 @@
       note('err', '这不是可用的工作流 JSON', [
         String((e && e.message) || e), '来源：' + (label || '粘贴内容')]);
       return false;
+    }
+    if (opts.fromFile && label) {
+      asNewWorkflow(res.wf, label);
+      res.sourceFile = label;
+      res.fixes = (res.fixes || []).concat(['已按文件名「' + fileStem(label) + '」准备新建工作流']);
     }
     openImportMenu();
     showImportPreview(res);
@@ -4435,9 +4543,63 @@
       return;
     }
     var rd = new FileReader();
-    rd.onload = function () { importFromText(String(rd.result), f.name); };
+    rd.onload = function () { importFromText(String(rd.result), f.name, { fromFile: true }); };
     rd.onerror = function () { note('err', '文件读取失败', f.name); };
     rd.readAsText(f, 'utf-8');
+  }
+
+  function readFileText(f) {
+    return new Promise(function (resolve, reject) {
+      var rd = new FileReader();
+      rd.onload = function () { resolve(String(rd.result || '')); };
+      rd.onerror = function () { reject(new Error('读文件失败')); };
+      rd.readAsText(f, 'utf-8');
+    });
+  }
+
+  /** 批量导入：每个 .json 按文件名新建一条工作流进左侧列表，不改当前画布。
+   *  解析逻辑与单文件导入共用 parseWorkflowText；files 必须是已 snapshot 的 File 数组
+   * （不能传活的 input.files，清空 input 后 FileList 会变空，读出来就是空内容/格式错）。 */
+  function importBatchFiles(fileList) {
+    var files = (Array.isArray(fileList) ? fileList : Array.prototype.slice.call(fileList || [], 0))
+      .filter(function (f) {
+        return f && (/\.json$/i.test(f.name || '') || ((f.type || '').indexOf('json') >= 0));
+      });
+    if (!files.length) {
+      note('warn', '没有可用文件', '请选择一个或多个 .json 工作流文件。');
+      return;
+    }
+    var ok = [], fail = [];
+    var chain = Promise.resolve();
+    files.forEach(function (f) {
+      chain = chain.then(function () {
+        return readFileText(f).then(function (text) {
+          // 与单文件导入同一条解析链
+          var res = parseWorkflowText(text);
+          asNewWorkflow(res.wf, f.name);
+          return putTemplate(res.wf).then(function () {
+            ok.push(res.wf.name || fileStem(f.name));
+          });
+        }).catch(function (e) {
+          fail.push((f && f.name ? f.name : '文件') + '：' + (e && e.message ? e.message : e));
+        });
+      });
+    });
+    chain.then(function () {
+      return fetchTplList();
+    }).then(function () {
+      hideImportMenu();
+      var body = ['成功新建 ' + ok.length + ' / 共 ' + files.length + ' 份（名称=文件名）'];
+      if (ok.length) {
+        body.push(ok.slice(0, 8).join('、') + (ok.length > 8 ? '…' : ''));
+      }
+      if (fail.length) {
+        body.push('失败 ' + fail.length + '：' + fail.slice(0, 3).join('；') +
+          (fail.length > 3 ? '…' : ''));
+      }
+      note(fail.length && !ok.length ? 'err' : (fail.length ? 'warn' : 'ok'),
+        '批量导入完成', body, 5200);
+    });
   }
 
   function bindImport() {
@@ -4462,6 +4624,13 @@
       ev.target.value = '';                      // 同一个文件再选一次也要能触发
       importFromFile(f);
     });
+    document.getElementById('wf-file-batch').addEventListener('change', function (ev) {
+      // 必须先拷成 File 数组再清空 input：FileList 是活引用，value='' 后长度变 0，
+      // 异步 FileReader 会读到空内容，批量导入就会误报「JSON 语法/格式错误」。
+      var list = Array.prototype.slice.call(ev.target.files || [], 0);
+      ev.target.value = '';
+      importBatchFiles(list);
+    });
     document.getElementById('import-parse').addEventListener('click', function () {
       var t = document.getElementById('import-text').value;
       if (!t.trim()) { note('warn', '还没有内容', '先粘贴工作流 JSON，或点「载入示例」。'); return; }
@@ -4480,10 +4649,11 @@
         .catch(function (e) { note('err', '示例加载失败', String(e.message || e)); });
     });
 
-    // 预览里的两个动作按钮（预览内容是 innerHTML 重建的，用委托绑定）
+    // 预览里的动作按钮（预览内容是 innerHTML 重建的，用委托绑定）
     document.getElementById('import-preview').addEventListener('click', function (ev) {
       var t = ev.target;
-      if (t.id === 'import-replace') doImport(pendingImport, 'replace');
+      if (t.id === 'import-as-new') doImport(pendingImport, 'new');
+      else if (t.id === 'import-replace') doImport(pendingImport, 'replace');
       else if (t.id === 'import-append') doImport(pendingImport, 'append');
     });
 
@@ -4706,8 +4876,21 @@
         });
       },
       listEdges: function () { return state.wf.data.edges.map(function (e) { return e.source_node_uuid + '>' + e.target_node_uuid; }); },
-      getWorkflow: function () { return collectWorkflow(); }
+      getWorkflow: function () { return collectWorkflow(); },
+      /** 直接改当前画布：删禁用节点相关连线 + 删无连线孤立节点 */
+      pruneOrphansAndDisabledEdges: pruneOrphansAndDisabledEdges,
+      removeIsolatedNodesOnly: removeIsolatedNodesOnly,
+      undo: undo,
+      redo: redo,
+      canUndo: function () { return !!(state.undo && state.undo.length); },
+      canRedo: function () { return !!(state.redo && state.redo.length); }
     };
+
+    var undoBtn = document.getElementById('btn-undo');
+    if (undoBtn && !undoBtn.dataset.bound) {
+      undoBtn.dataset.bound = '1';
+      undoBtn.addEventListener('click', function () { undo(); });
+    }
   }
   init();
 })();

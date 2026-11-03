@@ -59,14 +59,13 @@ SYSTEM_PROMPT = """你是一个「甲烷偶联 · AI 世界模型工作室」的
 
 def _post(messages: list[dict], temperature: float = 0.5, timeout: int = 60,
           model: str | None = None, base_url: str | None = None,
-          api_key: str | None = None) -> str:
-    """调用 chat/completions，返回助手文本（含可能的 ACTION 行）。
+          api_key: str | None = None, return_meta: bool = False):
+    """调用 chat/completions，默认返回助手文本；return_meta=True 时返回 dict。
 
-    - model/base_url/api_key 均可覆盖（前端按用户选择传入）：
-      * 外部常用/自定义模型：base_url=外部 API、api_key=外部 key（缺省用环境变量默认）
-      * 本地模型：base_url=用户填的本地端点（如 http://127.0.0.1:11434/v1）、
-        api_key 通常为空（Ollama 默认无鉴权）、model=本地模型名（如 qwen2.5:7b）
+    return_meta 时字段：content / reasoning / latency_ms / model
+    reasoning 来自 message.reasoning_content（若网关提供）。
     """
+    import time
     base = (base_url or EXT_LLM_URL).rstrip("/")
     # 智能拼接 chat/completions 端点，避免重复 /v1：
     # - 已以 /chat/completions 结尾 → 直接用
@@ -91,10 +90,34 @@ def _post(messages: list[dict], temperature: float = 0.5, timeout: int = 60,
     if key:
         headers["Authorization"] = "Bearer " + key
     req = urllib.request.Request(url, data=data, method="POST", headers=headers)
+    t0 = time.time()
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             body = json.loads(resp.read().decode("utf-8"))
-        return body["choices"][0]["message"]["content"]
+        msg = (body.get("choices") or [{}])[0].get("message") or {}
+        content = msg.get("content") or ""
+        reasoning = (
+            msg.get("reasoning_content")
+            or msg.get("reasoning")
+            or msg.get("thinking")
+            or ""
+        )
+        # 少数网关把思考塞进 content 的 <think>…</think>
+        if not reasoning and isinstance(content, str) and "<think>" in content.lower():
+            import re as _re
+            m = _re.search(r"<think>([\s\S]*?)</think>", content, _re.I)
+            if m:
+                reasoning = m.group(1).strip()
+                content = (content[: m.start()] + content[m.end():]).strip()
+        latency_ms = int((time.time() - t0) * 1000)
+        if return_meta:
+            return {
+                "content": content,
+                "reasoning": reasoning if isinstance(reasoning, str) else str(reasoning or ""),
+                "latency_ms": latency_ms,
+                "model": mdl,
+            }
+        return content
     except urllib.error.HTTPError as e:
         detail = e.read().decode("utf-8", "replace")[:300]
         logger.error("[ext_llm] HTTP %s: %s", e.code, detail)

@@ -1,0 +1,30 @@
+{
+  "target_lab_uuid": "1213449c-e330-4972-899d-f467a1092801",
+  "name": "金四面体全流程",
+  "data": {
+    "workflow_uuid": "96cdb50e-9d3c-46fd-bb17-f1f93a2432a1",
+    "workflow_name": "金四面体全流程",
+    "nodes": [],
+    "edges": [],
+    "embeds": [
+      {
+        "id": "30884c7e-c13e-48b7-9560-a97992f78c95",
+        "template_id": "cb54a6be-9014-4225-8b4d-f237936edcde",
+        "dx": 40,
+        "dy": 60
+      },
+      {
+        "id": "6b1149a3-0995-4760-b4a0-cf0b3b54fb08",
+        "template_id": "114aaafc-6216-42ba-bbfe-ab975a2cea56",
+        "dx": 5760,
+        "dy": 60
+      },
+      {
+        "id": "dc677ded-10f5-4767-9244-468015c8e39a",
+        "template_id": "0cd0cf15-9e02-43bc-85a4-210795733c39",
+        "dx": 14120,
+        "dy": 60
+      }
+    ]
+  }
+}
