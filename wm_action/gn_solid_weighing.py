@@ -289,7 +289,23 @@ class SolidWeighingDevice(GNStationClient):
             "Solid_GripperZSpeed": gripper_z_speed,
             "Solid_DoorSpeed": door_speed,
         }
-        return {node: val for node, val in mapping.items() if val is not None}
+        # 速度写 0 会冲掉 PLC 内有效速度（云端/表单默认 0）；当作「未设」跳过
+        speed_nodes = {
+            "Solid_XSpeed", "Solid_YSpeed", "Solid_MaterialZSpeed",
+            "Solid_GripperZSpeed", "Solid_DoorSpeed",
+        }
+        out = {}
+        for node, val in mapping.items():
+            if val is None:
+                continue
+            if node in speed_nodes:
+                try:
+                    if int(val) == 0:
+                        continue
+                except (TypeError, ValueError):
+                    pass
+            out[node] = val
+        return out
 
     @not_action
     def _run(
@@ -332,9 +348,14 @@ class SolidWeighingDevice(GNStationClient):
         setpoints: Optional[dict] = None,
         timeout: float = 180.0,
     ) -> dict:
-        """下发 CmdType → CmdTrig=1，等待 CompleteFB=1 后清理（同 centrifuge_tube，不要求下发前 idle）。"""
+        """下发 CmdType → CmdTrig=1，等待完成反馈后清理。
+
+        夹取/放置(12/13)：CompleteFB 超时后用 XY/GripperZ 位置兜底。
+        夹紧/松开(21/22)：先清粘滞 CompleteFB，再等边沿回 1。
+        """
         if timeout <= 0:
             raise ValueError("timeout 必须大于 0")
+        self._ensure_complete_idle(description)
         if not self._opc_write(self.CMD_TYPE_NODE, int(cmd_type)):
             raise ValueError(f"Solid_CmdType={cmd_type} 写入失败")
         if not self._opc_write(self.CMD_TRIG_NODE, 1):
@@ -342,14 +363,31 @@ class SolidWeighingDevice(GNStationClient):
 
         completed = False
         try:
-            _ = setpoints
-            completed = self._wait_complete_value(
-                expected=1,
-                timeout=timeout,
-                description=f"{description}完成",
-            )
+            cmd = int(cmd_type)
+            if cmd in (
+                int(SolidCommand.GRIPPER_PICK),
+                int(SolidCommand.GRIPPER_PLACE),
+            ) and setpoints:
+                completed = self._wait_motion_complete(
+                    setpoints or {},
+                    timeout=timeout,
+                    description=f"{description}完成",
+                )
+            elif cmd == int(SolidCommand.DISPENSE):
+                target = (setpoints or {}).get("Solid_VoluneWeightSet")
+                completed = self._wait_dispense_complete(
+                    int(target) if target is not None else None,
+                    timeout=timeout,
+                    description=f"{description}完成",
+                )
+            else:
+                completed = self._wait_complete_value(
+                    expected=1,
+                    timeout=timeout,
+                    description=f"{description}完成",
+                )
             if not completed:
-                raise ValueError(f"{description}失败，Solid_CompleteFB 未变为 1")
+                raise ValueError(f"{description}失败，Solid_CompleteFB 未变为 1（或位置未到位）")
         finally:
             trigger_cleared = self._opc_write(self.CMD_TRIG_NODE, 0)
             command_cleared = self._opc_write(self.CMD_TYPE_NODE, 0)
@@ -376,6 +414,34 @@ class SolidWeighingDevice(GNStationClient):
             "message": f"{description}完成",
             "cmd_type": int(cmd_type),
         }
+
+    @not_action
+    def _ensure_complete_idle(self, description: str, timeout: float = 3.0) -> None:
+        """触发前若 CompleteFB 已是 1，写 0 并短等回落，避免假完成导致夹爪不开合。"""
+        raw = self._opc_read(self.COMPLETE_NODE, force_read=True)
+        try:
+            idle = int(raw) != 1
+        except (TypeError, ValueError):
+            idle = not bool(raw)
+        if idle:
+            return
+        logger.warning(
+            f"固体加样：{description} 触发前 {self.COMPLETE_NODE}={raw!r}，先清 0"
+        )
+        self._opc_write(self.COMPLETE_NODE, 0)
+        start = time.monotonic()
+        while time.monotonic() - start < timeout:
+            v = self._opc_read(self.COMPLETE_NODE, force_read=True)
+            try:
+                if int(v) != 1:
+                    return
+            except (TypeError, ValueError):
+                if not v:
+                    return
+            time.sleep(0.05)
+        logger.warning(
+            f"固体加样：{self.COMPLETE_NODE} 未能在 {timeout}s 内回落，仍继续触发"
+        )
 
     @not_action
     def _wait_reset_positions(

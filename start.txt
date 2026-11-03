@@ -6,14 +6,23 @@ cd /Users/fenglongli/Downloads/ChemWorldModel
 git add -A
 git status
 git commit -m "$(cat <<'EOF'
-
-更新自适应功能
-
+更新说明写这里
 EOF
 )"
-git push origin main
+
+# 推送：强制走 GitHub SSH 的 443 端口（勿用默认 22）
+# 教训：git@github.com 默认连 22，常报
+#   ssh: connect to host github.com port 22: Undefined error: 0
+#   fatal: Could not read from remote repository.
+# 那是网络/防火墙拦了 22，本地 commit 其实已成功；修好推送方式后直接再 push 即可。
+GIT_SSH_COMMAND='ssh -o Hostname=ssh.github.com -p 443 -o User=git' git push origin main
+
+# 若上面仍失败（密钥/权限问题），改用 HTTPS（443）再推一次：
+# git remote set-url origin https://github.com/1412universe/ChemWorldModels.git
+# git push origin main
 
 # 说明：
 # - data/、根目录 skills/ 软链等已在 .gitignore，不会上传
 # - 正式 skill 副本在 wm_backend/skills/，会随仓库走
 # - 无改动时 commit 会失败，属正常
+# - status 显示 ahead of origin/main = 本地已有未推送提交，只需再执行上面的 push 行

@@ -214,7 +214,25 @@ def build_steps(action: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         from_pos = params.get("from")
         if to_pos is None or from_pos is None:
             raise ValueError("move_plate 需要 from 与 to（板位）")
-        return [_step("MvKit", "搬运 %s→%s" % (from_pos, to_pos),
+        # 拒 0 / 非 1..16 / 夹爪停用位 3·4，避免下发成「T0→0」或不可达位
+        def _slot(v, name):
+            try:
+                n = int(v)
+            except (TypeError, ValueError):
+                raise ValueError("move_plate %s 必须是整数板位号，收到 %r" % (name, v))
+            if n < 1 or n > 16:
+                raise ValueError(
+                    "move_plate %s=%s 非法（有效 T1–T16；0 多为未选板位默认值）" % (name, n)
+                )
+            if n in (3, 4):
+                raise ValueError(
+                    "move_plate %s=T%s 夹爪行程不覆盖（停用），请改用 T9（震荡）或 T16（中转）等可达位"
+                    % (name, n)
+                )
+            return n
+        from_pos = _slot(from_pos, "from")
+        to_pos = _slot(to_pos, "to")
+        return [_step("MvKit", "搬运 T%s→T%s" % (from_pos, to_pos),
                       Position=str(from_pos), TargetPosition=str(to_pos))]
     if action == "titration_liquid":
         sources = _parse_json_param(params.get("sources"), []) or []

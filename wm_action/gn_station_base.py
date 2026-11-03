@@ -330,13 +330,16 @@ class GNStationClient:
             done_node = self._complete_node()
         desc = description or (f"CmdType={cmd_type}" if cmd_type is not None else "动作")
 
-        _ = (reach_checks, clear_done)
         if interlock is not None:
             interlock()
         if setpoints:
             for node, val in setpoints.items():
                 if val is not None:
                     self.plc.write(node, val)
+
+        # 触发前清掉粘滞的完成位，避免「第一次假完成、轴不动」
+        if done_node:
+            self._ensure_done_idle(done_node, clear_done=clear_done, description=desc)
 
         ok_type = True
         if cmd_type is not None:
@@ -347,8 +350,10 @@ class GNStationClient:
 
         completed = False
         try:
-            completed = self._wait_done(done_node, None, timeout, desc)
+            completed = self._wait_done(done_node, reach_checks, timeout, desc)
             if not completed:
+                if reach_checks:
+                    raise ValueError(f"{desc} 未完成（完成反馈或位置未到位）")
                 raise ValueError(f"{desc} 未完成，完成反馈未变为 1")
         finally:
             self.plc.write(trig_node, 0)
@@ -356,6 +361,34 @@ class GNStationClient:
                 self.plc.write(cmd_type_node, 0)
         logger.info(f"{desc} 完成")
         return {"success": True, "message": f"{desc} 完成", "cmd_type": cmd_type}
+
+    @not_action
+    def _ensure_done_idle(
+        self,
+        done_node: str,
+        *,
+        clear_done: bool = True,
+        description: str = "",
+        timeout: float = 3.0,
+    ) -> None:
+        """触发前确保完成反馈为 0。粘滞的 1 先尝试写 0，再短等回落。"""
+        raw = self.plc.read(done_node, force_read=True)
+        try:
+            busy = int(raw) == 1
+        except (TypeError, ValueError):
+            busy = bool(raw)
+        if not busy:
+            return
+        logger.warning(
+            f"[{description}] 触发前 {done_node}={raw!r} 仍为完成态，先清 0 再下发"
+        )
+        if clear_done:
+            self.plc.write(done_node, 0)
+        if not self.plc.wait_false(done_node, timeout=timeout, description=f"{done_node} 回落"):
+            # 仍粘滞时继续下发，靠 reach_checks / 后续超时暴露问题
+            logger.warning(
+                f"[{description}] {done_node} 未能在 {timeout}s 内回落，仍继续触发"
+            )
 
     @not_action
     def _wait_done(
@@ -372,23 +405,33 @@ class GNStationClient:
         logger.info(f"[{description}] 已下发，等待到位（{watch}）...")
 
         start = time.time()
+        # 有位置校验时要求连续稳定；仅 CompleteFB 时 1 次即可
         need = 3 if reach_checks else 1
         stable = 0
         reached = False
         last_log = 0.0
+        # 有 reach_checks 时：完成位可选（粘滞/缺失时仍以位置为准）
+        require_done = bool(done_node) and not reach_checks
         while time.time() - start < timeout:
-            values = {n: self.plc.get_node_value(n, use_cache=True) for n in watch}
+            values = {n: self.plc.read(n, force_read=True) for n in watch}
             ok = True
-            if done_node:
+            if done_node and require_done:
                 raw = values.get(done_node)
                 try:
                     ok = int(raw) == 1
                 except (TypeError, ValueError):
                     ok = False
+            elif done_node and reach_checks:
+                # 位置为主；CompleteFB=1 时加分但不强制（避免粘滞假完成）
+                pass
             if ok and reach_checks:
                 for fb, tgt, tol in reach_checks:
                     v = values.get(fb)
-                    if v is None or abs(v - tgt) > tol:
+                    try:
+                        if v is None or abs(float(v) - float(tgt)) > float(tol):
+                            ok = False
+                            break
+                    except (TypeError, ValueError):
                         ok = False
                         break
             if ok:

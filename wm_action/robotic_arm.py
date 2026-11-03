@@ -135,6 +135,8 @@ class RoboticArmDevice(GNStationClient):
             *args,
             **kwargs,
         )
+        # 本会话是否已确认堆栈 R0；首次抓放堆栈前若列反馈无效则自动复位
+        self._stack_r0_ready = False
 
     # ==================== 抓 / 放 ====================
 
@@ -211,8 +213,14 @@ class RoboticArmDevice(GNStationClient):
         self.move_x(target_x, x_speed, timeout)
         logger.info(f"机械手：小车已到位 X={target_x}（FinishFB=1），准备{mode}")
 
-        # 2) 旋转堆栈：按 number 转到对应列并校验到位（绝对 R 定位，依赖开机/换批时外部先 reset() 建 R0）
+        # 2) 旋转堆栈：按 number 转到对应列并校验到位（绝对 R 定位依赖 R0）
         if st.rotary:
+            if not self._stack_r0_ready:
+                col_now = rotary_stack.current_column(self)
+                if col_now is None:
+                    logger.info("机械手：堆栈 R 反馈非整数列，首次抓放前自动复位建 R0")
+                    rotary_stack.reset(self, timeout=timeout)
+                self._stack_r0_ready = True
             column = rotary_stack.rotate_for_number(self, number, timeout=timeout)
             logger.info(f"机械手：旋转堆栈已校验到位第{column}列，开始{mode}")
 

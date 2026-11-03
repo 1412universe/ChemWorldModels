@@ -4416,7 +4416,7 @@
           "cross_section_type": "rectangle"
         },
         "param": {
-          "to": 3,
+          "to": 9,
           "from": 14,
           "force": 5,
           "plate": [
@@ -4449,7 +4449,7 @@
           "intermediate_locations": [],
           "pickup_distance_from_top": 0
         },
-        "footer": "Step3: T14->T3",
+        "footer": "Step3: T14->T9",
         "device_name": "PRCXI",
         "disabled": true,
         "minimized": false,
@@ -4797,7 +4797,7 @@
           "cmd_type": 13,
           "door_pos": 0,
           "door_speed": 0,
-          "gripper_z_pos": 930,
+          "gripper_z_pos": 2050,
           "volune_weight": 0,
           "material_z_pos": 0,
           "gripper_z_speed": 300,
@@ -7522,7 +7522,7 @@
           "cmd_type": 12,
           "door_pos": 0,
           "door_speed": 0,
-          "gripper_z_pos": 2050,
+          "gripper_z_pos": 930,
           "volune_weight": 0,
           "material_z_pos": 0,
           "gripper_z_speed": 300,
@@ -7873,7 +7873,7 @@
         },
         "param": {
           "to": 14,
-          "from": 3,
+          "from": 9,
           "force": 5,
           "plate": [
             {
@@ -7905,7 +7905,7 @@
           "intermediate_locations": [],
           "pickup_distance_from_top": 0
         },
-        "footer": "Step4: T3->T14",
+        "footer": "Step4: T9->T14",
         "device_name": "PRCXI",
         "disabled": true,
         "minimized": false,
