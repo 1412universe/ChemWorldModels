@@ -32,13 +32,55 @@ class _QuietHealthAccessLog(logging.Filter):
 if not os.getenv("WM_LOG_HEALTH"):
     logging.getLogger("uvicorn.access").addFilter(_QuietHealthAccessLog())
 
+def _ensure_ollama_serve(wait_s: int = 40) -> bool:
+    """若本机 11434 未就绪则后台拉起 `ollama serve`（已在跑则复用）。"""
+    import shutil
+    import subprocess
+    import time
+    import urllib.request
+
+    def _up() -> bool:
+        try:
+            urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=2)
+            return True
+        except Exception:
+            return False
+
+    if _up():
+        return True
+    ollama = shutil.which("ollama")
+    if not ollama:
+        return False
+    kw = {
+        "stdout": subprocess.DEVNULL,
+        "stderr": subprocess.DEVNULL,
+        "stdin": subprocess.DEVNULL,
+    }
+    if os.name == "nt":
+        kw["creationflags"] = (
+            subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS
+        )
+    else:
+        kw["start_new_session"] = True
+    try:
+        subprocess.Popen([ollama, "serve"], **kw)
+    except Exception:
+        return False
+    for _ in range(max(1, wait_s)):
+        if _up():
+            return True
+        time.sleep(1)
+    return False
+
+
 @asynccontextmanager
 async def lifespan(app):
-    """启动预热：后台加载 Ollama 7B 权重 + 预缓存 XGBoost 残差，使首个 /api/next 快速返回。"""
+    """启动：必要时自动起 Ollama，再预热 7B + XGBoost，使首个 /api/next 更快。"""
     import threading
 
     def _run():
         try:
+            _ensure_ollama_serve()
             from app import llm
             llm.warmup()
         except Exception:

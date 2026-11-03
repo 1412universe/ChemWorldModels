@@ -1,9 +1,9 @@
 {
   "target_lab_uuid": "75fb74df-2e98-4fc6-91e6-8992aa39e7ca",
-  "name": "锁紧",
+  "name": "demo",
   "data": {
     "workflow_uuid": "cec56e8d-272f-492a-a05a-639cba95e092",
-    "workflow_name": "锁紧",
+    "workflow_name": "demo",
     "nodes": [
       {
         "uuid": "50682d8f-c446-433b-9bd3-a636e97da76b",
@@ -14,8 +14,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 360,
-            "y": 56,
+            "x": 660,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -42,19 +42,79 @@
           "cross_section_type": "rectangle"
         },
         "param": {
-          "x_pos": 500,
-          "y_pos": 10,
-          "z1_pos": null,
-          "z2_pos": "",
-          "x_speed": "",
-          "y_speed": "",
-          "z1_speed": null,
-          "z2_speed": "",
-          "jaw_position": "",
+          "x_pos": 204,
+          "y_pos": 792,
+          "z1_pos": 1063,
+          "z2_pos": 0,
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": 300,
+          "jaw_position": 0,
           "jaw_force": "",
           "pre_turns": 5,
           "timeout": 180,
           "cmd_type": 15
+        },
+        "footer": "",
+        "device_name": "gn_locking_mechanism",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "43535dbe-a69e-4175-93e9-dab0eb4032e7",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 360,
+            "y": 242,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 338,
+          "y_pos": 307,
+          "z1_pos": 1060,
+          "z2_pos": 0,
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": 300,
+          "jaw_position": 0,
+          "jaw_force": "",
+          "pre_turns": "",
+          "timeout": 180,
+          "cmd_type": 12
         },
         "footer": "",
         "device_name": "gn_locking_mechanism",
@@ -66,7 +126,7 @@
         "resource_name": "gn_locking_mechanism"
       },
       {
-        "uuid": "4a120e6f-438a-4cd1-ac56-c1196a884bf3",
+        "uuid": "fb728cf9-8c02-4558-8e29-793435aed93c",
         "parent_uuid": "",
         "name": "auto-execute_command",
         "type": "ILab",
@@ -75,7 +135,7 @@
           "layout": "x-y",
           "position": {
             "x": 60,
-            "y": 276,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -102,8 +162,8 @@
           "cross_section_type": "rectangle"
         },
         "param": {
-          "x_pos": "",
-          "y_pos": "",
+          "x_pos": 100,
+          "y_pos": 792,
           "z1_pos": "",
           "z2_pos": "",
           "x_speed": "",
@@ -126,7 +186,7 @@
         "resource_name": "gn_locking_mechanism"
       },
       {
-        "uuid": "9c689b17-924a-4b79-8088-f5553fa07281",
+        "uuid": "1b915a10-a719-47cc-869c-2a7a2bfcd247",
         "parent_uuid": "",
         "name": "auto-execute_command",
         "type": "ILab",
@@ -134,8 +194,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 60,
-            "y": 56,
+            "x": 960,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -162,15 +222,75 @@
           "cross_section_type": "rectangle"
         },
         "param": {
-          "x_pos": 300,
-          "y_pos": 100,
-          "z1_pos": "",
-          "z2_pos": "",
-          "x_speed": "",
-          "y_speed": "",
-          "z1_speed": "",
-          "z2_speed": "",
-          "jaw_position": "",
+          "x_pos": 488,
+          "y_pos": 307,
+          "z1_pos": 1060,
+          "z2_pos": 0,
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": 300,
+          "jaw_position": 0,
+          "jaw_force": "",
+          "pre_turns": "",
+          "timeout": 180,
+          "cmd_type": 12
+        },
+        "footer": "",
+        "device_name": "gn_locking_mechanism",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "c0a766ff-38f3-4878-9970-9abfb7aad8cb",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1260,
+            "y": 242,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 729,
+          "y_pos": 764,
+          "z1_pos": 1063,
+          "z2_pos": 0,
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": 300,
+          "jaw_position": 0,
           "jaw_force": "",
           "pre_turns": 5,
           "timeout": 180,
@@ -178,7 +298,7 @@
         },
         "footer": "",
         "device_name": "gn_locking_mechanism",
-        "disabled": false,
+        "disabled": true,
         "minimized": false,
         "lab_node_type": "Device",
         "template_uuid": "",
@@ -188,16 +308,32 @@
     ],
     "edges": [
       {
-        "source_node_uuid": "50682d8f-c446-433b-9bd3-a636e97da76b",
-        "target_node_uuid": "4a120e6f-438a-4cd1-ac56-c1196a884bf3",
+        "source_node_uuid": "43535dbe-a69e-4175-93e9-dab0eb4032e7",
+        "target_node_uuid": "50682d8f-c446-433b-9bd3-a636e97da76b",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",
         "target_handle_io": "target"
       },
       {
-        "source_node_uuid": "9c689b17-924a-4b79-8088-f5553fa07281",
-        "target_node_uuid": "50682d8f-c446-433b-9bd3-a636e97da76b",
+        "source_node_uuid": "50682d8f-c446-433b-9bd3-a636e97da76b",
+        "target_node_uuid": "1b915a10-a719-47cc-869c-2a7a2bfcd247",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "1b915a10-a719-47cc-869c-2a7a2bfcd247",
+        "target_node_uuid": "c0a766ff-38f3-4878-9970-9abfb7aad8cb",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "fb728cf9-8c02-4558-8e29-793435aed93c",
+        "target_node_uuid": "43535dbe-a69e-4175-93e9-dab0eb4032e7",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",

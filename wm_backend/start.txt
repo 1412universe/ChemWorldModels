@@ -1,0 +1,55 @@
+:: ChemWorldModel 日常命令（仓库根目录执行）
+:: 约定：wm_backend/workflows 是本机流程，拉/推都不动它
+cd /d D:\Download\ChemWorldModel
+
+:: ===== 拉最新：其余跟远程；workflows 用本机备份整目录盖回 =====
+:: 必须在仓库根目录；全部用绝对路径，避免在 wm_backend 下执行导致盖回失败
+set ROOT=D:\Download\ChemWorldModel
+set WF=%ROOT%\wm_backend\workflows
+set WF_BAK=%TEMP%\cwm_workflows_bak
+cd /d %ROOT%
+
+if exist "%WF_BAK%" rmdir /s /q "%WF_BAK%"
+robocopy "%WF%" "%WF_BAK%" /E /NFL /NDL /NJH /NJS /nc /ns /np
+if not exist "%WF_BAK%\demo.json" (
+  echo [ERROR] workflows 备份失败，已中止，未执行 pull
+  goto :eof
+)
+
+git stash push -u -m "before-pull" -- ":(exclude)wm_backend/workflows"
+git restore --source=HEAD --staged --worktree -- "wm_backend/workflows"
+git clean -fd -- "wm_backend/workflows"
+
+git remote set-url origin https://ghfast.top/https://github.com/1412universe/ChemWorldModels.git
+git fetch origin
+git pull --ff-only origin main
+git remote set-url origin https://github.com/1412universe/ChemWorldModels.git
+git stash pop
+
+rmdir /s /q "%WF%"
+robocopy "%WF_BAK%" "%WF%" /E /NFL /NDL /NJH /NJS /nc /ns /np
+echo [OK] 代码已更新；workflows 已从本机备份盖回
+
+:: ===== 安装依赖（首次 / requirements 变更时）=====
+conda activate ChemWorldModel
+cd /d D:\Download\ChemWorldModel\wm_backend
+pip install -r requirements.txt
+
+:: ===== 启动（main.py 会自动拉起 ollama serve；模型需已 pull）=====
+conda activate ChemWorldModel
+cd /d D:\Download\ChemWorldModel\wm_backend
+python main.py
+
+:: http://127.0.0.1:8000
+:: 本机环境：conda ChemWorldModel (Python 3.13) + 本地 ollama qwen2.5:7b
+:: 首次才需要：ollama pull qwen2.5:7b
+:: data/ 在 .gitignore；无改动时 commit 失败属正常
+
+
+:: ===== 提交推送（排除 workflows；先改 commit 说明）=====
+git add -A -- ":!wm_backend/workflows"
+git status
+git commit -m "简述这次改动"
+git remote set-url origin https://ghfast.top/https://github.com/1412universe/ChemWorldModels.git
+git push origin main
+git remote set-url origin https://github.com/1412universe/ChemWorldModels.git

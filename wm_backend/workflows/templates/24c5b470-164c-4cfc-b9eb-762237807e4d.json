@@ -1,21 +1,21 @@
 {
   "target_lab_uuid": "803298d7-ba98-4cd5-a546-b7ca08b4cb12",
-  "name": "种子溶液制备",
+  "name": "离心机配平移液",
   "data": {
-    "workflow_uuid": "d2218d77-2874-439b-a080-dadb85a48cd8",
-    "workflow_name": "种子溶液制备",
+    "workflow_uuid": "24c5b470-164c-4cfc-b9eb-762237807e4d",
+    "workflow_name": "离心机配平移液",
     "nodes": [
       {
-        "uuid": "a42c4837-2dae-4fb6-a376-dbc3e6a790a8",
+        "uuid": "fc86cb30-3672-4564-a4be-96a1151095a9",
         "parent_uuid": "",
-        "name": "auto-run_protocol",
+        "name": "auto-execute_command",
         "type": "ILab",
         "icon": "",
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2548.0217,
-            "y": 246.5799,
+            "x": -1131.7223,
+            "y": 20.822935,
             "z": 0
           },
           "position_3d": {
@@ -42,19 +42,77 @@
           "cross_section_type": "rectangle"
         },
         "param": {
-          "protocol_id": null
+          "rpm": 0,
+          "y_pos": 0,
+          "z_pos": 0,
+          "timeout": 120,
+          "y_speed": 0,
+          "z_speed": 0,
+          "cmd_type": 11,
+          "plate_no": 0,
+          "inner_z_pos": 0,
+          "temperature": 0,
+          "time_minutes": 0
         },
-        "footer": "",
-        "device_name": "PRCXI",
+        "footer": "去皮",
+        "device_name": "gn_centrifuge",
         "disabled": false,
         "minimized": false,
         "lab_node_type": "Device",
-        "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
-        "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge"
       },
       {
-        "uuid": "e41699a9-77ed-4799-9337-e1ea688c2bda",
+        "uuid": "9e47add6-6de5-4c4a-b1b2-3957b5bf2b49",
+        "parent_uuid": "",
+        "name": "auto-cache_balance_delta_for_liquid_transfer",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -238.11937,
+            "y": -321.07205,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "timeout": 180
+        },
+        "footer": "1.两次cmd11去皮后读稳定重量，Δ=第一次−第二次写入缓存（水，g→μL）",
+        "device_name": "gn_centrifuge",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "19996d14-b3c1-4fc4-aa90-4c3d5c9fe919",
+        "template_name": "auto-cache_balance_delta_for_liquid_transfer",
+        "resource_name": "gn_centrifuge"
+      },
+      {
+        "uuid": "5c82a8d5-336f-40b2-90ab-92cdbfa48643",
         "parent_uuid": "",
         "name": "auto-create_protocol",
         "type": "ILab",
@@ -62,8 +120,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 699,
-            "y": 248,
+            "x": 465.72162,
+            "y": -5.2577286,
             "z": 0
           },
           "position_3d": {
@@ -98,7 +156,7 @@
           "protocol_version": "",
           "protocol_description": ""
         },
-        "footer": "",
+        "footer": "2.创建 9320 方案",
         "device_name": "PRCXI",
         "disabled": false,
         "minimized": false,
@@ -108,16 +166,16 @@
         "resource_name": "liquid_handler.prcxi"
       },
       {
-        "uuid": "63b53cb5-0ad4-403e-8ae2-185ffb860346",
+        "uuid": "f097fbec-9176-410b-9557-8a5ac7c17fd6",
         "parent_uuid": "",
-        "name": "auto-shaking_incubation_action",
+        "name": "auto-run_protocol",
         "type": "ILab",
         "icon": "",
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1872.7106,
-            "y": 243.36607,
+            "x": 1200,
+            "y": 0,
             "z": 0
           },
           "position_3d": {
@@ -144,32 +202,28 @@
           "cross_section_type": "rectangle"
         },
         "param": {
-          "time": 10,
-          "is_wait": true,
-          "amplitude": 1500,
-          "module_no": 1,
-          "temperature": 32
+          "protocol_id": null
         },
-        "footer": "",
+        "footer": "4.下发并执行 9320 方案",
         "device_name": "PRCXI",
         "disabled": false,
         "minimized": false,
         "lab_node_type": "Device",
-        "template_uuid": "16a27598-6607-4cad-b6d4-a8573b3d2f54",
-        "template_name": "auto-shaking_incubation_action",
+        "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
+        "template_name": "auto-run_protocol",
         "resource_name": "liquid_handler.prcxi"
       },
       {
-        "uuid": "147411a7-1ecb-4d5e-9b4a-792e9c0bc3e9",
+        "uuid": "9cf99a8c-9d15-41c6-bc77-52f9c784f54d",
         "parent_uuid": "",
-        "name": "move_plate",
+        "name": "auto-execute_command",
         "type": "ILab",
         "icon": "",
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2225.6926,
-            "y": 243.91139,
+            "x": -2364.7783,
+            "y": 9.229256,
             "z": 0
           },
           "position_3d": {
@@ -196,61 +250,38 @@
           "cross_section_type": "rectangle"
         },
         "param": {
-          "to": 16,
-          "from": 3,
-          "force": 5,
-          "plate": [
-            {
-              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_shake",
-              "name": "PRCXI_96_DeepWell_shake",
-              "uuid": "a2e75ff7-6b1a-494a-8b18-0b6d93619a11"
-            }
-          ],
-          "hierarchy": 1,
-          "get_direction": "",
-          "pickup_offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "put_direction": "",
-          "drop_direction": "",
-          "resource_offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "pickup_direction": "",
-          "put_down_position": 1,
-          "destination_offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "pinch_it_up_position": 1,
-          "intermediate_locations": [],
-          "pickup_distance_from_top": 0
+          "rpm": 0,
+          "y_pos": 0,
+          "z_pos": 0,
+          "timeout": 120,
+          "y_speed": 0,
+          "z_speed": 0,
+          "cmd_type": 11,
+          "plate_no": 0,
+          "inner_z_pos": 0,
+          "temperature": 0,
+          "time_minutes": 0
         },
-        "footer": "T3->T16",
-        "device_name": "PRCXI",
+        "footer": "去皮",
+        "device_name": "gn_centrifuge",
         "disabled": false,
         "minimized": false,
         "lab_node_type": "Device",
-        "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
-        "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge"
       },
       {
-        "uuid": "4e2c26cd-b71e-4eb3-a3e9-974837015178",
+        "uuid": "b0e2471d-4b4c-4866-849f-d4a539704636",
         "parent_uuid": "",
-        "name": "pick",
+        "name": "transfer_liquid",
         "type": "ILab",
         "icon": "",
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2814.3696,
-            "y": 246.09053,
+            "x": 800,
+            "y": 0,
             "z": 0
           },
           "position_3d": {
@@ -277,420 +308,29 @@
           "cross_section_type": "rectangle"
         },
         "param": {
-          "number": 1,
-          "station": "nine9320",
-          "timeout": 180,
-          "x_speed": 300,
-          "item_type": "plate"
-        },
-        "footer": "",
-        "device_name": "gn_robotic_arm",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
-        "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
-      },
-      {
-        "uuid": "cd6aada3-cc9e-4a00-8a7a-c1b9cb8db5d4",
-        "parent_uuid": "",
-        "name": "pick",
-        "type": "ILab",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 89,
-            "y": 249.4,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {
-          "number": 1,
-          "station": "stack",
-          "timeout": 180,
-          "x_speed": 300,
-          "item_type": "plate"
-        },
-        "footer": "",
-        "device_name": "gn_robotic_arm",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
-        "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
-      },
-      {
-        "uuid": "539bc2f9-71c4-42f5-88f0-568a4460568d",
-        "parent_uuid": "",
-        "name": "place",
-        "type": "ILab",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 3111.1914,
-            "y": 234.0572,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {
-          "number": 1,
-          "station": "finished_area",
-          "timeout": 180,
-          "x_speed": 300,
-          "item_type": "plate"
-        },
-        "footer": "放到料区，28-32°C，静置4.5h",
-        "device_name": "gn_robotic_arm",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
-        "template_name": "place",
-        "resource_name": "gn_robotic_arm"
-      },
-      {
-        "uuid": "6aa76426-1f93-49f8-a422-3206c1691a8b",
-        "parent_uuid": "",
-        "name": "place",
-        "type": "ILab",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 389,
-            "y": 248,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {
-          "number": 1,
-          "station": "nine9320",
-          "timeout": 180,
-          "x_speed": 300,
-          "item_type": "plate"
-        },
-        "footer": "",
-        "device_name": "gn_robotic_arm",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
-        "template_name": "place",
-        "resource_name": "gn_robotic_arm"
-      },
-      {
-        "uuid": "6d617cd0-0c65-4398-88bd-636f94e0e9a1",
-        "parent_uuid": "",
-        "name": "move_plate",
-        "type": "ILab",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 1001.85535,
-            "y": 249.39005,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {
-          "to": 3,
-          "from": 16,
-          "force": 5,
-          "plate": [
+          "delays": null,
+          "spread": "wide",
+          "mix_vol": null,
+          "offsets": null,
+          "sources": [
             {
               "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell5",
               "name": "PRCXI_96_DeepWell5",
               "uuid": "e74c153c-a29f-4653-a665-b9e1cc1711a9"
             }
           ],
-          "hierarchy": 1,
-          "get_direction": "",
-          "pickup_offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "put_direction": "",
-          "drop_direction": "",
-          "resource_offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "pickup_direction": "",
-          "put_down_position": 1,
-          "destination_offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "pinch_it_up_position": 1,
-          "intermediate_locations": [],
-          "pickup_distance_from_top": 0
-        },
-        "footer": "T16->T3",
-        "device_name": "PRCXI",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
-        "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
-      },
-      {
-        "uuid": "c5523d11-e2df-4dfa-b1f6-19674a063b20",
-        "parent_uuid": "",
-        "name": "transfer_liquid",
-        "type": "ILab",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 1601.3292,
-            "y": 247.25339,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {
-          "delays": null,
-          "spread": "wide",
-          "mix_vol": null,
-          "offsets": null,
-          "sources": [
-            {
-              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_2",
-              "name": "PRCXI_96_DeepWell_2",
-              "uuid": "39051c8a-0180-4516-88e1-fa7ec724f453"
-            }
-          ],
           "targets": [
             {
-              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_shake",
-              "name": "PRCXI_96_DeepWell_shake",
-              "uuid": "a2e75ff7-6b1a-494a-8b18-0b6d93619a11"
+              "id": "/gn_workstation/PRCXI/PRCXI_nest_1_troughplate4",
+              "name": "PRCXI_nest_1_troughplate4",
+              "uuid": "bd6f7d88-e96a-4efa-b8c6-f5514aeb7cdf"
             }
           ],
           "asp_vols": [
-            300
+            0
           ],
           "dis_vols": [
-            300
-          ],
-          "mix_rate": null,
-          "mix_stage": "none",
-          "mix_times": null,
-          "none_keys": [],
-          "tip_racks": [
-            {
-              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips3",
-              "name": "PRCXI_1250uL_Tips3",
-              "uuid": "0014ea7c-9743-452a-96ab-5407f475a32c"
-            }
-          ],
-          "touch_tip": false,
-          "is_96_well": true,
-          "use_channels": [],
-          "liquid_height": null,
-          "asp_flow_rates": [
-            300
-          ],
-          "dis_flow_rates": [
-            300
-          ],
-          "post_air_volume": null,
-          "dispensing_method": null,
-          "mix_liquid_height": null,
-          "blow_out_air_volume": [
-            20
-          ],
-          "hover_below_liquid_level": null,
-          "blow_out_air_volume_before": [],
-          "z_start_point_offset_height": null,
-          "post_discharge_pause_time_ms": null
-        },
-        "footer": "T8CTAC，T12枪头，到T3",
-        "device_name": "PRCXI",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "b1f8991e-9f06-4abf-ad40-38406c5e5b0a",
-        "template_name": "transfer_liquid",
-        "resource_name": "liquid_handler.prcxi"
-      },
-      {
-        "uuid": "71040af1-a9cb-42af-ae25-0fe15ff5960b",
-        "parent_uuid": "",
-        "name": "transfer_liquid",
-        "type": "ILab",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 1307.5928,
-            "y": 244.28816,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {
-          "delays": null,
-          "spread": "wide",
-          "mix_vol": null,
-          "offsets": null,
-          "sources": [
-            {
-              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_nest_1_troughplate3",
-              "name": "PRCXI_nest_1_troughplate3",
-              "uuid": "dd9a0925-8aa7-44c0-a1bc-7dc9776ee6e0"
-            }
-          ],
-          "targets": [
-            {
-              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_shake",
-              "name": "PRCXI_96_DeepWell_shake",
-              "uuid": "a2e75ff7-6b1a-494a-8b18-0b6d93619a11"
-            }
-          ],
-          "asp_vols": [
-            300
-          ],
-          "dis_vols": [
-            300
+            0
           ],
           "mix_rate": null,
           "mix_stage": "none",
@@ -700,11 +340,13 @@
             {
               "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips2",
               "name": "PRCXI_1250uL_Tips2",
-              "uuid": "695548f2-3e97-4913-a2c5-e19b3b07cac9"
+              "uuid": "e7df077f-ec56-48e6-a7af-9fabf569c418"
             }
           ],
           "touch_tip": false,
-          "is_96_well": true,
+          "is_96_well": false,
+          "source_slots": 16,
+          "target_slots": 7,
           "use_channels": [],
           "liquid_height": null,
           "asp_flow_rates": [
@@ -713,18 +355,19 @@
           "dis_flow_rates": [
             300
           ],
-          "post_air_volume": null,
-          "dispensing_method": null,
+          "tip_rack_slots": 15,
+          "post_air_volume": [],
+          "dispensing_method": [],
           "mix_liquid_height": null,
           "blow_out_air_volume": [
             20
           ],
-          "hover_below_liquid_level": null,
-          "blow_out_air_volume_before": [],
-          "z_start_point_offset_height": null,
-          "post_discharge_pause_time_ms": null
+          "hover_below_liquid_level": [],
+          "blow_out_air_volume_before": null,
+          "z_start_point_offset_height": [],
+          "post_discharge_pause_time_ms": []
         },
-        "footer": "T6氯金酸，T15枪头，到T3",
+        "footer": "3.读天平缓存：Δ>0 吸液 T16→T7；Δ<0 放液 T2→T16；默认速率300、blow_out=20、枪头T15",
         "device_name": "PRCXI",
         "disabled": false,
         "minimized": false,
@@ -732,84 +375,524 @@
         "template_uuid": "b1f8991e-9f06-4abf-ad40-38406c5e5b0a",
         "template_name": "transfer_liquid",
         "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "350126d6-b520-4cc5-be97-8f129add27f7",
+        "parent_uuid": "",
+        "name": "pick",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -2048.3247,
+            "y": 6.7719817,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 1,
+          "station": "centrifuge",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "从离心机搬反应板",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
+        "template_name": "pick",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "9d800b2a-8c31-494d-9147-49fda05c4c24",
+        "parent_uuid": "",
+        "name": "place",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -1730.5542,
+            "y": 8.830176,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 5,
+          "station": "quick_change",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "放到天平上",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
+        "template_name": "place",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "d5a8905d-d46f-4ca7-9609-2fdd6b95f60a",
+        "parent_uuid": "",
+        "name": "pick",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -823.5344,
+            "y": 20.559654,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 1,
+          "station": "nine9320",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "从9320搬配平板",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
+        "template_name": "pick",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "b919256b-9d8b-4e75-886b-14f02dec1491",
+        "parent_uuid": "",
+        "name": "place",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 307.76587,
+            "y": 559.10077,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 1,
+          "station": "nine9320",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "放到9320上",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
+        "template_name": "place",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "271047b5-02c0-4c77-8ceb-2f833f464ad3",
+        "parent_uuid": "",
+        "name": "place",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -522.3232,
+            "y": 22.103916,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 5,
+          "station": "quick_change",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "放到天平上",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
+        "template_name": "place",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "3f57e6c2-72ac-4bde-ab26-7395016726e4",
+        "parent_uuid": "",
+        "name": "pick",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -45.326122,
+            "y": 549.09186,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 5,
+          "station": "quick_change",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "从天平取配平板",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
+        "template_name": "pick",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "66799408-c4f0-45a4-9809-c8417d91db17",
+        "parent_uuid": "",
+        "name": "pick",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -1424.4165,
+            "y": -296.8791,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 5,
+          "station": "quick_change",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "从天平上取板子",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
+        "template_name": "pick",
+        "resource_name": "gn_robotic_arm"
+      },
+      {
+        "uuid": "1815615c-d872-44fa-99a7-02874e6081b6",
+        "parent_uuid": "",
+        "name": "place",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -1104.4165,
+            "y": -296.8791,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "number": 1,
+          "station": "centrifuge",
+          "timeout": 180,
+          "x_speed": 300,
+          "item_type": "plate"
+        },
+        "footer": "放回离心机去",
+        "device_name": "gn_robotic_arm",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
+        "template_name": "place",
+        "resource_name": "gn_robotic_arm"
       }
     ],
     "edges": [
       {
-        "source_node_uuid": "63b53cb5-0ad4-403e-8ae2-185ffb860346",
-        "target_node_uuid": "147411a7-1ecb-4d5e-9b4a-792e9c0bc3e9",
+        "source_node_uuid": "271047b5-02c0-4c77-8ceb-2f833f464ad3",
+        "target_node_uuid": "9e47add6-6de5-4c4a-b1b2-3957b5bf2b49",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",
         "target_handle_io": "target"
       },
       {
-        "source_node_uuid": "cd6aada3-cc9e-4a00-8a7a-c1b9cb8db5d4",
-        "target_node_uuid": "6aa76426-1f93-49f8-a422-3206c1691a8b",
+        "source_node_uuid": "3f57e6c2-72ac-4bde-ab26-7395016726e4",
+        "target_node_uuid": "b919256b-9d8b-4e75-886b-14f02dec1491",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",
         "target_handle_io": "target"
       },
       {
-        "source_node_uuid": "6aa76426-1f93-49f8-a422-3206c1691a8b",
-        "target_node_uuid": "e41699a9-77ed-4799-9337-e1ea688c2bda",
+        "source_node_uuid": "9e47add6-6de5-4c4a-b1b2-3957b5bf2b49",
+        "target_node_uuid": "3f57e6c2-72ac-4bde-ab26-7395016726e4",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",
         "target_handle_io": "target"
       },
       {
-        "source_node_uuid": "e41699a9-77ed-4799-9337-e1ea688c2bda",
-        "target_node_uuid": "6d617cd0-0c65-4398-88bd-636f94e0e9a1",
+        "source_node_uuid": "b919256b-9d8b-4e75-886b-14f02dec1491",
+        "target_node_uuid": "5c82a8d5-336f-40b2-90ab-92cdbfa48643",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",
         "target_handle_io": "target"
       },
       {
-        "source_node_uuid": "6d617cd0-0c65-4398-88bd-636f94e0e9a1",
-        "target_node_uuid": "71040af1-a9cb-42af-ae25-0fe15ff5960b",
+        "source_node_uuid": "d5a8905d-d46f-4ca7-9609-2fdd6b95f60a",
+        "target_node_uuid": "271047b5-02c0-4c77-8ceb-2f833f464ad3",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",
         "target_handle_io": "target"
       },
       {
-        "source_node_uuid": "71040af1-a9cb-42af-ae25-0fe15ff5960b",
-        "target_node_uuid": "c5523d11-e2df-4dfa-b1f6-19674a063b20",
+        "source_node_uuid": "fc86cb30-3672-4564-a4be-96a1151095a9",
+        "target_node_uuid": "d5a8905d-d46f-4ca7-9609-2fdd6b95f60a",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",
         "target_handle_io": "target"
       },
       {
-        "source_node_uuid": "c5523d11-e2df-4dfa-b1f6-19674a063b20",
-        "target_node_uuid": "63b53cb5-0ad4-403e-8ae2-185ffb860346",
+        "source_node_uuid": "66799408-c4f0-45a4-9809-c8417d91db17",
+        "target_node_uuid": "1815615c-d872-44fa-99a7-02874e6081b6",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",
         "target_handle_io": "target"
       },
       {
-        "source_node_uuid": "147411a7-1ecb-4d5e-9b4a-792e9c0bc3e9",
-        "target_node_uuid": "a42c4837-2dae-4fb6-a376-dbc3e6a790a8",
+        "source_node_uuid": "9d800b2a-8c31-494d-9147-49fda05c4c24",
+        "target_node_uuid": "66799408-c4f0-45a4-9809-c8417d91db17",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",
         "target_handle_io": "target"
       },
       {
-        "source_node_uuid": "a42c4837-2dae-4fb6-a376-dbc3e6a790a8",
-        "target_node_uuid": "4e2c26cd-b71e-4eb3-a3e9-974837015178",
+        "source_node_uuid": "1815615c-d872-44fa-99a7-02874e6081b6",
+        "target_node_uuid": "fc86cb30-3672-4564-a4be-96a1151095a9",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",
         "target_handle_io": "target"
       },
       {
-        "source_node_uuid": "4e2c26cd-b71e-4eb3-a3e9-974837015178",
-        "target_node_uuid": "539bc2f9-71c4-42f5-88f0-568a4460568d",
+        "source_node_uuid": "5c82a8d5-336f-40b2-90ab-92cdbfa48643",
+        "target_node_uuid": "b0e2471d-4b4c-4866-849f-d4a539704636",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "b0e2471d-4b4c-4866-849f-d4a539704636",
+        "target_node_uuid": "f097fbec-9176-410b-9557-8a5ac7c17fd6",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "9cf99a8c-9d15-41c6-bc77-52f9c784f54d",
+        "target_node_uuid": "350126d6-b520-4cc5-be97-8f129add27f7",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "350126d6-b520-4cc5-be97-8f129add27f7",
+        "target_node_uuid": "9d800b2a-8c31-494d-9147-49fda05c4c24",
         "source_handle_key": "ready",
         "source_handle_io": "source",
         "target_handle_key": "ready",

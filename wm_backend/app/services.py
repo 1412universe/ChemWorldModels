@@ -314,7 +314,8 @@ def compute_constraints(r: dict, oer_target: str = "cat") -> list[dict]:
     # ⑲
     e = P['eovf']
     st = 'pass'
-    d = f'E_ovf≈{e:.2f} eV{'' if not P['hasOv'] else '（文献提及氧空位/Ov/缺陷）'}；窗口 0.8–2.0 eV 最佳'
+    ov_note = '' if not P['hasOv'] else '（文献提及氧空位/Ov/缺陷）'
+    d = f'E_ovf≈{e:.2f} eV{ov_note}；窗口 0.8–2.0 eV 最佳'
     if e < OVF_LO:
         st = 'warn'
         d += '；过低→位点不稳/易复合或溶出'
@@ -328,7 +329,7 @@ def compute_constraints(r: dict, oer_target: str = "cat") -> list[dict]:
     # ⑳
     phi_b = P['phiB']
     st = 'pass'
-    d = f'金属功函数 Φ≈{P['wf']:.2f} eV，载体 χ≈{P['chi']:.1f} eV → φ_B≈{phi_b:.2f} eV'
+    d = f"金属功函数 Φ≈{P['wf']:.2f} eV，载体 χ≈{P['chi']:.1f} eV → φ_B≈{phi_b:.2f} eV"
     if r.get('metals'):
         if phi_b < SCHOTTKY_PHI_LO:
             st = 'warn'
@@ -356,7 +357,7 @@ def compute_constraints(r: dict, oer_target: str = "cat") -> list[dict]:
     tau_s = P['tau'] * 1e-9
     ttr = math.pow(P['d'] * 1e-7 / 2, 2) / P['D']
     st = 'pass'
-    ds = f'τ≈{P['tau']:.1f} ns，抵达表面 t≈{ttr*1e9:.1f} ns'
+    ds = f"τ≈{P['tau']:.1f} ns，抵达表面 t≈{ttr*1e9:.1f} ns"
     if tau_s < ttr * TAU_FAIL:
         st = 'fail'
         ds += '；τ < t_transit，载流子未达表面即复合'
@@ -385,7 +386,7 @@ def compute_constraints(r: dict, oer_target: str = "cat") -> list[dict]:
     Vbi = max(MS_VBI_FLOOR, bg * MS_VBI_F)
     W = math.sqrt(2 * eps * Vbi / (1.602e-19 * ND)) * 1e7
     st = 'pass'
-    ds = f'假设 N_D≈1e17 cm⁻³，耗尽宽度 W≈{W:.0f} nm（vs d≈{P['d']:.0f} nm）'
+    ds = f"假设 N_D≈1e17 cm⁻³，耗尽宽度 W≈{W:.0f} nm（vs d≈{P['d']:.0f} nm）"
     if W < P['d'] * MS_W_RATIO:
         st = 'warn'
         ds += '；W < d/2，空间电荷区未达表面，分离弱'
@@ -446,14 +447,15 @@ def compute_constraints(r: dict, oer_target: str = "cat") -> list[dict]:
         ds = '非多孔/块体，外扩散主导'
     elif P['pore'] < KNUD_PORE:
         st = 'warn' if y > KNUD_Y_THR else 'pass'
-        ds = f'孔径≈{P['pore']:.0f} nm < 平均自由程(~{KNUD_PORE:.0f} nm)，Knudsen 扩散；{('高活性下孔道内传质受限' if y > KNUD_Y_THR else '传质可接受')}'
+        knud_note = '高活性下孔道内传质受限' if y > KNUD_Y_THR else '传质可接受'
+        ds = f"孔径≈{P['pore']:.0f} nm < 平均自由程(~{KNUD_PORE:.0f} nm)，Knudsen 扩散；{knud_note}"
     else:
-        ds = f'孔径≈{P['pore']:.0f} nm，分子扩散区'
+        ds = f"孔径≈{P['pore']:.0f} nm，分子扩散区"
     out.append({'k': 'knud', 'name': '㉘ 孔道 Knudsen 扩散', 'st': st, 'd': ds, 'cat': '动力学与传质'})
 
     # ㉙
     st = 'pass'
-    ds = f'载体 {r.get('support_raw') or r.get('support')}：{P['photoStab']}'
+    ds = f"载体 {r.get('support_raw') or r.get('support')}：{P['photoStab']}"
     if re.search(r'cds', str(r.get('support') or ''), re.I) and mech in ('OCM', 'MPO'):
         st = 'warn'
         ds += '；光照+氧化条件易光腐蚀，需包覆/牺牲剂保护'
@@ -466,7 +468,7 @@ def compute_constraints(r: dict, oer_target: str = "cat") -> list[dict]:
     kT_eV = 8.617e-5 * (temp_c + 273.15)
     ratio = P['ea'] / kT_eV
     st = 'pass'
-    ds = f'E_a≈{P['ea']:.2f} eV，E_a/kT≈{ratio:.0f}（@{temp_c}℃）'
+    ds = f"E_a≈{P['ea']:.2f} eV，E_a/kT≈{ratio:.0f}（@{temp_c}℃）"
     if ratio > EA_RATIO_HI:
         st = 'warn'
         ds += '；E_a/kT >40，本征动力学受抑制（需光/热助驱动）'
