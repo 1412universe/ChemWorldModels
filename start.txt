@@ -7,7 +7,7 @@ git add -A
 git status
 git commit -m "$(cat <<'EOF'
 
-简述这次改动。
+更新自适应功能
 
 EOF
 )"
