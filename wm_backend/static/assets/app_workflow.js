@@ -4027,39 +4027,16 @@
     note('ok', '已导出', a.download + '（' + wf.data.nodes.length + ' 节点 / ' + wf.data.edges.length + ' 连线）');
   }
   function bindOpenSave() {
-    var om = document.getElementById('open-menu');
-    document.getElementById('btn-open').addEventListener('click', function (ev) {
-      document.getElementById('import-menu').classList.add('hidden');
-      var ins = document.getElementById('insert-menu');
-      if (ins) ins.classList.add('hidden');
-      om.classList.toggle('hidden'); ev.stopPropagation(); loadList();
-    });
     document.addEventListener('click', function (ev) {
       var t = ev.target;
-      if (t && t.closest && t.closest('#insert-menu, #btn-insert-tpl, #open-menu, #btn-open, #import-menu, #btn-import')) return;
-      om.classList.add('hidden');
-      document.getElementById('import-menu').classList.add('hidden');
+      if (t && t.closest && t.closest('#insert-menu, #btn-insert-tpl, #import-menu, #btn-import')) return;
+      var imp = document.getElementById('import-menu');
+      if (imp) imp.classList.add('hidden');
       var ins = document.getElementById('insert-menu');
       if (ins) ins.classList.add('hidden');
     });
-    om.addEventListener('click', function (ev) { ev.stopPropagation(); });
     // 注意：文件导入的 change 绑定已挪到 bindImport()（同一个 #wf-file，
     // 在这里再绑一次会读两遍、弹两次预览）。
-    document.getElementById('om-ai-run').addEventListener('click', function () {
-      var cond = document.getElementById('om-ai-cond').value.trim();
-      if (!cond) { note('warn', '请先填写工艺条件', '例如：合成金纳米颗粒。'); return; }
-      var btn = this;
-      btn.textContent = '生成中…'; btn.disabled = true;
-      fetch('/api/generate-workflow', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cond: { reaction: cond }, reaction: cond })
-      }).then(function (r) { return r.json(); }).then(function (res) {
-        if (res.ok && res.workflow) openWorkflow(res.workflow);
-        else note('err', '生成失败', res.error || '未知错误');
-      }).catch(function (e) { note('err', '请求失败', e.message); }).finally(function () {
-        btn.textContent = '生成并载入'; btn.disabled = false;
-      });
-    });
     document.getElementById('btn-save').addEventListener('click', function () {
       var name = (document.getElementById('wf-name').value || '').trim() || '未命名工作流';
       var wf = collectLinked();
@@ -4507,7 +4484,8 @@
     if (m) m.classList.add('hidden');
   }
   function openImportMenu() {
-    document.getElementById('open-menu').classList.add('hidden');
+    var open = document.getElementById('open-menu');
+    if (open) open.classList.add('hidden');
     var ins = document.getElementById('insert-menu');
     if (ins) ins.classList.add('hidden');
     document.getElementById('import-menu').classList.remove('hidden');
@@ -4607,7 +4585,8 @@
     document.getElementById('btn-import').addEventListener('click', function (ev) {
       ev.stopPropagation();
       var willOpen = menu.classList.contains('hidden');
-      document.getElementById('open-menu').classList.add('hidden');
+      var open = document.getElementById('open-menu');
+      if (open) open.classList.add('hidden');
       var ins = document.getElementById('insert-menu');
       if (ins) ins.classList.add('hidden');
       menu.classList.toggle('hidden');
@@ -4695,24 +4674,8 @@
   }
 
   function loadList() {
-    var box = document.getElementById('om-list');
-    box.innerHTML = '<div class="om-item" style="cursor:default;color:#94a3b8">加载中…</div>';
-    fetch('/api/workflow-list').then(function (r) { return r.json(); }).then(function (res) {
-      box.innerHTML = '';
-      if (!res.ok || !res.workflows || !res.workflows.length) {
-        box.innerHTML = '<div class="om-item" style="cursor:default;color:#94a3b8">暂无已保存工作流</div>';
-        return;
-      }
-      res.workflows.forEach(function (w) {
-        var it = el('div', 'om-item', '<span>' + esc(w.name) + '</span><span class="om-meta">' + w.size + 'B · ' + fmtTime(w.mtime) + '</span>');
-        it.addEventListener('click', function () {
-          fetch('/api/workflow-open?name=' + encodeURIComponent(w.name))
-            .then(function (r) { return r.json(); })
-            .then(function (res) { if (res.ok) openWorkflow(res.workflow); else note('err', '打开失败', res.error); });
-        });
-        box.appendChild(it);
-      });
-    }).catch(function () { box.innerHTML = '<div class="om-item" style="cursor:default;color:#ef4444">无法连接后端</div>'; });
+    // 「打开」下拉已移除；工作流切换走左侧列表。保留空实现以免旧调用报错。
+    return;
   }
 
   // ---------- 初始化 ----------

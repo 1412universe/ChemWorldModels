@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>工作流编辑器 — CWM-Lab 工作流编排</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236366f1'/%3E%3Cpath d='M9 16h5m4 0h5M14 10v12' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='9' cy='16' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='16' r='3' fill='%23fff'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/app.css?v=20261014l">
-<link rel="stylesheet" href="assets/wfed.css?v=20261103k">
+<link rel="stylesheet" href="assets/app.css?v=20261103p">
+<link rel="stylesheet" href="assets/wfed.css?v=20261103p">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
@@ -29,18 +29,6 @@
     </div>
     <div class="wf-stats" id="wf-stats">节点 0 · 连线 0</div>
     <div class="wf-btns">
-      <div class="btn-group">
-        <button id="btn-open">📂 打开</button>
-        <div class="open-menu hidden" id="open-menu">
-          <div class="om-title">已保存的工作流</div>
-          <div id="om-list" class="om-list scrollbar"></div>
-          <div class="om-title">从 AI 生成加载</div>
-          <div class="om-ai">
-            <input id="om-ai-cond" type="text" placeholder="工艺条件，如：合成金纳米颗粒" />
-            <button id="om-ai-run">生成并载入</button>
-          </div>
-        </div>
-      </div>
       <div class="btn-group">
         <button id="btn-import" title="从文件 / 剪贴板导入工作流 JSON；也可一次批量导入多个 .json">📥 导入</button>
         <div class="open-menu imp-menu hidden" id="import-menu">
@@ -71,6 +59,7 @@
         </div>
       </div>
       <button id="btn-save" class="primary">💾 保存</button>
+      <button id="btn-export" class="exp primary" title="导出当前画布为 CWM-Lab 工作流 JSON">⬇ 导出</button>
       <div class="btn-group">
         <button id="btn-insert-tpl" title="把一份模版插进当前画布。先在左侧工作流上右键「转为模版」">📎 插入模版</button>
         <div class="open-menu hidden" id="insert-menu">
@@ -89,7 +78,6 @@
       <button id="btn-undo" type="button" title="撤销上一步（Ctrl/⌘+Z）">↶ 撤销</button>
       <button id="btn-stoprun" class="stop" style="display:none" title="终止本次运行，未完成的节点不再执行">✕ 取消</button>
       <span id="wf-share" title="画布实际占屏幕总面积的比例">画布 —</span>
-      <button id="btn-export" class="exp primary">⬇ 导出 CWM-Lab 工作流</button>
     </div>
   </div>
 
@@ -217,11 +205,11 @@ window.PAGE_CONFIG={"page":"wfed","theme":"gn"};
 window.WFED_MODE = (new URLSearchParams(location.search)).get('mode') || 'real';
 </script>
 <script src="assets/gn_node_library.js?v=20261029f"></script>
-<script src="assets/app_workflow.js?v=20261103d"></script>
+<script src="assets/app_workflow.js?v=20261103n"></script>
 <script src="assets/runmode.js?v=20261016a"></script>
 <script src="assets/world3d.js?v=20261102c"></script>
 <script src="assets/wf_twin_float.js?v=20261103a"></script>
 <script src="assets/wfrun.js?v=20261103a"></script>
-<script src="assets/wf_agent.js?v=20261103k"></script>
+<script src="assets/wf_agent.js?v=20261103q"></script>
 </body>
 </html>

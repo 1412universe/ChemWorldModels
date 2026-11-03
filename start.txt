@@ -6,6 +6,7 @@ cd /Users/fenglongli/Downloads/ChemWorldModel
 git add -A
 git status
 git commit -m "$(cat <<'EOF'
+
 简述这次改动。
 
 EOF

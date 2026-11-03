@@ -4721,15 +4721,40 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
   const msgsEl   = document.getElementById('ai-chat-msgs');
   const textEl   = document.getElementById('ai-chat-text');
   const sendEl   = document.getElementById('ai-chat-send');
-  const stopEl   = document.getElementById('ai-chat-stop');
   if(!chatEl || !msgsEl) return;  // 节点不存在则跳过
-  // 停止键默认隐藏（CSS 改为 inline-block 以便 style.display='' 能正确显示）
-  if(stopEl) stopEl.style.display = 'none';
 
   let history = [];  // [{role, content}]
   let busy = false;
   let pendingFile = null;  // 聊天栏待发送的数据文件
   let _abortCtrl = null;   // 当前流式请求的 AbortController（用于停止键）
+  let _sendGen = 0;
+
+  function setPrimaryBtn(mode){
+    if(!sendEl) return;
+    if(mode === 'stop'){
+      sendEl.textContent = '停止';
+      sendEl.classList.add('is-stop');
+      sendEl.disabled = false;
+      sendEl.title = '停止当前对话';
+    }else{
+      sendEl.textContent = '发送';
+      sendEl.classList.remove('is-stop');
+      sendEl.disabled = false;
+      sendEl.title = '发送';
+    }
+  }
+  function stopChat(reason){
+    if(!busy && !_abortCtrl) return false;
+    _sendGen++;
+    try{ if(_abortCtrl) _abortCtrl.abort(); }catch(e){}
+    _abortCtrl = null;
+    busy = false;
+    setPrimaryBtn('send');
+    if(reason === 'user'){
+      appendMsg('act', '⏹ 已停止。可编辑后点「发送」，或点自己的上一条消息修改再发。', 'act');
+    }
+    return true;
+  }
 
   // —— 数据文件上传（📎）——
   const attachBtn = document.getElementById('ai-chat-attach-btn');
@@ -4845,13 +4870,37 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
   // 页面加载自动探测一次：若 Ollama 可达，把本地默认地址设为实际监听地址
   probeOllama(false);
 
-  function appendMsg(role, text, cls){
+  function appendMsg(role, text, cls, rawUser){
     const d = document.createElement('div');
     d.className = 'ai-msg ' + (cls || role);
     d.innerHTML = text;
+    if(role === 'user' || (cls||'') === 'user'){
+      const raw = (rawUser != null) ? String(rawUser) : String(text).replace(/<[^>]+>/g,'');
+      d.setAttribute('data-raw', raw);
+      d.classList.add('user-editable');
+      d.title = '点击可编辑并重新发送';
+    }
     msgsEl.appendChild(d);
     msgsEl.scrollTop = msgsEl.scrollHeight;
     while(msgsEl.children.length > 80) msgsEl.removeChild(msgsEl.firstChild);
+    return d;
+  }
+  if(msgsEl && !msgsEl.dataset.userEditBound){
+    msgsEl.dataset.userEditBound = '1';
+    msgsEl.addEventListener('click', (ev)=>{
+      const bubble = ev.target && ev.target.closest && ev.target.closest('.ai-msg.user');
+      if(!bubble || !textEl) return;
+      const raw = bubble.getAttribute('data-raw') || '';
+      if(!raw) return;
+      textEl.value = raw;
+      try{ textEl.focus(); textEl.setSelectionRange(raw.length, raw.length); }catch(e){}
+      setPrimaryBtn('send');
+      if(busy && sendEl){
+        sendEl.textContent = '发送';
+        sendEl.classList.remove('is-stop');
+        sendEl.title = '将先停止当前任务，再发送编辑后的内容';
+      }
+    });
   }
 
   function worldState(){
@@ -4866,15 +4915,18 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
 
   async function send(text){
     text = (text||'').trim();
-    if(busy) return;
     if(!text && !pendingFile) return;
+    if(busy){
+      stopChat('resend');
+      await new Promise(r=>setTimeout(r, 30));
+    }
     // 带数据文件 → 走「解析 + AI 分析 + 真实反馈登记」专用通道
     if(pendingFile){ await sendWithFile(text, pendingFile); return; }
-    appendMsg('user', text.replace(/</g,'&lt;'));
+    appendMsg('user', text.replace(/</g,'&lt;'), 'user', text);
     history.push({role:'user', content:text});
-    busy = true; sendEl.disabled = true; sendEl.style.display = 'none';
-    if(stopEl){ stopEl.style.display = 'inline-block'; stopEl.disabled = false; }
+    busy = true; setPrimaryBtn('stop');
     _abortCtrl = new AbortController();
+    const gen = ++_sendGen;
     appendMsg('bot', '🤔 思考中…', 'bot');
     const thinkNode = msgsEl.lastChild;
     let botNode = null;        // 流式打字机节点
@@ -4890,11 +4942,13 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
         )),
         signal: _abortCtrl.signal,
       });
+      if(gen !== _sendGen) return;
       if(!res.ok){ throw new Error('HTTP '+res.status); }
       const reader = res.body.getReader();
       const decoder = new TextDecoder('utf-8');
       let buf = '';
       while(true){
+        if(gen !== _sendGen) return;
         const {done, value} = await reader.read();
         if(done) break;
         buf += decoder.decode(value, {stream:true});
@@ -4920,7 +4974,7 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
               const actInfo = actionLabels[actKey];
               if(!actInfo){
                 console.warn('[WM-Chat] 收到未知 ACTION 指令，已忽略:', ev.data.value);
-                return; // 不显示按钮
+                continue;
               }
               const chip = document.createElement('div');
               chip.className = 'ai-msg act';
@@ -4944,6 +4998,7 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
           }
         }
       }
+      if(gen !== _sendGen) return;
       if(!gotFirst){
         if(thinkNode && thinkNode.parentNode) thinkNode.remove();
         // 用 err 样式（红底）确保用户能看到，不再用 bot 样式（可能因颜色融合不可见）
@@ -4960,25 +5015,27 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
       if(thinkNode && thinkNode.parentNode) thinkNode.remove();
       // 区分用户主动停止 vs 真实错误
       if(e.name === 'AbortError'){
-        appendMsg('act', '⏹ 已停止生成', 'act');
+        // stopChat 已提示（user）；resend 静默
       } else {
         appendMsg('err', '⚠️ 对话请求失败：' + (e.message||e), 'err');
       }
     }
-    busy = false; sendEl.disabled = false; sendEl.style.display = '';
-    if(stopEl){ stopEl.style.display = 'none'; stopEl.disabled = true; }
-    _abortCtrl = null;
-    textEl.value=''; textEl.style.height='auto';
+    if(gen === _sendGen){
+      busy = false; setPrimaryBtn('send');
+      _abortCtrl = null;
+      textEl.value=''; textEl.style.height='auto';
+    }
   }
 
   // 带数据文件发送：解析 + AI 专家分析 + 提供「应用为真实实验反馈」按钮
   async function sendWithFile(text, file){
     const fname = file.name || 'data';
-    appendMsg('user', (text ? text + ' ' : '') + '📎 ' + fname.replace(/</g,'&lt;'));
+    const userRaw = text ? (text + ' 📎 ' + fname) : ('📎 ' + fname);
+    appendMsg('user', (text ? text + ' ' : '') + '📎 ' + fname.replace(/</g,'&lt;'), 'user', userRaw);
     history.push({role:'user', content: text ? (text + ' [附文件:' + fname + ']') : '[附文件:' + fname + ']'});
-    busy = true; sendEl.disabled = true; sendEl.style.display = 'none';
-    if(stopEl){ stopEl.style.display = 'inline-block'; stopEl.disabled = false; }
+    busy = true; setPrimaryBtn('stop');
     _abortCtrl = new AbortController();
+    const gen = ++_sendGen;
     appendMsg('bot', '🔍 解析并 AI 分析中…', 'bot');
     const thinkNode = msgsEl.lastChild;
     const clearFile = ()=>{
@@ -4996,12 +5053,14 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
       if(mp.base_url)  fd.append('base_url', mp.base_url);
       if(mp.api_key)   fd.append('api_key', mp.api_key);
       const res = await fetch(backendBase + '/api/chat/analyze-file', {method:'POST', body: fd, signal: _abortCtrl.signal});
+      if(gen !== _sendGen) return;
       const j = await res.json();
       if(thinkNode && thinkNode.parentNode) thinkNode.remove();
       if(!j || !j.ok){
         appendMsg('err', '⚠️ ' + ((j && j.note) || '文件分析失败').replace(/</g,'&lt;'), 'err');
-        clearFile(); busy = false; sendEl.disabled = false; sendEl.style.display = '';
-        if(stopEl){ stopEl.style.display = 'none'; stopEl.disabled = true; } _abortCtrl = null; return;
+        clearFile();
+        if(gen === _sendGen){ busy = false; setPrimaryBtn('send'); _abortCtrl = null; }
+        return;
       }
       // 解析结果卡
       let card = '';
@@ -5034,12 +5093,14 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
       history.push({role:'assistant', content: (j.analysis || '') + ' [解析'+(j.rows?j.rows.length:0)+'行]'});
     }catch(e){
       if(thinkNode && thinkNode.parentNode) thinkNode.remove();
-      appendMsg('err', '⚠️ 文件分析请求失败：' + ((e && e.message) || e), 'err');
+      if(!(e && e.name === 'AbortError'))
+        appendMsg('err', '⚠️ 文件分析请求失败：' + ((e && e.message) || e), 'err');
     }
     clearFile();
-    busy = false; sendEl.disabled = false; sendEl.style.display = ''; textEl.value=''; textEl.style.height='auto';
-    if(stopEl){ stopEl.style.display = 'none'; stopEl.disabled = true; }
-    _abortCtrl = null;
+    if(gen === _sendGen){
+      busy = false; setPrimaryBtn('send'); textEl.value=''; textEl.style.height='auto';
+      _abortCtrl = null;
+    }
   }
 
   // 解析单个 SSE 块：返回 {event, data}（event 缺省 'message'）
@@ -5122,12 +5183,10 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
   headEl.addEventListener('click', toggleChat);
   toggleEl.addEventListener('click', (e)=>{ e.stopPropagation(); toggleChat(); });
 
-  sendEl.addEventListener('click', ()=> send(textEl.value));
-  if(stopEl){
-    stopEl.addEventListener('click', ()=>{
-      if(_abortCtrl){ _abortCtrl.abort(); }
-    });
-  }
+  sendEl.addEventListener('click', ()=>{
+    if(busy && sendEl.classList.contains('is-stop')){ stopChat('user'); return; }
+    send(textEl.value);
+  });
   textEl.addEventListener('keydown', (e)=>{
     if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(textEl.value); }
     setTimeout(()=>{ textEl.style.height='auto'; textEl.style.height=Math.min(90, textEl.scrollHeight)+'px'; }, 0);

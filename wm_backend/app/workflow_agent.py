@@ -237,7 +237,17 @@ def validate_workflow_doc(doc: dict) -> dict:
             "problems": problems,
             "summary": "nodes=%d edges=%d（无 skill 校验器，仅结构检查）" % (len(nodes), len(edges)),
         }
-    problems, _stats = vw.validate(doc)
+    try:
+        problems, _stats = vw.validate(doc)
+    except Exception as e:
+        logger.warning("[wf_agent] validate exception: %s", e)
+        nodes = ((doc or {}).get("data") or {}).get("nodes") or []
+        edges = ((doc or {}).get("data") or {}).get("edges") or []
+        return {
+            "ok": True,
+            "problems": [],
+            "summary": "nodes=%d edges=%d · 校验器跳过（%s）" % (len(nodes), len(edges), e),
+        }
     nodes = ((doc or {}).get("data") or {}).get("nodes") or []
     edges = ((doc or {}).get("data") or {}).get("edges") or []
     return {
@@ -436,6 +446,157 @@ def wants_degree_remove(message: str) -> bool:
     if not re.search(r"删|移除|去掉|清除", msg):
         return False
     return parse_degree_threshold(msg) is not None
+
+
+def parse_bulk_disabled_intent(message: str) -> bool | None:
+    """批量启用/禁用意图 → 目标 disabled 值；无法判定则 None。"""
+    msg = (message or "").strip()
+    if not msg or is_analysis_only(msg):
+        return None
+    # 取消禁用 / 禁用→启用（必须先于「…禁用」误匹配）
+    if re.search(r"禁用.{0,16}(全部|所有)?.{0,8}(取消|去掉|解除|清除)", msg):
+        return False
+    if re.search(r"(取消|关闭|去掉|解除|清除).{0,10}(全部|所有)?.{0,6}禁用", msg):
+        return False
+    if re.search(r"(已)?禁用.{0,16}(改|变|设|换).{0,12}(未禁用|启用|不禁用|启动)", msg):
+        return False
+    if re.search(r"(未禁用|启用|启动).{0,12}(改|变|设).{0,12}(已)?禁用", msg):
+        return True
+    if re.search(r"(全部|所有|全都|整个画布|当前画布).{0,10}(启用|未禁用|已启动|启动)", msg):
+        return False
+    if re.search(r"(启用|未禁用|已启动|启动).{0,10}(全部|所有|所有节点|全部节点|当前画布)", msg):
+        return False
+    # 「全部禁用」——排除取消/启用措辞，避免「画布中的已禁用全部取消」误判
+    if re.search(r"(全部|所有|全都).{0,6}禁用", msg) and not re.search(
+        r"未禁用|取消|启用|启动|去掉|解除", msg
+    ):
+        return True
+    if re.search(r"(改|设|变为?).{0,6}全部禁用|(改|设)为禁用", msg) and not re.search(
+        r"未禁用|取消|启用|启动", msg
+    ):
+        return True
+    return None
+
+
+def wants_linearize_edges(message: str) -> bool:
+    """多入/多出只留最近一条边（前后至多一条线）。"""
+    msg = message or ""
+    if not re.search(r"线|边|连", msg):
+        return False
+    return bool(
+        re.search(
+            r"前后.?一条|一条线连接|最多一条|不允许.{0,10}多条|多条线|"
+            r"只(保留|留).{0,8}最近|连接距离.{0,6}最近|入出各.?一|线性化",
+            msg,
+        )
+    )
+
+
+def wants_remove_isolated(message: str) -> bool:
+    msg = message or ""
+    return bool(re.search(r"(清|删|去掉|移除).{0,8}孤立", msg))
+
+
+def wants_canvas_mutation(message: str) -> bool:
+    """用户是否在要求改画布（非纯问答）。"""
+    if is_analysis_only(message):
+        return False
+    msg = message or ""
+    # 明确只要说明 / 更新文档类
+    if re.search(r"更新到\s*skill|写(进|入)\s*skill|总结画布|校验当前|是什么意思", msg) \
+            and not re.search(r"改画布|应用到画布|删掉|启用|禁用", msg):
+        return False
+    return bool(
+        re.search(
+            r"改|删|移除|去掉|启用|禁用|启动|连接|应用到画布|写回|按这个|"
+            r"操作吧|一条线|多条线|线性|清空|补丁",
+            msg,
+        )
+    )
+
+
+def _node_xy(n: dict | None) -> tuple[float, float]:
+    if not n:
+        return 0.0, 0.0
+    pose = n.get("pose") or {}
+    pos = pose.get("position") if isinstance(pose, dict) else None
+    if not isinstance(pos, dict):
+        pos = pose if isinstance(pose, dict) else {}
+    try:
+        return float(pos.get("x") or 0), float(pos.get("y") or 0)
+    except Exception:
+        return 0.0, 0.0
+
+
+def prune_to_nearest_links(workflow: dict | None) -> dict[str, Any]:
+    """每个节点出边/入边至多保留 1 条：留画布坐标距离最近的对端，删其余边。孤立节点不动。"""
+    import copy
+    from collections import defaultdict
+
+    if not workflow or not isinstance(workflow, dict):
+        return {"ok": False, "error": "无工作流", "workflow": None, "log": []}
+    wf = copy.deepcopy(workflow)
+    data = wf.setdefault("data", {})
+    nodes = list(data.get("nodes") or [])
+    edges = [e for e in (data.get("edges") or []) if e]
+    xy = {n.get("uuid"): _node_xy(n) for n in nodes if n and n.get("uuid")}
+
+    def _dist(u: str, v: str) -> float:
+        a, b = xy.get(u, (0.0, 0.0)), xy.get(v, (0.0, 0.0))
+        return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+
+    outs: dict[str, list[int]] = defaultdict(list)
+    ins: dict[str, list[int]] = defaultdict(list)
+    for i, e in enumerate(edges):
+        s, t = e.get("source_node_uuid"), e.get("target_node_uuid")
+        if s:
+            outs[s].append(i)
+        if t:
+            ins[t].append(i)
+
+    keep = set(range(len(edges)))
+    for s, idxs in outs.items():
+        if len(idxs) <= 1:
+            continue
+        best = min(idxs, key=lambda i: _dist(s, edges[i].get("target_node_uuid") or ""))
+        for i in idxs:
+            if i != best:
+                keep.discard(i)
+    for t, idxs in ins.items():
+        idxs = [i for i in idxs if i in keep]
+        if len(idxs) <= 1:
+            continue
+        best = min(idxs, key=lambda i: _dist(t, edges[i].get("source_node_uuid") or ""))
+        for i in idxs:
+            if i != best:
+                keep.discard(i)
+
+    before = len(edges)
+    edges = [edges[i] for i in sorted(keep)]
+    data["edges"] = edges
+    removed = before - len(edges)
+    return {
+        "ok": True,
+        "workflow": wf,
+        "log": ["prune_to_nearest_links: -%d edges" % removed],
+        "removed_edges": removed,
+        "kept_nodes": len(nodes),
+        "kept_edges": len(edges),
+    }
+
+
+def count_disabled(wf: dict | None) -> tuple[int, int]:
+    nodes = ((wf or {}).get("data") or {}).get("nodes") or []
+    total = len([n for n in nodes if n])
+    dis = len([n for n in nodes if n and n.get("disabled")])
+    return total, dis
+
+
+def apply_set_disabled_all(workflow: dict | None, disabled: bool) -> dict[str, Any]:
+    ops = [{"op": "set_disabled", "disabled": bool(disabled), "all": True}]
+    applied = apply_ops_to_workflow(workflow, ops)
+    applied["ops"] = ops
+    return applied
 
 
 def analysis_reply_for_degree(wf: dict | None, message: str) -> str:
@@ -862,6 +1023,13 @@ def apply_ops_to_workflow(workflow: dict | None, ops: list) -> dict[str, Any]:
             nodes = [n for n in nodes if n and n.get("uuid") in linked]
             log.append("remove_isolated_nodes: -%d" % (before - len(nodes)))
             continue
+        if op in ("prune_to_nearest_links", "keep_nearest_links", "linearize_edges"):
+            tmp = prune_to_nearest_links({"data": {"nodes": nodes, "edges": edges}})
+            if tmp.get("ok") and tmp.get("workflow"):
+                nodes = list((tmp["workflow"].get("data") or {}).get("nodes") or [])
+                edges = list((tmp["workflow"].get("data") or {}).get("edges") or [])
+                log.extend(tmp.get("log") or ["prune_to_nearest_links"])
+            continue
         if op == "remove_nodes_by_degree":
             deg_map = {}
             for n in nodes:
@@ -951,15 +1119,24 @@ def apply_ops_to_workflow(workflow: dict | None, ops: list) -> dict[str, Any]:
             log.append("remove_edges: -%d" % (before - len(edges)))
             continue
         if op == "set_disabled":
-            ids = set(raw_op.get("uuids") or ([] if not raw_op.get("uuid") else [raw_op.get("uuid")]))
             flag = bool(raw_op.get("disabled", True))
+            match = raw_op.get("match") if isinstance(raw_op.get("match"), dict) else {}
+            all_nodes = bool(raw_op.get("all") or match.get("all"))
+            ids = set(raw_op.get("uuids") or ([] if not raw_op.get("uuid") else [raw_op.get("uuid")]))
             nmap = by_uuid()
             c = 0
-            for u in ids:
-                if u in nmap:
-                    nmap[u]["disabled"] = flag
+            if all_nodes:
+                for n in nodes:
+                    if not n:
+                        continue
+                    n["disabled"] = flag
                     c += 1
-            log.append("set_disabled(%s): %d" % (flag, c))
+            else:
+                for u in ids:
+                    if u in nmap:
+                        nmap[u]["disabled"] = flag
+                        c += 1
+            log.append("set_disabled(%s%s): %d" % (flag, ",all" if all_nodes else "", c))
             continue
         if op in ("update_param", "merge_param"):
             u = raw_op.get("uuid")
@@ -1019,26 +1196,27 @@ def looks_truncated_workflow(original: dict | None, candidate: dict | None) -> b
 
 
 WF_SYSTEM_PROMPT = """你是「工作流编辑器 · Uni-Lab 工作流 Agent」。
-核心目的：读懂并修改用户屏幕上的**实验室自动化工作流**（设备动作步骤图）。
+核心目的：读懂并**真正改写**用户屏幕上的实验室自动化工作流（设备动作步骤图）。
 
-## 如何读 LIVE_CANVAS（最重要）
-- 每个节点是一个实验步骤：看 [设备]、动作名、说明(footer)，不要只盯着长 uuid。
-- `#3→#4` / 执行链片段表示步骤先后顺序，不是不明「层级符号」。
-- 总结画布时用中文讲：有哪些设备、主要动作、是否线性链、有无禁用/高连线汇合点；引用「步骤预览」里的说明文字。
-- 禁止输出「这似乎是复杂图结构/独特标识符网络，请提供更多上下文」这类空话。
+## 如何读 LIVE_CANVAS
+- 节点=实验步骤：[设备]、动作、footer；边 #i→#j = 执行顺序。
+- 总结时用中文讲设备/动作/禁用情况；禁止「抽象 ID 网络、请再给上下文」空话。
 
-硬性规则：
-1. 有 LIVE_CANVAS 就等于已看见画布；禁止说看不到/没有 JSON/请再提供信息。
-2. 禁止编造示意节点或示意 JSON。
-3. 「不要动 / 先理解」：只文字分析，禁止 ops / 完整 JSON。
-4. 改大图只用 {"ops":[...]}，不要整图替换。
+## 改画布（硬性）
+1. 有 LIVE_CANVAS = 已看见画布。
+2. 用户要改状态/删节点等：**必须**输出 {"ops":[...]}；后端会打到**全部**匹配节点并写回画布。
+3. **禁止**只贴若干步骤「示例」、禁止说「仅展示部分 / 其余请自行修改 / 需要完整列表请告知」。要改就一次改完全部。
+4. 「已禁用→未禁用 / 全部启用」→ 只用：
+   {"ops":[{"op":"set_disabled","disabled":false,"all":true}]}
+   「全部禁用」→ {"ops":[{"op":"set_disabled","disabled":true,"all":true}]}
+5. 「不要动 / 先理解」：只文字，禁止 ops。
+6. 改大图只用 ops，不要整图替换、不要手写几百行启用示例。
 
-常用 ops：
-- remove_isolated_nodes / remove_edges_to_disabled / prune_orphans_disabled
-- remove_nodes_by_degree（gt/gte…；连线数=入+出）
-- remove_nodes / set_disabled / update_param / update_footer / set_workflow_name
-
-撤销走编辑器撤销栈。简洁中文。"""
+其它常用 ops：
+- remove_isolated_nodes
+- prune_to_nearest_links（多入/多出只留最近一条边；孤立节点保留）
+- remove_nodes_by_degree、remove_nodes、update_param、update_footer
+撤销走编辑器撤销栈。简洁中文。改画布时**必须**输出 ops，禁止只写步骤说明。"""
 
 
 def detect_local_action(message: str) -> str | None:
@@ -1163,6 +1341,130 @@ def run_agent(
             "skill": str(skill_root()) if skill_root() else None,
         }
 
+    # 明确「多连线只留最近 / 前后一条线」：确定性补丁
+    if wants_linearize_edges(message) and workflow and not analysis_only:
+        before_e = len(((workflow.get("data") or {}).get("edges") or []))
+        applied = prune_to_nearest_links(workflow)
+        if not applied.get("ok"):
+            return {
+                "ok": False,
+                "error": applied.get("error") or "线性化连线失败",
+                "reply": "",
+            }
+        ops = [{"op": "prune_to_nearest_links"}]
+        reply = (
+            "已按规则改画布：**每个节点入/出边至多各留 1 条**（保留坐标距离最近的对端），"
+            "孤立节点不动。\n"
+            "- 边：%d → %d（删除 %d）\n"
+            "- %s\n"
+            "已直接写回（可撤销）。"
+            % (
+                before_e,
+                applied.get("kept_edges"),
+                applied.get("removed_edges") or 0,
+                "; ".join(applied.get("log") or []) or "ok",
+            )
+        )
+        validation = validate_workflow_doc(applied["workflow"])
+        return {
+            "ok": True,
+            "reply": reply,
+            "workflow": applied["workflow"],
+            "ops": ops,
+            "validation": validation,
+            "apply_direct": True,
+            "action": "apply_ops",
+            "stats": {
+                "ops": 1,
+                "log": applied.get("log") or [],
+                "kept_nodes": applied.get("kept_nodes"),
+                "kept_edges": applied.get("kept_edges"),
+                "removed_edges": applied.get("removed_edges"),
+            },
+            "skill": str(skill_root()) if skill_root() else None,
+        }
+
+    if wants_remove_isolated(message) and workflow and not analysis_only \
+            and not wants_linearize_edges(message):
+        applied = remove_isolated_nodes_only(workflow)
+        if not applied.get("ok"):
+            return {"ok": False, "error": applied.get("error") or "清孤立失败", "reply": ""}
+        ops = [{"op": "remove_isolated_nodes"}]
+        reply = (
+            "已删除两侧无连线的孤立节点（连线未动）。\n"
+            "- 删除节点 %d · 现保留节点 %d · 连线 %d\n"
+            "已直接写回（可撤销）。"
+            % (
+                applied.get("removed_nodes") or 0,
+                applied.get("kept_nodes"),
+                applied.get("kept_edges"),
+            )
+        )
+        return {
+            "ok": True,
+            "reply": reply,
+            "workflow": applied["workflow"],
+            "ops": ops,
+            "apply_direct": True,
+            "action": "apply_ops",
+            "stats": {
+                "ops": 1,
+                "removed_nodes": applied.get("removed_nodes"),
+                "kept_nodes": applied.get("kept_nodes"),
+                "kept_edges": applied.get("kept_edges"),
+            },
+            "skill": str(skill_root()) if skill_root() else None,
+        }
+
+    # 明确「全部启用/全部禁用」：一次改完全部节点，不经 LLM（避免只贴示例不写画布）
+    bulk_dis = parse_bulk_disabled_intent(message)
+    if bulk_dis is not None and workflow and not analysis_only:
+        before_n, before_d = count_disabled(workflow)
+        applied = apply_set_disabled_all(workflow, bulk_dis)
+        if not applied.get("ok"):
+            return {
+                "ok": False,
+                "error": applied.get("error") or "批量改禁用状态失败",
+                "reply": "",
+                "ops": applied.get("ops"),
+            }
+        after_n, after_d = count_disabled(applied.get("workflow"))
+        verb = "全部禁用" if bulk_dis else "全部启用（取消禁用）"
+        reply = (
+            "已**一次改完全部**步骤：%s。\n"
+            "- 改前：节点 %d · 禁用 %d\n"
+            "- 改后：节点 %d · 禁用 %d\n"
+            "- %s\n"
+            "其余字段未动；已直接写回画布（可撤销）。"
+            % (
+                verb,
+                before_n,
+                before_d,
+                after_n,
+                after_d,
+                "; ".join(applied.get("log") or []) or "ok",
+            )
+        )
+        validation = validate_workflow_doc(applied["workflow"])
+        return {
+            "ok": True,
+            "reply": reply,
+            "workflow": applied["workflow"],
+            "ops": applied.get("ops"),
+            "validation": validation,
+            "apply_direct": True,
+            "action": "apply_ops",
+            "stats": {
+                "ops": 1,
+                "log": applied.get("log") or [],
+                "kept_nodes": applied.get("kept_nodes"),
+                "kept_edges": applied.get("kept_edges"),
+                "disabled_before": before_d,
+                "disabled_after": after_d,
+            },
+            "skill": str(skill_root()) if skill_root() else None,
+        }
+
     # 明确「按连线数/度数删除」：服务器对当前完整画布打确定性补丁，不经 LLM（避免示意 JSON）
     if wants_degree_remove(message) and degree_thr and workflow and not analysis_only:
         ops = [{"op": "remove_nodes_by_degree", **degree_thr}]
@@ -1214,6 +1516,7 @@ def run_agent(
 
     # 画布必须进 LLM 的 user 消息；见 assemble_llm_messages（修「模型说看不到」）
     msg_for_llm = message or ""
+    mutate = wants_canvas_mutation(message)
     if analysis_only:
         msg_for_llm += (
             "\n\n【系统约束】本次只要理解/说明，禁止输出 ops 或完整工作流 JSON，禁止改画布。"
@@ -1223,6 +1526,12 @@ def run_agent(
             "\n\n【系统约束】请只输出 "
             '{"ops":[{"op":"remove_nodes_by_degree",%s}]} ，不要输出完整工作流 JSON。'
             % json.dumps(degree_thr, ensure_ascii=False)[1:-1]
+        )
+    elif mutate:
+        msg_for_llm += (
+            "\n\n【系统约束】用户要改画布：你必须输出可执行 "
+            '{"ops":[...]}（如 set_disabled/prune_to_nearest_links/remove_isolated_nodes 等）。'
+            "禁止只写文字步骤或示例；不输出 ops = 失败。"
         )
 
     msgs, llm_ingest = assemble_llm_messages(msg_for_llm, workflow, history)
@@ -1277,7 +1586,7 @@ def run_agent(
             "skill": str(skill_root()) if skill_root() else None,
         }
 
-    # 模型胡编示意整图 / 没吐出 ops：对明确的度数删除意图，用服务器确定性补丁兜底
+    # 模型胡编示意 / 没吐出 ops：明确意图用服务器确定性补丁兜底（一次改全）
     if (not ops) and wants_degree_remove(message) and degree_thr and workflow:
         cand = extract_workflow_json(raw)
         need_fallback = True
@@ -1291,6 +1600,26 @@ def run_agent(
                 "已改用服务器按当前画布计算的确定性补丁：remove_nodes_by_degree %s。"
                 % json.dumps(degree_thr, ensure_ascii=False)
             )
+    if (not ops) and bulk_dis is not None and workflow:
+        ops = [{"op": "set_disabled", "disabled": bool(bulk_dis), "all": True}]
+        reply = (
+            (reply + "\n\n" if reply else "")
+            + "模型未给出可执行补丁，已改用服务器确定性补丁："
+            "set_disabled(all → %s) —— 一次改完全部步骤，不写示例。"
+            % ("禁用" if bulk_dis else "启用")
+        )
+    if (not ops) and wants_linearize_edges(message) and workflow:
+        ops = [{"op": "prune_to_nearest_links"}]
+        reply = (
+            (reply + "\n\n" if reply else "")
+            + "模型未给出可执行补丁，已改用服务器确定性补丁：prune_to_nearest_links。"
+        )
+    if (not ops) and wants_remove_isolated(message) and workflow:
+        ops = [{"op": "remove_isolated_nodes"}]
+        reply = (
+            (reply + "\n\n" if reply else "")
+            + "模型未给出可执行补丁，已改用服务器确定性补丁：remove_isolated_nodes。"
+        )
 
     # 1) 优先：ops 补丁打到当前画布完整 JSON → 直接改画布
     if ops:
@@ -1340,6 +1669,18 @@ def run_agent(
                         (validation.get("problems") or [])[:8]
                     )
 
+    # 改图意图却没有任何可执行结果 → 明确宣告未改画布（禁止假装成功）
+    canvas_unchanged = False
+    if mutate and not apply_direct:
+        canvas_unchanged = True
+        action = action or "no_ops"
+        reply = (
+            (reply or "").rstrip()
+            + "\n\n⚠️ **本次未改动画布**：没有可执行的 ops 补丁。"
+            "请换用明确指令（如「全部启用」「清孤立节点」「多条线只留最近一条」），"
+            "或再说一次并要求「输出 ops 并应用到画布」。"
+        )
+
     return {
         "ok": True,
         "reply": reply or "（无文本回复）",
@@ -1352,5 +1693,6 @@ def run_agent(
         "llm_ingest": llm_ingest,
         "reasoning": reasoning or None,
         "llm_latency_ms": llm_latency_ms,
+        "canvas_unchanged": canvas_unchanged,
         "skill": str(skill_root()) if skill_root() else None,
     }

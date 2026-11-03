@@ -14,12 +14,17 @@
 
   var history = [];
   var busy = false;
+  var abortCtrl = null;
+  var activeThink = null;
+  var lastSentText = '';
+  var sendGen = 0;
   var pendingWf = null;
   var pendingVal = null;
   var dragging = false;
   var dragMoved = false;
   var dragOff = { x: 0, y: 0 };
   var POS_KEY = 'cwm_wf_agent_pos';
+  var HIST_KEY = 'cwm_wf_agent_history_v1';
   var modelCfg = {
     mode: 'ext', ext: 'GLM-4.5-Flash', custom: '',
     localUrl: 'http://127.0.0.1:11434/v1', localModel: 'qwen2.5:7b', localKey: ''
@@ -27,6 +32,34 @@
   var LS_KEY = 'wm_chat_model';
 
   function $(id) { return document.getElementById(id); }
+
+  function loadHistory() {
+    try {
+      var raw = localStorage.getItem(HIST_KEY);
+      if (!raw) return;
+      var arr = JSON.parse(raw);
+      if (Array.isArray(arr)) history = arr.slice(-80);
+    } catch (e) { history = []; }
+  }
+
+  function saveHistory() {
+    try {
+      localStorage.setItem(HIST_KEY, JSON.stringify((history || []).slice(-80)));
+    } catch (e) { }
+  }
+
+  function restoreChatUi() {
+    if (!history.length) return;
+    var box = $('wf-agent-msgs');
+    if (!box) return;
+    // 保留首条欢迎语，其后重放历史
+    while (box.children.length > 1) box.removeChild(box.lastChild);
+    history.forEach(function (m) {
+      if (!m || !m.content) return;
+      if (m.role === 'user') appendUserMsg(m.content);
+      else appendMsg(mdToHtml(m.content) || mdLite(m.content), 'bot md');
+    });
+  }
 
   function ensureDom() {
     if ($('wf-agent')) return;
@@ -68,8 +101,8 @@
       '    <button type="button" class="ai-quick wf-agent-undo" id="wf-agent-undo" title="撤销上一步画布修改（Ctrl/⌘+Z）">↶ 撤销</button>' +
       '  </div>' +
       '  <div class="ai-chat-input">' +
-      '    <textarea id="wf-agent-text" rows="1" placeholder="描述要批量改/生成的工作流…（Enter 发送）"></textarea>' +
-      '    <button type="button" id="wf-agent-send" class="ai-chat-send">发送</button>' +
+      '    <textarea id="wf-agent-text" rows="1" placeholder="描述要批量改/生成的工作流…（Enter 发送；点自己的上一条消息可编辑重发）"></textarea>' +
+      '    <button type="button" id="wf-agent-send" class="ai-chat-send" title="空闲时发送；运行中变为停止">发送</button>' +
       '  </div>' +
       '  <div id="wf-agent-applybar" class="wf-agent-applybar" hidden>' +
       '    <span id="wf-agent-applymeta"></span>' +
@@ -93,21 +126,49 @@
       toggle();
     });
     $('wf-agent-send').addEventListener('click', function () {
+      if (busy) {
+        stopAgent('user');
+        return;
+      }
       send($('wf-agent-text').value);
     });
     $('wf-agent-text').addEventListener('keydown', function (ev) {
       if (ev.key === 'Enter' && !ev.shiftKey) {
         ev.preventDefault();
-        send(this.value);
+        send(this.value); // 运行中也会先停再发（编辑重发）
       }
     });
+    var msgsBox = $('wf-agent-msgs');
+    if (msgsBox && !msgsBox.dataset.userEditBound) {
+      msgsBox.dataset.userEditBound = '1';
+      msgsBox.addEventListener('click', function (ev) {
+        var bubble = ev.target && ev.target.closest && ev.target.closest('.ai-msg.user');
+        if (!bubble) return;
+        var raw = bubble.getAttribute('data-raw') || '';
+        if (!raw) return;
+        var ta = $('wf-agent-text');
+        if (!ta) return;
+        ta.value = raw;
+        try { ta.focus(); ta.setSelectionRange(raw.length, raw.length); } catch (e) { }
+        setPrimaryBtn('send'); // 编辑态显示发送（即便后台还在跑，点发送会先停再发）
+        if (busy) {
+          // 按钮文案仍提示可点发送以改发
+          var btn = $('wf-agent-send');
+          if (btn) {
+            btn.textContent = '发送';
+            btn.classList.remove('is-stop');
+            btn.title = '将先停止当前任务，再发送编辑后的内容';
+          }
+        }
+      });
+    }
     el.querySelectorAll('.ai-quick').forEach(function (b) {
       b.addEventListener('click', function () {
         if (b.id === 'wf-agent-undo') return;
         var local = b.getAttribute('data-local');
         if (local) {
           // 快捷按钮 = 用户明确点名的本地动作（不经关键词误匹配）
-          appendMsg(esc(b.textContent.trim()), 'user');
+          appendUserMsg(b.textContent.trim());
           var st = runCleanupLocal(local);
           if (st) {
             reportCleanup(st, local);
@@ -120,6 +181,7 @@
                 ? ('已删除孤立节点 ' + (st.removedNodes || 0))
                 : ('已清理：删禁用边 ' + (st.removedEdges || 0) + '、删孤立 ' + (st.removedNodes || 0))
             });
+            saveHistory();
           }
           return;
         }
@@ -272,6 +334,32 @@
     box.scrollTop = box.scrollHeight;
     while (box.children.length > 60) box.removeChild(box.firstChild);
     return d;
+  }
+
+  function appendUserMsg(rawText) {
+    var d = appendMsg(esc(rawText), 'user');
+    d.setAttribute('data-raw', rawText);
+    d.title = '点击可编辑并重新发送';
+    d.classList.add('user-editable');
+    return d;
+  }
+
+  function setPrimaryBtn(mode) {
+    var btn = $('wf-agent-send');
+    if (!btn) return;
+    if (mode === 'stop') {
+      btn.textContent = '停止';
+      btn.classList.add('is-stop');
+      btn.hidden = false;
+      btn.disabled = false;
+      btn.title = '停止当前对话 / 请求';
+    } else {
+      btn.textContent = '发送';
+      btn.classList.remove('is-stop');
+      btn.hidden = false;
+      btn.disabled = false;
+      btn.title = '发送';
+    }
   }
 
   function esc(s) {
@@ -629,39 +717,81 @@
     clearPending();
   }
 
+  function setRunUi(running) {
+    busy = !!running;
+    setPrimaryBtn(running ? 'stop' : 'send');
+  }
+
+  function stopAgent(reason) {
+    if (!busy && !abortCtrl) return false;
+    sendGen++;
+    try {
+      if (abortCtrl) abortCtrl.abort();
+    } catch (e) { }
+    abortCtrl = null;
+    if (activeThink) {
+      try {
+        activeThink.stop({
+          ok: false,
+          stageDone: reason === 'user' ? '· 已手动停止' : '· 已停止'
+        });
+      } catch (e2) { }
+      activeThink = null;
+    }
+    busy = false;
+    setPrimaryBtn('send');
+    if (reason === 'user') {
+      appendMsg('⏹ 已停止。可继续编辑后点「发送」，或点自己的上一条消息修改再发。', 'act');
+    }
+    return true;
+  }
+
   async function send(text) {
     text = (text || '').trim();
-    if (!text || busy) return;
+    if (!text) return;
+    // 编辑重发：若仍在跑，先停再发
+    if (busy) {
+      stopAgent('resend');
+      await new Promise(function (r) { setTimeout(r, 30); });
+    }
     var el = $('wf-agent');
     if (el) el.classList.remove('collapsed');
     var ta = $('wf-agent-text');
     if (ta) ta.value = '';
-    appendMsg(esc(text), 'user');
+    lastSentText = text;
+    appendUserMsg(text);
     history.push({ role: 'user', content: text });
+    saveHistory();
 
     // 仅撤销走本地栈；其余自然语言一律交给 Agent 读画布
     if (looksLikeUndo(text)) {
       runUndoLocal();
       history.push({ role: 'assistant', content: '已撤销上一步画布修改' });
+      saveHistory();
       return;
     }
 
-    busy = true;
-    var sendBtn = $('wf-agent-send');
-    if (sendBtn) sendBtn.disabled = true;
+    setRunUi(true);
+    abortCtrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     var think = startThinkPanel();
+    activeThink = think;
+    var gen = ++sendGen;
     try {
       var body = Object.assign({
         message: text,
         history: history.slice(-8),
         workflow: currentWorkflow()
       }, modelParams());
-      var res = await fetch(backendBase + '/api/workflow-agent', {
+      var fetchOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
-      });
+      };
+      if (abortCtrl) fetchOpts.signal = abortCtrl.signal;
+      var res = await fetch(backendBase + '/api/workflow-agent', fetchOpts);
+      if (gen !== sendGen || !busy) return;
       var j = await res.json().catch(function () { return {}; });
+      if (gen !== sendGen || !busy) return;
       var latencySec = (j && j.llm_latency_ms != null)
         ? (j.llm_latency_ms / 1000)
         : ((Date.now() - think.t0) / 1000);
@@ -695,11 +825,12 @@
       if (j.apply_direct && j.action === 'undo') {
         runUndoLocal();
         history.push({ role: 'assistant', content: j.reply || '已撤销' });
+        saveHistory();
         return;
       }
       appendMsg(mdToHtml(j.reply || '') || mdLite(j.reply || ''), 'bot md');
       history.push({ role: 'assistant', content: j.reply || '' });
-      // Agent 基于画布产出的补丁/完整结果 → 直接写回当前画布
+      saveHistory();
       if (j.apply_direct && j.workflow) {
         applyToCanvas(j.workflow, {
           via: j.action === 'apply_ops' ? 'Agent 补丁' : 'Agent 替换'
@@ -708,13 +839,21 @@
         showPending(j.workflow, j.validation);
       } else {
         clearPending();
+        if (j.canvas_unchanged || (j.action === 'no_ops')) {
+          appendMsg('⚠️ <b>画布未改动</b>：这次没有可执行补丁。请换明确指令或再说「应用到画布」。', 'err');
+        }
       }
     } catch (e) {
+      var aborted = (e && (e.name === 'AbortError' || /abort/i.test(String(e.message || e))));
+      if (aborted) return;
       if (think) think.stop({ ok: false, stageDone: '· 网络或解析异常' });
       appendMsg('⚠️ 请求失败：' + esc(e.message || e), 'err');
     } finally {
-      busy = false;
-      if (sendBtn) sendBtn.disabled = false;
+      if (gen === sendGen) {
+        abortCtrl = null;
+        activeThink = null;
+        setRunUi(false);
+      }
     }
   }
 
@@ -724,6 +863,7 @@
     btn.dataset.wfAgBound = '1';
     btn.addEventListener('click', function () {
       ensureDom();
+      restoreChatUi();
       var el = $('wf-agent');
       if (el) el.classList.remove('collapsed');
       var ta = $('wf-agent-text');
@@ -732,7 +872,9 @@
   }
 
   function boot() {
+    loadHistory();
     ensureDom();
+    restoreChatUi();
     bindToolbar();
   }
 
@@ -744,6 +886,7 @@
 
   window.__WF_AGENT = {
     send: send,
+    stop: function () { return stopAgent('user'); },
     apply: applyPending,
     show: function () {
       ensureDom();
