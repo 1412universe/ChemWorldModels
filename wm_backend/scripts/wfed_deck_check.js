@@ -82,15 +82,21 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     api.j.geometry.rowPitch === 96.0, api.j.slotOrder);
   T('transfer_liquid 三个角色', (api.j.roles || []).map(r => r.key).join(',') === 'source,target,tips',
     (api.j.roles || []).map(r => r.key + '→' + r.param).join(' '));
-  T('move_plate 角色 from/to/plate', api.roles2.join(',') === 'from,to,plate');
+  T('move_plate 角色 from/to（无 Tips）', api.roles2.join(',') === 'from,to');
   T('资源实例带 id/name/uuid',
     (api.j.resources || []).length >= 10 &&
     (api.j.resources || []).every(r => r.name && r.uuid && /^\/gn_workstation\/PRCXI\/PRCXI_Deck\//.test(r.id)),
     (api.j.resources || []).length + ' 个实例');
-  T('工艺语义随工艺切换（mof 的 T9 = 备用/空位）',
-    api.mof9 && api.mof9.group === 'spare', api.mof9 && (api.mof9.group + ' / ' + api.mof9.name));
-  T('3/4 号位标为夹爪不可达', api.j.sites[2].enabled === false && api.j.sites[3].enabled === false &&
-    /夹爪行程不覆盖/.test(api.j.sites[2].reason), api.j.sites[2].reason);
+  T('统一台面：T9/T13 空位·不覆盖',
+    api.j.sites[8].enabled === false && api.j.sites[12].enabled === false &&
+    /不覆盖/.test(api.j.sites[8].reason || ''), api.j.sites[8].reason);
+  T('T3 震荡加样 / T4 酶标板 / T11·14·15 枪头 / T10·12 储液槽',
+    api.j.sites[2].group === 'shake' && api.j.sites[3].group === 'reader' &&
+    api.j.sites[10].group === 'tip' && api.j.sites[13].group === 'tip' && api.j.sites[14].group === 'tip' &&
+    api.j.sites[9].group === 'trough' && api.j.sites[11].group === 'trough',
+    [2,3,9,10,11,12,13,14].map(i => 'T'+(i+1)+'='+(api.j.sites[i].group||'off')).join(' '));
+  T('工艺切换行已取消', Array.isArray(api.j.processes) && api.j.processes.length === 0,
+    JSON.stringify(api.j.processes));
 
   // ============ C. 属性面板：三态 ============
   mark('右栏三态（折叠 / 窄栏轨道 / 钉住）');
@@ -202,9 +208,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     return { role: window.__WFED.deck.state().role, bySlot: bySlot,
              off: Array.prototype.filter.call(cells, c => c.classList.contains('off')).length };
   });
-  T('切到 tips 后只有枪头位 10/11/12/15 可选且被推荐',
-    ['10', '11', '12', '15'].every(s => tipsAvail.bySlot[s] !== 'off') &&
-    Object.keys(tipsAvail.bySlot).filter(s => tipsAvail.bySlot[s] !== 'off').length === 4,
+  T('切到 tips 后只有枪头位 11/12/15 可选且被推荐',
+    ['11', '12', '15'].every(s => tipsAvail.bySlot[s] !== 'off') &&
+    Object.keys(tipsAvail.bySlot).filter(s => tipsAvail.bySlot[s] !== 'off').length === 3,
     JSON.stringify(tipsAvail.bySlot));
   await click('#p-deck-grid .dk-cell[data-slot="11"]');
   await sleep(260);
@@ -267,37 +273,24 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await sleep(220);
 
   // —— 不可用板位被拒绝 ——
-  mark('点被停用的 T3（夹爪行程不覆盖）');
-  const before3 = await page.evaluate(() => JSON.stringify(
+  mark('点被停用的 T9（空位·不覆盖）');
+  const before9 = await page.evaluate(() => JSON.stringify(
     window.__WFED.state.wf.data.nodes.filter(x => x.device_name === 'PRCXI')[0].param.sources));
-  await click('#p-deck-grid .dk-cell[data-slot="3"]');
+  await click('#p-deck-grid .dk-cell[data-slot="9"]');
   await sleep(320);
   const rej = await page.evaluate(() => ({
     after: JSON.stringify(window.__WFED.state.wf.data.nodes.filter(x => x.device_name === 'PRCXI')[0].param.sources),
     notes: Array.prototype.map.call(document.querySelectorAll('.wfed-note'), n => n.innerText.replace(/\n/g, ' | ')),
   }));
-  const rejHit = rej.notes.some(t => /T3/.test(t) && /夹爪行程不覆盖/.test(t));
-  T('T3 被拒绝且给出原因（值未变）', rej.after === before3 && rejHit,
-    (rej.notes.find(t => /T3/.test(t)) || '(无 T3 提示)').slice(0, 100));
+  const rejHit = rej.notes.some(t => /T9/.test(t) && /不覆盖/.test(t));
+  T('T9 被拒绝且给出原因（值未变）', rej.after === before9 && rejHit,
+    (rej.notes.find(t => /T9/.test(t)) || '(无 T9 提示)').slice(0, 100));
 
-  // ============ 台面工艺切换 ============
-  mark('切台面工艺 autet → mof');
-  await click('#p-deck-proc button[data-proc="mof"]');
-  const mofOk = await waitFor(() => {
-    const c = document.querySelectorAll('#p-deck-grid .dk-cell');
-    return c.length === 16 && /g-spare/.test(c[8].className);
-  });
-  const mof = await page.evaluate(() => {
-    const cells = document.querySelectorAll('#p-deck-grid .dk-cell');
-    return { cls: cells[8] ? cells[8].className : '(无)', nm: cells[8] ? cells[8].innerText.replace(/\n/g, ' ') : '' };
-  });
-  T('切工艺后 T9 变成「空位」语义（g-spare）', mofOk && /g-spare/.test(mof.cls), mof.cls + ' → ' + mof.nm);
-  await click('#p-deck-proc button[data-proc="autet"]');
-  await waitFor(() => {
-    const c = document.querySelectorAll('#p-deck-grid .dk-cell');
-    return c.length === 16 && /g-deepWell/.test(c[8].className);
-  });
-  await page.screenshot({ path: '/tmp/wfed_deck_3_autet.png' });
+  // ============ 工艺切换行已取消 ============
+  mark('确认无金球/金四面体/MOF 工艺切换行');
+  const procBtns = await page.evaluate(() => document.querySelectorAll('#p-deck-proc button').length);
+  T('无工艺切换按钮', procBtns === 0, 'buttons=' + procBtns);
+  await page.screenshot({ path: '/tmp/wfed_deck_3_unified.png' });
 
   // ============ move_plate：from/to 写板位号 ============
   mark('新增 move_plate 节点 → from/to 写板位号');
@@ -315,8 +308,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       off: Array.prototype.filter.call(cells, c => c.classList.contains('off')).map(c => c.dataset.slot),
     };
   });
-  T('move_plate 角色 = from/to/plate', mpUi.roles.join(',') === 'from,to,plate', mpUi.roles.join('/'));
-  T('move_plate 下 T3/T4 不可选（夹爪不可达）', mpUi.off.indexOf('3') >= 0 && mpUi.off.indexOf('4') >= 0,
+  T('move_plate 角色 = from/to（无 Tips）', mpUi.roles.join(',') === 'from,to', mpUi.roles.join('/'));
+  T('move_plate 下 T9/T13 不可选（空位不覆盖）', mpUi.off.indexOf('9') >= 0 && mpUi.off.indexOf('13') >= 0,
     'off=' + mpUi.off.join(','));
 
   // 节点库默认 from=16 → 格子上应显示为已选；点一下是「取消」，再点一下是「选中」

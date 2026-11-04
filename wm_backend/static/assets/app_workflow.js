@@ -1386,18 +1386,14 @@
   // move_plate 的 from / to（板位号）都指向 9320 的 16 个物理板位。
   // 数据源是后端 GET /api/gn-adapter/prcxi-deck：
   //   · 板位几何源自驱动 PRCXI9300Deck（4 行 × 4 列，行主序 T1..T16）
-  //   · 台面工艺语义（三工艺）与真实占用（真实工作流实测）由后端合成
+  //   · 台面语义与真实占用（真实工作流实测）由后端合成；已取消三工艺切换行
   // 节点库 gn_node_library.js 的 device.deck / action.deckRoles 告诉前端
   // 「哪个参数对应哪个角色、接受哪些板位语义」，所以这里不硬编码任何板位表。
   // ==================================================================
-  var DECK_PROC_FALLBACK = [
-    { key: 'aus', label: '金球合成' },
-    { key: 'autet', label: '金四面体合成' },
-    { key: 'mof', label: 'MOF 合成' }
-  ];
+  var DECK_PROC_FALLBACK = [];
   var deckState = {
-    proc: 'autet',    // 当前台面工艺
-    role: null,       // 当前角色 key（source / target / tips / from / to / plate）
+    proc: 'default',  // 统一台面
+    role: null,       // 当前角色 key（source / target / tips / from / to）
     nodeUuid: null,   // 角色归属的节点（换节点即重置，避免角色串味）
     cache: {},        // 'proc|action' → 后端快照
     loading: {},      // 'proc|action' → true
@@ -1422,9 +1418,9 @@
     var a = actionOfNode(n);
     return (a && a.name) || n.name || '';
   }
-  /** transfer_liquid 只选 T1..T16，不按金球 / 金四面体 / MOF 分台面 */
+  /** 已取消 plain 模式：transfer_liquid 与 move_plate 共用同一套资源板位点选 */
   function deckPlainSlots(n) {
-    return deckActionName(n) === 'transfer_liquid';
+    return false;
   }
   function plainDeckSites() {
     var sites = [];
@@ -1642,13 +1638,7 @@
       '<span class="ps-hint">' + esc(dk.model || 'PRCXI9300Deck') + ' · ' + (dk.total || 16) + ' 位（' +
       (dk.rows || 4) + '×' + (dk.cols || 4) + '）</span></h4>';
 
-    // 台面工艺
-    h += '<div class="dks-proc" id="p-deck-proc">';
-    deckProcs().forEach(function (p) {
-      h += '<button data-proc="' + esc(p.key) + '"' + (p.key === deckState.proc ? ' class="on"' : '') +
-        ' title="切换台面工艺（只影响板位语义标注，不改已选值）">' + esc(p.label) + '</button>';
-    });
-    h += '</div>';
+    // 台面工艺行已取消（金球/金四面体/MOF）；不再渲染切换按钮
 
     // 角色
     h += '<div class="dks-roles" id="p-deck-roles">';
@@ -4734,7 +4724,7 @@
         setProc: function (p) { deckState.proc = p; },
         setRole: function (r) { deckState.role = r; },
         reset: function () {
-          deckState.proc = 'autet'; deckState.role = null;
+          deckState.proc = 'default'; deckState.role = null;
           deckState.nodeUuid = null; deckState.err = ''; deckState.cache = {};
         },
         /** 当前选中节点的后端板位快照（未加载则 null） */

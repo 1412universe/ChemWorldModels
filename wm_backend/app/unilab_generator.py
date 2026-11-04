@@ -17,30 +17,30 @@ import os
 import copy
 from . import prcxi_factory as pf
 
-# 真实 9320 台面 16 槽位（取自《9320台面布局-金四面体合成》）
-# 4 columns × 4 rows, column-major; pos 3/4 停用（夹爪行程不覆盖）
+# 真实 9320 台面 16 槽位（统一布局）
+# T11/T12/T15 枪头；T10/T14 储液槽；T9/T13 空·不覆盖；T3 震荡加样；T4 酶标板
 DECK_9320 = [
-    {'pos': 1,  'name': '垃圾桶',           'enabled': True,  'group': None},
-    {'pos': 2,  'name': '废液槽',           'enabled': True,  'group': None},
-    {'pos': 3,  'name': '停用(夹爪不覆盖)', 'enabled': False, 'group': None},
-    {'pos': 4,  'name': '停用(夹爪不覆盖)', 'enabled': False, 'group': None},
-    {'pos': 5,  'name': '整板储液槽(4℃)',   'enabled': True,  'group': 'trough',    'content': '金球溶液'},
+    {'pos': 1,  'name': '垃圾桶',           'enabled': True,  'group': 'trash'},
+    {'pos': 2,  'name': '整板储液槽(4℃)',   'enabled': True,  'group': 'trough',    'content': '金球溶液'},
+    {'pos': 3,  'name': '震荡加样模块',     'enabled': True,  'group': 'shake'},
+    {'pos': 4,  'name': '酶标板',           'enabled': True,  'group': 'reader'},
+    {'pos': 5,  'name': '废液槽',           'enabled': True,  'group': 'waste'},
     {'pos': 6,  'name': '整板储液槽(4℃)',   'enabled': True,  'group': 'trough',    'content': '2.5mM 氯金酸'},
     {'pos': 7,  'name': '96孔深孔板(28℃)',  'enabled': True,  'group': 'deepWell',  'content': '20mM CTAC'},
     {'pos': 8,  'name': '96孔深孔板(28℃)',  'enabled': True,  'group': 'deepWell',  'content': 'CTAC及CTAB混液'},
-    {'pos': 9,  'name': '96孔深孔板(恒温振荡)','enabled': True,'group': 'deepWell',  'content': '抗坏血酸梯度'},
-    {'pos': 10, 'name': '枪头位(1ml)',      'enabled': True,  'group': 'tip'},
+    {'pos': 9,  'name': '空位·不覆盖',       'enabled': False, 'group': None},
+    {'pos': 10, 'name': '整板储液槽',       'enabled': True,  'group': 'trough'},
     {'pos': 11, 'name': '枪头位(1ml)',      'enabled': True,  'group': 'tip'},
     {'pos': 12, 'name': '枪头位(1ml)',      'enabled': True,  'group': 'tip'},
-    {'pos': 13, 'name': '酶标板',           'enabled': True,  'group': None},
-    {'pos': 14, 'name': '96孔深孔板',       'enabled': True,  'group': 'deepWell',  'content': '金四面体成品'},
+    {'pos': 13, 'name': '空位·不覆盖',       'enabled': False, 'group': None},
+    {'pos': 14, 'name': '整板储液槽',       'enabled': True,  'group': 'trough'},
     {'pos': 15, 'name': '枪头位(1ml)',      'enabled': True,  'group': 'tip'},
     {'pos': 16, 'name': '中转位(纯水)',     'enabled': True,  'group': 'transfer'},
 ]
 
-TIP_SLOTS    = [s['pos'] for s in DECK_9320 if s['group'] == 'tip'    and s['enabled']]   # [10,11,12,15]
-TROUGH_SLOTS = [s['pos'] for s in DECK_9320 if s['group'] == 'trough' and s['enabled']]   # [5,6]
-DW_SLOTS     = [s['pos'] for s in DECK_9320 if s['group'] == 'deepWell' and s['enabled']] # [7,8,9,14]
+TIP_SLOTS    = [s['pos'] for s in DECK_9320 if s['group'] == 'tip'    and s['enabled']]   # [11,12,15]
+TROUGH_SLOTS = [s['pos'] for s in DECK_9320 if s['group'] == 'trough' and s['enabled']]   # [2,6,10,14]
+DW_SLOTS     = [s['pos'] for s in DECK_9320 if s['group'] == 'deepWell' and s['enabled']] # [7,8]
 TRANSFER_POS = next((s['pos'] for s in DECK_9320 if s['group'] == 'transfer'), 16)
 
 # 真实堆栈枪头盒槽位（取自参考工作流 arm pick: stack number 74/75/76）
@@ -93,7 +93,8 @@ def _titration(vol, repeat, tip_rack_idx=0):
 
 
 def _move_plate(frm, to):
-    return pf.move_plate(frm, to, RES_DW5, '9320-移板 %d→%d' % (frm, to))
+    # 只按 from/to 板位搬运，不绑枪头盒
+    return pf.move_plate(frm, to, None, '9320-移板 %d→%d' % (frm, to))
 
 
 def _place_tips(stack_slot, tip_pos):
@@ -169,7 +170,7 @@ def generate_workflow(cond):
 
     # —— 状态模型 ——
     stack_tips = STACK_TIP_SLOTS[:]      # [74,75,76]
-    tip_positions = TIP_SLOTS[:]          # [10,11,12,15]
+    tip_positions = TIP_SLOTS[:]          # [11,12,15]
     used_stack = []
     used_tip = []
     trough_vol = 200

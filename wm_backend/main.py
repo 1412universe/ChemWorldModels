@@ -33,11 +33,12 @@ if not os.getenv("WM_LOG_HEALTH"):
     logging.getLogger("uvicorn.access").addFilter(_QuietHealthAccessLog())
 
 def _ensure_ollama_serve(wait_s: int = 40) -> bool:
-    """若本机 11434 未就绪则后台拉起 `ollama serve`（已在跑则复用）。"""
+    """若本机 11434 未就绪则静默拉起 Ollama（已在跑则复用，不弹控制台窗口）。"""
     import shutil
     import subprocess
     import time
     import urllib.request
+    from pathlib import Path
 
     def _up() -> bool:
         try:
@@ -48,22 +49,57 @@ def _ensure_ollama_serve(wait_s: int = 40) -> bool:
 
     if _up():
         return True
-    ollama = shutil.which("ollama")
-    if not ollama:
-        return False
+
+    def _ollama_running() -> bool:
+        try:
+            if os.name == "nt":
+                out = subprocess.check_output(
+                    ["tasklist", "/FI", "IMAGENAME eq ollama.exe"],
+                    stderr=subprocess.DEVNULL,
+                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000),
+                    text=True,
+                    timeout=5,
+                )
+                return "ollama.exe" in out.lower()
+            out = subprocess.check_output(["pgrep", "-x", "ollama"], stderr=subprocess.DEVNULL)
+            return bool(out.strip())
+        except Exception:
+            return False
+
+    # 已有进程则只等端口，避免重复启动弹窗
+    if _ollama_running():
+        for _ in range(max(1, wait_s)):
+            if _up():
+                return True
+            time.sleep(1)
+        return _up()
+
     kw = {
         "stdout": subprocess.DEVNULL,
         "stderr": subprocess.DEVNULL,
         "stdin": subprocess.DEVNULL,
+        "close_fds": True,
     }
     if os.name == "nt":
-        kw["creationflags"] = (
-            subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS
-        )
+        # CREATE_NO_WINDOW：禁止弹出黑色终端；勿用 DETACHED_PROCESS
+        kw["creationflags"] = getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)
+        gui = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "Ollama.exe"
+        if gui.is_file():
+            cmd = [str(gui)]
+        else:
+            ollama = shutil.which("ollama")
+            if not ollama:
+                return False
+            cmd = [ollama, "serve"]
     else:
         kw["start_new_session"] = True
+        ollama = shutil.which("ollama")
+        if not ollama:
+            return False
+        cmd = [ollama, "serve"]
+
     try:
-        subprocess.Popen([ollama, "serve"], **kw)
+        subprocess.Popen(cmd, **kw)
     except Exception:
         return False
     for _ in range(max(1, wait_s)):

@@ -1991,28 +1991,23 @@ const RES_TROUGH = {id:'/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_nest_1_troughplat
 const RES_DEEPWELL = {id:'/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_shake', name:'PRCXI_96_DeepWell_shake', uuid:'a2e75ff7-6b1a-494a-8b18-0b6d93619a11'};
 const RES_TIP1 = {id:'/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips1', name:'PRCXI_1250uL_Tips1', uuid:'2c525d62-d238-48d5-892a-993e5c0065d7'};
 const RES_TIP3 = {id:'/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips3', name:'PRCXI_1250uL_Tips3', uuid:'0014ea7c-9743-452a-96ab-5407f475a32c'};
-// move_plate 搬运的深孔板（取自参考工作流「从堆栈到9320三次放枪头」：PRCXI_96_DeepWell5）
-const RES_DEEPWELL_BOX = {id:'/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell5', name:'PRCXI_96_DeepWell5', uuid:'e74c153c-a29f-4653-a665-b9e1cc1711a9'};
+// move_plate 只按 from/to 板位号搬运，不再绑定枪头盒 Tips
+
 // 固体料桶槽位 → material_z_pos（取自 8通道/12通道加样 实测：取桶 cmd9 / 放回 cmd19 的 Z 位；"堆栈代码里的注释"即此映射）
 const SOLID_BUCKET_Z = {1:136000, 2:179000, 3:239000, 4:200000, 5:150000};
 
 /* =========================================================================
    真实台面物料分布（数据源：《纳米中心化学合成工作站最新台面布局》
-                        +《9320台面布局-金四面体合成(1)》）
-   两台液体设备各 16 个物理板位（PPT 上 4 列 × 4 行，"板子位置就那么多"），
-   按三条工艺（金球 / 金四面体 / MOF）分别布置。取 / 换 / 补 / 滴注全部
-   只能在这 16 个位里推理 —— 槽位、载具、物料、温控均取自 PPT 实测，不再虚构。
-   group: trough 储液槽 / deepWell 96孔深孔板·玻璃管孔板 / tip 枪头位 / transfer 中转位
-          spare 备用·空位 / waste 废液槽 / trash 垃圾桶 / reader 酶标板 / sonic 超声混匀
-   ⚠ 9320 的 3/4 号位：新版《9320台面布局》标注"夹爪行程不覆盖，停用"（旧版总布局
-      曾列作"吸头放置位"），此处以新版物理约束为准 → enabled:false。
+                        +《9320台面布局》）
+   两台液体设备各 16 个物理板位（PPT 上 4 列 × 4 行）。
+   PRCXI 9320 统一台面：T11/T12/T15 枪头；T10/T14 储液槽；T9/T13 空·不覆盖；
+   T3 震荡加样模块；T4 酶标板。离心管台面仍保留三工艺 layouts（无工艺切换行）。
+   group: trough 储液槽 / deepWell 96孔深孔板 / tip 枪头位 / transfer 中转位
+          spare 备用·空位 / waste 废液槽 / trash 垃圾桶 / reader 酶标板
+          sonic 超声混匀 / shake 震荡加样
    ========================================================================= */
-const DECK_PROCESSES = [
-  {key:'aus',   label:'金球合成'},
-  {key:'autet', label:'金四面体合成'},
-  {key:'mof',   label:'MOF 合成'}
-];
-let DECK_PROCESS = 'autet';            // 当前工艺（台面视图 + 工作流导出共用）
+const DECK_PROCESSES = [];              // 不再展示金球/金四面体/MOF 工艺行
+let DECK_PROCESS = 'autet';            // 离心管台面默认布局 key
 
 const DECKS = {
   /* ── 离心管液体处理设备台面布局（PPT 第 3 / 5 / 8 页）── */
@@ -2075,65 +2070,30 @@ const DECKS = {
       ]
     }
   },
-  /* ── 9320 设备台面布局（PPT2《9320台面布局》第 1 页 ×2 + PPT1 第 4 / 6 / 9 页）── */
+  /* ── 9320 设备台面布局（统一一张；aus/autet/mof key 兼容旧调用）── */
   prcxi:{
     label:'9320 液体处理设备', deviceKey:'liquid',
-    layouts:{
-      aus:[
+    layouts:(()=>{
+      const L=[
         {pos:1,  name:'垃圾桶',                 group:'trash'},
-        {pos:2,  name:'废液槽',                 group:'waste'},
-        {pos:3,  name:'夹爪行程不覆盖·停用',     group:null, enabled:false},
-        {pos:4,  name:'夹爪行程不覆盖·停用',     group:null, enabled:false},
-        {pos:5,  name:'整板储液槽（制冷4℃）',    group:'trough',   content:'NaBH4溶液',   temp:'4℃'},
-        {pos:6,  name:'整板储液槽（制冷4℃）',    group:'trough',   content:'0.5mM 氯金酸', temp:'4℃'},
-        {pos:7,  name:'96孔深孔板（金属浴28℃）', group:'deepWell', content:'20mM CTAC',   temp:'28℃'},
-        {pos:8,  name:'整板储液槽（金属浴28℃）', group:'trough',   content:'200mM CTAC',  temp:'28℃'},
-        {pos:9,  name:'96孔深孔板（恒温振荡）',   group:'deepWell', content:'混合溶液A/种子溶液', temp:'恒温振荡'},
-        {pos:10, name:'枪头位',                 group:'tip', content:'1ml'},
-        {pos:11, name:'枪头位',                 group:'tip', content:'1ml'},
-        {pos:12, name:'枪头位',                 group:'tip', content:'1ml'},
-        {pos:13, name:'整板储液槽',             group:'trough',   content:'抗坏血酸溶液（100mM）'},
-        {pos:14, name:'96孔深孔板',             group:'deepWell', content:'金球溶液'},
-        {pos:15, name:'枪头位',                 group:'tip', content:'1ml'},
-        {pos:16, name:'中转位',                 group:'transfer', content:''}
-      ],
-      autet:[
-        {pos:1,  name:'垃圾桶',                 group:'trash'},
-        {pos:2,  name:'废液槽',                 group:'waste'},
-        {pos:3,  name:'夹爪行程不覆盖·停用',     group:null, enabled:false},
-        {pos:4,  name:'夹爪行程不覆盖·停用',     group:null, enabled:false},
-        {pos:5,  name:'整板储液槽（制冷4℃）',    group:'trough',   content:'金球溶液',     temp:'4℃'},
+        {pos:2,  name:'整板储液槽（制冷4℃）',    group:'trough',   content:'金球溶液',     temp:'4℃'},
+        {pos:3,  name:'震荡加样模块',           group:'shake'},
+        {pos:4,  name:'酶标板',                 group:'reader'},
+        {pos:5,  name:'废液槽',                 group:'waste'},
         {pos:6,  name:'整板储液槽（制冷4℃）',    group:'trough',   content:'2.5mM 氯金酸', temp:'4℃'},
         {pos:7,  name:'96孔深孔板（金属浴28℃）', group:'deepWell', content:'20mM CTAC',    temp:'28℃'},
         {pos:8,  name:'96孔深孔板（金属浴28℃）', group:'deepWell', content:'CTAC及CTAB混液', temp:'28℃'},
-        {pos:9,  name:'96孔深孔板（恒温振荡）',   group:'deepWell', content:'抗坏血酸溶液（梯度）', temp:'恒温振荡'},
-        {pos:10, name:'枪头位',                 group:'tip', content:'1ml'},
+        {pos:9,  name:'空位·不覆盖',             group:null, enabled:false},
+        {pos:10, name:'整板储液槽',             group:'trough'},
         {pos:11, name:'枪头位',                 group:'tip', content:'1ml'},
         {pos:12, name:'枪头位',                 group:'tip', content:'1ml'},
-        {pos:13, name:'酶标板',                 group:'reader', content:''},
-        {pos:14, name:'96孔深孔板',             group:'deepWell', content:'金四面体成品'},
+        {pos:13, name:'空位·不覆盖',             group:null, enabled:false},
+        {pos:14, name:'整板储液槽',             group:'trough'},
         {pos:15, name:'枪头位',                 group:'tip', content:'1ml'},
         {pos:16, name:'中转位（纯水用完须转移走）', group:'transfer', content:'纯水（整板储液槽）'}
-      ],
-      mof:[
-        {pos:1,  name:'垃圾桶',                 group:'trash'},
-        {pos:2,  name:'废液槽',                 group:'waste'},
-        {pos:3,  name:'夹爪行程不覆盖·停用',     group:null, enabled:false},
-        {pos:4,  name:'夹爪行程不覆盖·停用',     group:null, enabled:false},
-        {pos:5,  name:'整板储液槽（制冷4℃）',    group:'trough',   content:'', temp:'4℃'},
-        {pos:6,  name:'整板储液槽（制冷4℃）',    group:'trough',   content:'', temp:'4℃'},
-        {pos:7,  name:'96孔深孔板（金属浴28℃）', group:'deepWell', content:'', temp:'28℃'},
-        {pos:8,  name:'96孔深孔板（金属浴28℃）', group:'deepWell', content:'', temp:'28℃'},
-        {pos:9,  name:'空位（可放枪头盒）',       group:'spare',    content:''},
-        {pos:10, name:'96孔深孔板',             group:'deepWell', content:'溶液A'},
-        {pos:11, name:'整板储液槽',             group:'trough',   content:'DMF溶液'},
-        {pos:12, name:'96孔深孔板',             group:'deepWell', content:'成品'},
-        {pos:13, name:'96孔深孔板（恒温振荡）',   group:'deepWell', content:'', temp:'恒温振荡'},
-        {pos:14, name:'空位（可放枪头盒）',       group:'spare',    content:''},
-        {pos:15, name:'空位（可放枪头盒）',       group:'spare',    content:''},
-        {pos:16, name:'空位（兼中转位）',         group:'spare',    content:''}
-      ]
-    }
+      ];
+      return {aus:L, autet:L, mof:L, default:L};
+    })()
   }
 };
 
@@ -2173,9 +2133,9 @@ function processLabel(k){ const p=DECK_PROCESSES.find(x=>x.key===k); return p?p.
 
 // 兼容旧引用：默认工艺（金四面体）下的 9320 台面与可用槽位
 const DECK_9320       = getDeck('prcxi','autet');
-const DECK_TIP_POS    = DECK_9320.filter(s=>s.group==='tip'    && s.enabled!==false).map(s=>s.pos); // [10,11,12,15]
-const DECK_TROUGH_POS = DECK_9320.filter(s=>s.group==='trough' && s.enabled!==false).map(s=>s.pos); // [5,6]
-const DECK_DW_POS     = DECK_9320.filter(s=>s.group==='deepWell'&&s.enabled!==false).map(s=>s.pos); // [7,8,9,14]
+const DECK_TIP_POS    = DECK_9320.filter(s=>s.group==='tip'    && s.enabled!==false).map(s=>s.pos); // [11,12,15]
+const DECK_TROUGH_POS = DECK_9320.filter(s=>s.group==='trough' && s.enabled!==false).map(s=>s.pos); // [2,6,10,14]
+const DECK_DW_POS     = DECK_9320.filter(s=>s.group==='deepWell'&&s.enabled!==false).map(s=>s.pos); // [7,8]
 const DECK_TRANSFER   = (DECK_9320.find(s=>s.group==='transfer')||{pos:16}).pos;                     // 16
 
 // 真实堆栈枪头盒槽位（取自参考工作流 arm pick：stack number 74/75/76）
@@ -2216,9 +2176,9 @@ function nTitration(opts){
   }, opts.footer || ('9320-滴注×'+opts.repeat));
 }
 function nMovePlate(to,from){
-  // plate 资源取自真实参考工作流「从堆栈到9320三次放枪头」(PRCXI_96_DeepWell5, e74c153c…)，与滴定目标深孔板同属 9320 深孔板族
+  // 仅 from/to 板位搬运，不带枪头盒
   return mkUniNode('move_plate', UNILAB_TPL.move, {
-    to:to, from:from, force:5, plate:[RES_DEEPWELL_BOX], hierarchy:1,
+    to:to, from:from, force:5, plate:[], hierarchy:1,
     get_direction:'', pickup_offset:{x:0,y:0,z:0}, put_direction:'', drop_direction:'',
     resource_offset:{x:0,y:0,z:0}, pickup_direction:'', put_down_position:2,
     destination_offset:{x:0,y:0,z:0}, pinch_it_up_position:2, intermediate_locations:[],
@@ -2255,7 +2215,7 @@ function emitPlaceTips(state, count){
   const out=[];
   for(let i=0;i<count;i++){
     const tipSlot = state.stackTips.shift(); if(tipSlot==null) break;   // 真实堆栈槽 74/75/76
-    const tipPos  = state.prcxi.tipPos.shift();   if(tipPos==null)  break; // 真实 9320 枪头位 10/11/12/15
+    const tipPos  = state.prcxi.tipPos.shift();   if(tipPos==null)  break; // 真实 9320 枪头位 11/12/15
     out.push(nPickStack(tipSlot)); out.push(nPlace9320(1));
     // 参考文件实测：move_plate {to:枪头位, from:16中转位}（从堆栈到9320三次放枪头）
     out.push(nCreate()); out.push(nMovePlate(tipPos, state.prcxi.transferPos)); out.push(nRun());
@@ -2357,7 +2317,7 @@ function recipeToIntent(cond, recipe, proc){
   intent.injections.total = Math.max(27, Math.min(243, Math.round(G/60)));
   intent.injections.vol = 4.8;
   intent.targetPos = intent.targetSlot ? intent.targetSlot.pos
-                     : (DECK_9320.find(s=>s.content==='金四面体成品')||{pos:14}).pos;
+                     : (deckSlots(DECK_9320,'deepWell').slice(-1)[0]||{pos:8}).pos;
   return intent;
 }
 /* —— AI 理论最优方案 → 设备操作参数映射（任务③纠正后的正确数据源）——
@@ -3410,7 +3370,7 @@ function renderReadings(d){
    并同步决定「导出 CWM-Lab 工作流」时的槽位推理。 */
 const DECK_OF_DEVICE = {liquid:'prcxi', tube:'tube'};
 const DECK_GROUP_LABEL = {trough:'储液槽', deepWell:'深孔板', tip:'枪头位', transfer:'中转位',
-  spare:'备用/空位', waste:'废液槽', trash:'垃圾桶', reader:'酶标板', sonic:'超声混匀'};
+  spare:'备用/空位', waste:'废液槽', trash:'垃圾桶', reader:'酶标板', sonic:'超声混匀', shake:'震荡加样'};
 function deckSectionEl(){
   const old=document.getElementById('dm-deck-sec'); if(old) return old;
   const card=document.querySelector('#dev-modal .dm-card'); if(!card) return null;
@@ -3443,14 +3403,14 @@ function renderDeckPanel(d){
     const txt=s.content || s.name || '—';
     el.innerHTML='<b>'+s.pos+'</b><span>'+txt+'</span>'+(s.temp?'<i>'+s.temp+'</i>':'');
     el.title=s.pos+'号 · '+(DECK_GROUP_LABEL[s.group]||'其他')+' · '+s.name+(s.content?(' · '+s.content):'')+(s.temp?(' · '+s.temp):'')
-      +((s.enabled===false)?' · 停用（9320 夹爪行程不覆盖）':'');
+      +((s.enabled===false)?' · 停用（空位·不覆盖）':'');
     box.appendChild(el);
   });
   const tip=deckSlots(deck,'tip').map(s=>s.pos), tr=deckSlots(deck,'trough').map(s=>s.pos),
         dw=deckSlots(deck,'deepWell').map(s=>s.pos);
   let note='枪头位 '+(tip.length?tip.join('/'):'未布置（需从堆栈放到空位）')
     +' · 储液槽 '+tr.join('/')+' · 深孔板 '+dw.join('/');
-  if(DECK_PROCESS==='mof') note+=' ｜ 溶剂 '+MOF_INFO.solvents.length+' 种：'+MOF_INFO.solvents.join('/')+'；'+MOF_INFO.powders+'；'+MOF_INFO.bottle;
+  if(dk==='tube' && DECK_PROCESS==='mof') note+=' ｜ 溶剂 '+MOF_INFO.solvents.length+' 种：'+MOF_INFO.solvents.join('/')+'；'+MOF_INFO.powders+'；'+MOF_INFO.bottle;
   else { const st=[]; for(const k in REAGENT_STORAGE) st.push(k+' '+REAGENT_STORAGE[k].temp); note+=' ｜ 存储：'+st.join('、'); }
   document.getElementById('dm-deck-note').textContent=note;
 }

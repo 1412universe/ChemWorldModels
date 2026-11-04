@@ -330,13 +330,36 @@ class GNStationClient:
             done_node = self._complete_node()
         desc = description or (f"CmdType={cmd_type}" if cmd_type is not None else "动作")
 
-        _ = (reach_checks, clear_done)
         if interlock is not None:
             interlock()
         if setpoints:
             for node, val in setpoints.items():
                 if val is not None:
                     self.plc.write(node, val)
+
+        # 触发前尽量让完成位置 0，避免「残留 1 立刻判成功」或「PLC 不重拉沿」。
+        # clear_done=False（堆栈等）时不写完成位（点位可能只读），只尽量等回落。
+        if done_node:
+            try:
+                cur = self.plc.get_node_value(done_node, force_read=True)
+            except Exception:
+                cur = None
+            if cur:
+                if clear_done:
+                    try:
+                        self.plc.write(done_node, 0)
+                    except Exception:
+                        logger.warning(f"{desc}：预清 {done_node} 失败，继续下发")
+                else:
+                    # 堆栈复位：不写 CompleteFB，最多等 2s 看 PLC 是否自行回落
+                    t0_idle = time.time()
+                    while time.time() - t0_idle < 2.0:
+                        try:
+                            if int(self.plc.get_node_value(done_node, force_read=True) or 0) == 0:
+                                break
+                        except Exception:
+                            break
+                        time.sleep(0.05)
 
         ok_type = True
         if cmd_type is not None:
@@ -347,9 +370,11 @@ class GNStationClient:
 
         completed = False
         try:
-            completed = self._wait_done(done_node, None, timeout, desc)
+            # 必须把 reach_checks 传下去（旋转到列靠 Stack_RPosFB）；
+            # 以前写成 None，等于只等 CompleteFB，到位判据被丢掉。
+            completed = self._wait_done(done_node, reach_checks, timeout, desc)
             if not completed:
-                raise ValueError(f"{desc} 未完成，完成反馈未变为 1")
+                raise ValueError(f"{desc} 未完成，完成反馈未变为 1（或到位条件未满足）")
         finally:
             self.plc.write(trig_node, 0)
             if cmd_type is not None:
@@ -365,10 +390,13 @@ class GNStationClient:
         timeout: float,
         description: str,
     ) -> bool:
-        """发指令后等到位：对 done_node 与 reach_checks 反馈节点建临时订阅（仅在
-        全局订阅未开时），靠订阅推送值判断。"""
+        """发指令后等到位。
+
+        重要：完成位必须 **force_read**。全局订阅缓存里若 CompleteFB 初值是 0，
+        且该点订阅未刷新，use_cache=True 会永远读到 0 → 堆栈复位「收不到反馈」死等。
+        """
         watch = ([done_node] if done_node else []) + [c[0] for c in (reach_checks or [])]
-        sub = self.plc.subscribe_once(watch) if (watch and not self.plc._use_subscription) else None
+        sub = self.plc.subscribe_once(watch) if (watch and not getattr(self.plc, "_use_subscription", True)) else None
         logger.info(f"[{description}] 已下发，等待到位（{watch}）...")
 
         start = time.time()
@@ -377,7 +405,13 @@ class GNStationClient:
         reached = False
         last_log = 0.0
         while time.time() - start < timeout:
-            values = {n: self.plc.get_node_value(n, use_cache=True) for n in watch}
+            values = {}
+            for n in watch:
+                try:
+                    values[n] = self.plc.get_node_value(n, force_read=True)
+                except Exception as ex:
+                    values[n] = None
+                    logger.warning(f"[{description}] 读 {n} 失败: {ex}")
             ok = True
             if done_node:
                 raw = values.get(done_node)
@@ -411,7 +445,8 @@ class GNStationClient:
                 except Exception:
                     pass
             for name in watch:
-                self.plc._node_values.pop(self.plc._name_mapping.get(name, name), None)
+                mapping = getattr(self.plc, "_name_mapping", {}) or {}
+                getattr(self.plc, "_node_values", {}).pop(mapping.get(name, name), None)
         return reached
 
     # ==================================================================

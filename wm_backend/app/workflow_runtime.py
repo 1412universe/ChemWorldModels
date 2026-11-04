@@ -170,8 +170,27 @@ def estimate_duration(node: Dict[str, Any]) -> float:
     minutes = _num(p, "minutes", "minutes_1", "time_minutes", "stir_time_minutes")
     if minutes:
         return max(1.0, minutes * 60.0)
+
+    name = str(node.get("name") or node.get("template_name") or "")
+    # PRCXI 会话：create/中间动作只记账；真正耗时在 run_protocol
+    if dev == "PRCXI":
+        if "create_protocol" in name:
+            return 0.5
+        if "run_protocol" in name:
+            # 整份协议在此执行；无缓冲信息时给保守上限（节点 timeout 优先）
+            opc_run = _num(p, "timeout")
+            return max(120.0, opc_run) if opc_run else 300.0
+        if "shaking" in name or "震荡" in lbl or "孵育" in lbl:
+            # 中间动作：只追加步骤，几乎不占墙钟
+            return 0.5
+        if "titration" in name or "滴注" in lbl:
+            return 0.5
+        if "move_plate" in name or "搬运" in lbl or "transfer" in name or "移液" in lbl:
+            return 0.5
+        return 3.0  # 其余 PRCXI（含 reset）；勿落入下方 temperature→240s 启发式
+
     for k in ("temperature", "temperature_1"):
-        # 升温到达设定值：粗略按温差给 4 分钟
+        # 升温到达设定值：粗略按温差给 4 分钟（非 PRCXI）
         if p.get(k) is not None:
             return 240.0
 
@@ -188,12 +207,17 @@ def estimate_duration(node: Dict[str, Any]) -> float:
     def has(words):
         return any(w in lbl for w in words)
 
+    # OPC 握手动作常带 param.timeout（堆栈/离心复位默认 120s）。
+    # 以前「复位」一律估 1.5s，UI 显示「预计 1.50s」后长时间无 node-done，
+    # 看起来像「复位后收不到反馈」。有 timeout 时用它做上限估计。
+    opc_to = _num(p, "timeout")
+
     if dev == "PRCXI" or has(kw_proto):
         return 3.0
     if has(kw_lock):
         return 8.0
     if has(kw_fast):
-        return 1.5
+        return max(1.5, min(opc_to, 180.0)) if opc_to else 1.5
     if has(kw_grab):
         return 3.5
     if has(kw_dose):
@@ -201,9 +225,9 @@ def estimate_duration(node: Dict[str, Any]) -> float:
     if has(kw_liq):
         return 5.0
     if has(kw_move):
-        return 2.5
+        return max(2.5, min(opc_to, 180.0)) if opc_to else 2.5
     if ct is not None:
-        return 2.5
+        return max(2.5, min(opc_to, 180.0)) if opc_to else 2.5
     return 3.0
 
 
