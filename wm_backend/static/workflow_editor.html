@@ -6,7 +6,7 @@
 <title>工作流编辑器 — CWM-Lab 工作流编排</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236366f1'/%3E%3Cpath d='M9 16h5m4 0h5M14 10v12' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='9' cy='16' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='16' r='3' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/app.css?v=20261103p">
-<link rel="stylesheet" href="assets/wfed.css?v=20261103p">
+<link rel="stylesheet" href="assets/wfed.css?v=20261123c">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
@@ -70,7 +70,8 @@
       <span class="vsep"></span>
       <button id="btn-validate" title="校验：环 / 孤立节点 / 同设备并行冲突 / 工艺规则">✅ 校验</button>
       <button id="btn-autolayout" title="按依赖分层自动布局（并行分支并列）">🧭 自动布局</button>
-      <button id="btn-fit" title="缩放至适应画布">⤢ 适应</button>
+      <button id="btn-fold" title="把同设备的连续节点折叠成一张卡片">🗂 折叠同设备</button>
+      <button id="btn-unfold" title="展开所有折叠组">📂 全部展开</button>
       <span class="vsep"></span>
       <button id="btn-dryrun" class="run" title="按 CWM-Lab 调度语义试运行（不接硬件）">▶ 试运行</button>
       <button id="btn-twin" type="button" title="随时打开 / 显示 510 仿真空间（关闭后可再从这里打开）">🗺 仿真空间</button>
@@ -123,6 +124,15 @@
       </defs></svg>
       <div id="wfed-canvas"></div>
       <div id="wfed-marquee"></div>
+      <div id="wfed-batchbar" class="wfed-batchbar">
+        <span>已选 <span class="bb-n" id="bb-n">0</span> 个</span>
+        <button type="button" id="bb-disable">禁用</button>
+        <button type="button" id="bb-enable">启用</button>
+        <button type="button" id="bb-fold">折叠同设备</button>
+        <button type="button" id="bb-unfold">展开全部</button>
+        <button type="button" class="danger" id="bb-del">删除</button>
+        <button type="button" id="bb-clear">取消选择</button>
+      </div>
       <div id="wfed-empty">将左侧节点拖入画布，编排 CWM-Lab 可执行工作流<br/>
         节点间从 <b>右端口 → 左端口</b> 拖线建立依赖；<b>依赖不同的节点会并行执行</b>（同一设备自动串行）</div>
 
@@ -204,8 +214,15 @@
 window.PAGE_CONFIG={"page":"wfed","theme":"gn"};
 window.WFED_MODE = (new URLSearchParams(location.search)).get('mode') || 'real';
 </script>
+<script>
+// 临时诊断：把初始化期间的异常挂到 window 上，便于定位
+window.__bootErrs = [];
+window.addEventListener('error', function (e) {
+  window.__bootErrs.push((e.message || '') + ' @ ' + (e.filename || '').split('/').pop() + ':' + (e.lineno || ''));
+});
+</script>
 <script src="assets/gn_node_library.js?v=20261029f"></script>
-<script src="assets/app_workflow.js?v=20261103o"></script>
+<script src="assets/app_workflow.js?v=20261123c"></script>
 <script src="assets/runmode.js?v=20261016a"></script>
 <script src="assets/world3d.js?v=20261102c"></script>
 <script src="assets/wf_twin_float.js?v=20261103a"></script>

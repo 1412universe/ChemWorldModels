@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>甲烷偶联光催化 · AI 世界模型 — 总览-光催化闭环设计</title>
 <link rel="stylesheet" href="assets/app.css?v=20261103p">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+<script src="assets/vendor/chart.umd.min.js"></script>
+<script src="assets/vendor/three.min.js"></script>
+<script src="assets/vendor/OrbitControls.js"></script>
+<script src="assets/vendor/CSS2DRenderer.js"></script>
 </head>
 <body class="page-index">
 
@@ -45,8 +45,15 @@
   </main>
 
   <aside id="right">
+    <div class="scene-tabs" id="scene-tabs">
+      <button class="scene-tab active" data-scene="ocm">甲烷偶联 OCM</button>
+      <button class="scene-tab" data-scene="hcho">ZnO 制 HCHO</button>
+    </div>
     <h2><span class="dot"></span> AI Agent 实时推演</h2>
     <div id="chat" class="scrollbar"></div>
+
+    <!-- OCM 场景面板（原有内容） -->
+    <div id="panel-ocm">
     <div id="cand-card">
       <div class="name" id="cand-name">等待启动…</div>
       <table>
@@ -62,6 +69,25 @@
         <div class="sp"><div class="sp-l">PL 发射峰</div><div class="sp-v" id="sp-pl">—</div></div>
         <div class="sp"><div class="sp-l">EPR g 值</div><div class="sp-v" id="sp-epr">—</div></div>
         <div class="sp"><div class="sp-l">XRD 物相</div><div class="sp-v" id="sp-xrd">—</div></div>
+      </div>
+    </div>
+    </div>
+
+    <!-- HCHO 场景面板（ZnO 光热制甲醛 · 纯 BO 首轮补点） -->
+    <div id="panel-hcho" style="display:none">
+      <div id="hcho-card">
+        <div class="name" id="hcho-name">ZnO 掺 FeCl₃ · 光热催化 CH₄ 制 HCHO</div>
+        <div class="hcho-meta" id="hcho-meta">加载探索空间…</div>
+        <div class="hcho-fixed" id="hcho-fixed"></div>
+        <div class="hcho-sec">
+          <button class="hcho-open-btn" id="hcho-open-btn" type="button">📋 首轮空间填充设计（<span id="hcho-n">–</span> 条）</button>
+          <div class="hcho-sec-note">首轮空间填充设计 · 非采集结果</div>
+        </div>
+        <div class="hcho-sec">
+          <div class="hcho-sec-title">待回填产物口径</div>
+          <div class="hcho-outputs" id="hcho-outputs"></div>
+        </div>
+        <div class="hcho-note" id="hcho-note">模型层留空，纯 BO 先铺探索空间；预测模型待实测数据回流后接入。</div>
       </div>
     </div>
   </aside>
@@ -83,6 +109,25 @@
       <button onclick="document.getElementById('bo-modal').style.display='none'" style="background:#f5f5f5;border:none;width:30px;height:30px;border-radius:50%;color:#666;font-size:15px;cursor:pointer;line-height:1">✕</button>
     </div>
     <div id="bo-modal-body" style="font-size:14px;color:#333;line-height:1.6"></div>
+  </div>
+</div>
+
+<!-- HCHO 首轮空间填充设计弹窗（独立 fixed，与 bo-modal 同款遮罩） -->
+<div id="hcho-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.65);z-index:99999;align-items:center;justify-content:center">
+  <div style="background:#ffffff;border:1px solid #ddd;border-radius:12px;width:1320px;max-width:96%;max-height:88vh;overflow:auto;padding:24px;box-shadow:0 12px 48px rgba(0,0,0,0.3)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:12px;border-bottom:2px solid #f0f0f0">
+      <div>
+        <div id="hcho-modal-title" style="font-size:17px;font-weight:700;color:#1a1a1a">首轮空间填充设计 · 非采集结果</div>
+        <div style="font-size:12px;color:#64748b;margin-top:4px">模型层留空，纯 BO 先铺探索空间；待实测数据回流后，再由采集函数（UCB / EI / PI / TS）迭代选点。</div>
+      </div>
+      <button onclick="document.getElementById('hcho-modal').style.display='none'" style="background:#f5f5f5;border:none;width:30px;height:30px;border-radius:50%;color:#666;font-size:15px;cursor:pointer;line-height:1">✕</button>
+    </div>
+    <div class="hcho-table-wrap scrollbar">
+      <table id="hcho-table">
+        <thead><tr id="hcho-thead"></tr></thead>
+        <tbody id="hcho-tbody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 

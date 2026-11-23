@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import math
 import re
+import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -41,6 +42,11 @@ INLET_O2_TARGET = 1.0                  # 推荐锚定进料氧 1%
 
 _DATA = Path(__file__).resolve().parents[2] / "data"
 MASTER = str(_DATA / "OCM_master.xlsx")
+
+_WM = Path(__file__).resolve().parents[2] / "wm_model"
+if str(_WM) not in sys.path:
+    sys.path.insert(0, str(_WM))
+import lamp_calib as CAL  # noqa: E402
 
 
 def _clamp(x: float, lo: float, hi: float) -> float:
@@ -95,12 +101,12 @@ def _spread_masses(n: int = N_TOTAL) -> List[int]:
 
 
 def _attach_power(points: List[Dict[str, Any]]) -> float:
-    """历史光强 mW/cm² → 相对光功率% = lpd / Pd-P25 最大光强 × 100。"""
+    """历史 LPD → 相对光功率%（满量程 = 数据最大 LPD，且不低于灯标定 257.3）。"""
     lpds = [p["lpd"] for p in points if p.get("lpd") is not None and p["lpd"] > 0]
-    ref = float(max(lpds)) if lpds else 1.0
+    ref = max(float(max(lpds)) if lpds else 0.0, float(CAL.LPD_MAX))
     for p in points:
         if p.get("lpd") is not None and ref > 0:
-            p["power"] = _clip_power(100.0 * float(p["lpd"]) / ref)
+            p["power"] = _clip_power(CAL.rel_from_lpd_ref(p["lpd"], ref))
         else:
             p["power"] = None
     return ref
@@ -152,14 +158,27 @@ def _sel_weight(mu_sel: float) -> float:
 
 
 def _score(mu_y: float, mu_sel: float, sel_min: float = SEL_MIN) -> Optional[float]:
-    """综合分 score = μ_y × (μ_sel / 100)。硬门槛不通过返回 None。"""
+    """旧口径：score = μ_y × (μ_sel/100)。保留给兼容/对照用。"""
     if mu_sel < sel_min:
         return None
     return float(mu_y) * _sel_weight(mu_sel)
 
 
+def _score_aqy(mu_aqy: Optional[float], mu_sel: float, sel_min: float = SEL_MIN) -> Optional[float]:
+    """新口径：score = AQY × (μ_sel/100)。
+
+    AQY 已把光子数除掉，跨装置可比，因此在同产率下会更偏向低负载、高光利用率的点。
+    AQY 缺失时回退到 None（该点不参与排序）。
+    """
+    if mu_aqy is None or mu_aqy <= 0:
+        return None
+    if mu_sel < sel_min:
+        return None
+    return float(mu_aqy) * _sel_weight(mu_sel)
+
+
 def _rank_key_score(score: Optional[float], mu_y: float = 0.0):
-    """按 score 降序；同分时产率高者优先（便于冲 Y_TARGET）。"""
+    """按 score 降序；同分时产率高者优先。"""
     return (-(score if score is not None else -1.0), -float(mu_y))
 
 
@@ -237,6 +256,7 @@ def load_pd_p25_points(master_path: str = MASTER) -> List[Dict[str, Any]]:
         "o2": C("O2流量/(mL·min⁻¹)"),
         "ar": C("Ar流量/(mL·min⁻¹)"),
         "y": C("p_C2+时空产率"),
+        "aqy": C("AQY/%"),
         "sel": C("C2+选择性/%"),
         "sel_c2h4": C("C2H4选择性/%"),
         "sel_c2h6": C("C2H6选择性/%"),
@@ -250,6 +270,8 @@ def load_pd_p25_points(master_path: str = MASTER) -> List[Dict[str, Any]]:
         ix["m_cat"] = C("催化剂质量/mg")
     except KeyError:
         ix["m_cat"] = None
+    if ix.get("aqy") is None:
+        ix["aqy"] = None
     try:
         ix["c_co"] = C("CO浓度/ppm")
     except KeyError:
@@ -275,6 +297,7 @@ def load_pd_p25_points(master_path: str = MASTER) -> List[Dict[str, Any]]:
             return v
 
         y = take("y")
+        aqy = take("aqy")
         sel = take("sel")
         sel_c2h4, sel_c2h6 = take("sel_c2h4"), take("sel_c2h6")
         ch4, o2, ar = take("ch4"), take("o2"), take("ar")
@@ -314,6 +337,7 @@ def load_pd_p25_points(master_path: str = MASTER) -> List[Dict[str, Any]]:
             "lpd": lpd,
             "o2_in": o2_in,
             "y": float(y),
+            "aqy": float(aqy) if aqy is not None and aqy > 0 else None,
             "sel": float(sel),
             "sel_c2h4": float(sel_c2h4) if sel_c2h4 is not None else None,
             "sel_c2h6": float(sel_c2h6) if sel_c2h6 is not None else None,
@@ -333,6 +357,7 @@ def load_pd_p25_points(master_path: str = MASTER) -> List[Dict[str, Any]]:
 def _group_stats(pts: List[Dict[str, Any]], pooled_sigma: Optional[float] = None) -> Dict[str, Any]:
     ys = np.array([p["y"] for p in pts], dtype=float)
     ss = np.array([p["sel"] for p in pts], dtype=float)
+    aqys = np.array([p["aqy"] for p in pts if p.get("aqy") is not None], dtype=float)
     n = len(ys)
     mu = float(ys.mean())
     if n >= 2:
@@ -342,6 +367,7 @@ def _group_stats(pts: List[Dict[str, Any]], pooled_sigma: Optional[float] = None
         sigma = float(pooled_sigma) if pooled_sigma and pooled_sigma > 0 else max(mu * 0.25, 1.0)
     mu_sel = float(ss.mean())
     sig_sel = float(ss.std(ddof=1)) if n >= 2 else 8.0
+    mu_aqy = float(aqys.mean()) if len(aqys) else None
     # 小样本：用 n_eff≥3 压探索项，避免 n=1 压过 n=200
     n_eff = max(float(n), 3.0)
     se = sigma / math.sqrt(n_eff)
@@ -370,17 +396,24 @@ def _group_stats(pts: List[Dict[str, Any]], pooled_sigma: Optional[float] = None
     power_med = float(np.median(pw)) if pw else 50.0
     power_lo = float(min(pw)) if pw else 0.0
     power_hi = float(max(pw)) if pw else 100.0
-    # 利用点：可行域内按 score=μ_y×(μ_sel/100)，同分偏高产率
+    # 利用点：可行域内按 AQY×(sel/100) 排；AQY 缺失的点不参与
     best = max(
         cond_pts,
-        key=lambda p: (_score(p["y"], p["sel"]) or -1.0, p["y"]),
+        key=lambda p: (
+            _score_aqy(p.get("aqy"), p["sel"]) or -1.0,
+            p["y"],
+        ),
     )
     # 负载排序用锚点子集成绩，避免被域外/低 sel 点拉低
     mu_rank = float(np.mean([p["y"] for p in cond_pts]))
     mu_sel_rank = float(np.mean([p["sel"] for p in cond_pts]))
+    aqy_rank_vals = [p["aqy"] for p in cond_pts if p.get("aqy") is not None]
+    mu_aqy_rank = float(np.mean(aqy_rank_vals)) if aqy_rank_vals else None
     return {
         "n": n,
         "mu": mu,
+        "mu_aqy": mu_aqy,
+        "mu_aqy_rank": mu_aqy_rank,
         "sigma": sigma,
         "se": se,
         "ucb": ucb,
@@ -407,19 +440,21 @@ def _group_stats(pts: List[Dict[str, Any]], pooled_sigma: Optional[float] = None
 
 
 def select_three_loadings(by_load: Dict[float, Dict[str, Any]]) -> List[float]:
-    """选 3 个负载：硬门槛内按 score 排；优先样本够、log 负载拉开；偏好高产率档。"""
+    """选 3 个负载：按 AQY 排（光利用率优先），再拉开负载、保证样本量。"""
     MIN_N = 2
     scored = []
     for load, st in by_load.items():
-        sc = _score(st.get("mu_rank", st["mu"]), st.get("mu_sel_rank", st["mu_sel"]))
+        sc = _score_aqy(
+            st.get("mu_aqy_rank", st.get("mu_aqy")),
+            st.get("mu_sel_rank", st["mu_sel"]),
+        )
         scored.append((load, st, sc))
 
     def rank_key(t):
         L, st, sc = t
         n_pen = 1.0 if st["n"] >= MIN_N else 0.35
         my = st.get("mu_rank", st["mu"])
-        y_bonus = 1.15 if my >= Y_TARGET else 1.0
-        return (-((sc or -1) * n_pen * y_bonus), -my, -st["n"])
+        return (-((sc or -1) * n_pen), -my, -st["n"])
 
     ok = [t for t in scored if t[2] is not None]
     ok.sort(key=rank_key)
@@ -521,7 +556,7 @@ def _st_for_load(
 def _exploit_from_measured(st: Dict[str, Any], n: int = N_EXPLOIT) -> List[Dict[str, Any]]:
     """从高产负载的实测里取 n 条互异条件作利用锚定（按 score）。"""
     pts = list(st.get("cond_pts") or st["pts"])
-    pts = sorted(pts, key=lambda p: (_score(p["y"], p["sel"]) or -1.0, p["y"]), reverse=True)
+    pts = sorted(pts, key=lambda p: (_score_aqy(p.get("aqy"), p["sel"]) or -1.0, p["y"]), reverse=True)
     out = []
     seen = set()
     for i, p in enumerate(pts):
@@ -608,7 +643,7 @@ def _wide_explore_candidates(
         if st:
             own = sorted(
                 st.get("cond_pts") or st["pts"],
-                key=lambda p: (_score(p["y"], p["sel"]) or -1.0, p["y"]),
+                key=lambda p: (_score_aqy(p.get("aqy"), p["sel"]) or -1.0, p["y"]),
                 reverse=True,
             )[:4]
             for i, p in enumerate(own):
@@ -758,8 +793,9 @@ def _predict_at(st: Dict[str, Any], cond: Dict[str, Any]) -> Dict[str, float]:
     # 条件几乎贴合实测时：同条件多条取 score 最高，避免核平滑冲掉 >40000 的峰
     near = [p for p, d in zip(pts, dists) if d < 0.08]
     if near:
-        p_star = max(near, key=lambda p: (_score(p["y"], p["sel"]) or -1.0, p["y"]))
+        p_star = max(near, key=lambda p: (_score_aqy(p.get("aqy"), p["sel"]) or -1.0, p["y"]))
         mu_y = float(p_star["y"])
+        mu_aqy = p_star.get("aqy")
         mu_sel = float(p_star["sel"])
         mu_sel_c2h4 = p_star.get("sel_c2h4")
         mu_sel_c2h6 = p_star.get("sel_c2h6")
@@ -775,6 +811,8 @@ def _predict_at(st: Dict[str, Any], cond: Dict[str, Any]) -> Dict[str, float]:
             k = min(3, len(order))
             nn = [pts[i] for i in order[:k]]
             mu_y = float(np.mean([p["y"] for p in nn]))
+            _aq = [p["aqy"] for p in nn if p.get("aqy") is not None]
+            mu_aqy = float(np.mean(_aq)) if _aq else None
             mu_sel = float(np.mean([p["sel"] for p in nn]))
             mu_sel_c2h4 = float(np.mean([p["sel_c2h4"] for p in nn if p.get("sel_c2h4") is not None])) if any(p.get("sel_c2h4") is not None for p in nn) else None
             mu_sel_c2h6 = float(np.mean([p["sel_c2h6"] for p in nn if p.get("sel_c2h6") is not None])) if any(p.get("sel_c2h6") is not None for p in nn) else None
@@ -784,6 +822,9 @@ def _predict_at(st: Dict[str, Any], cond: Dict[str, Any]) -> Dict[str, float]:
         else:
             wsum = sum(weights) + 1e-12
             mu_y = sum(w * p["y"] for w, p in zip(weights, pts)) / wsum
+            _aw = [(w, p["aqy"]) for w, p in zip(weights, pts) if p.get("aqy") is not None]
+            _asum = sum(w for w, _ in _aw)
+            mu_aqy = (sum(w * a for w, a in _aw) / _asum) if _asum > 1e-12 else None
             mu_sel = sum(w * p["sel"] for w, p in zip(weights, pts)) / wsum
             mu_sel_c2h4 = _wavg(pts, weights, "sel_c2h4")
             mu_sel_c2h6 = _wavg(pts, weights, "sel_c2h6")
@@ -803,6 +844,7 @@ def _predict_at(st: Dict[str, Any], cond: Dict[str, Any]) -> Dict[str, float]:
             ucb = mu_y + KAPPA * sigma
     return {
         "mu_y": float(mu_y),
+        "mu_aqy": (float(mu_aqy) if mu_aqy is not None else None),
         "mu_sel": float(mu_sel),
         "mu_sel_c2h4": float(mu_sel_c2h4) if mu_sel_c2h4 is not None else None,
         "mu_sel_c2h6": float(mu_sel_c2h6) if mu_sel_c2h6 is not None else None,
@@ -839,7 +881,7 @@ def recommend_3x3(master_path: str = MASTER, sel_min: float = SEL_MIN) -> Dict[s
     load_rank = sorted(
         by_load.items(),
         key=lambda t: _rank_key_score(
-            _score(t[1].get("mu_rank", t[1]["mu"]), t[1].get("mu_sel_rank", t[1]["mu_sel"])),
+            _score_aqy(t[1].get("mu_aqy_rank", t[1].get("mu_aqy")), t[1].get("mu_sel_rank", t[1]["mu_sel"])),
             t[1].get("mu_rank", t[1]["mu"]),
         ),
     )
@@ -863,17 +905,19 @@ def recommend_3x3(master_path: str = MASTER, sel_min: float = SEL_MIN) -> Dict[s
         assert _in_dom(c), "DOM violated: %s" % c
         hard_ok = pred["mu_sel"] >= sel_min
         sw = _sel_weight(pred["mu_sel"]) if hard_ok else 0.0
-        lpd = round(float(c["power"]) / 100.0 * lpd_ref, 1) if lpd_ref else None
+        # 相对光功率 → LPD；超出灯上限的点说明不是本灯打的，按比例外推
+        lpd = round(float(CAL.lpd_from_pct_ref(c["power"], lpd_ref)), 1)
         y_note = "产率≥目标" if pred["mu_y"] >= Y_TARGET else f"产率<{Y_TARGET:g}"
         reason = (
             f"{c['kind']}；{acq_note}；负载 {load:g}%；"
             f"μ_y={pred['mu_y']:.0f}，μ_sel={pred['mu_sel']:.1f}%；"
             f"硬门槛{'过' if hard_ok else '未过'}(≥{sel_min:g}%)；"
-            f"score=μ_y×(μ_sel/100)={sc:.1f}；{y_note}；"
+            f"score=AQY×(μ_sel/100)={sc:.4f}；{y_note}；"
             f"UCB={pred['ucb']:.0f}；"
             f"可行域 CH4/1%O2/Ar∈[0,100]、质量{MASS_LO}-{MASS_HI}mg、光功率0-100%"
         )
         mu_y = round(pred["mu_y"], 1)
+        mu_aqy = pred.get("mu_aqy")
         mu_sel = round(pred["mu_sel"], 2)
         p4 = pred.get("mu_p_c2h4")
         p6 = pred.get("mu_p_c2h6")
@@ -891,10 +935,14 @@ def recommend_3x3(master_path: str = MASTER, sel_min: float = SEL_MIN) -> Dict[s
             "o2_in": INLET_O2_TARGET,
             "mass": mass,
             "power": int(round(c["power"])),
+            "power_w": CAL.power_w_if_in_range(lpd),
+            "over_lamp_range": CAL.power_w_if_in_range(lpd) is None,
             "lpd": lpd,
             "mu_y": mu_y,
+            "mu_aqy": round(mu_aqy, 4) if mu_aqy is not None else None,
             "mu_sel": mu_sel,
             "y": mu_y,
+            "aqy": round(mu_aqy, 4) if mu_aqy is not None else None,
             "sel": mu_sel,
             "ucb": round(pred["ucb"], 1),
             "score": round(sc, 2),
@@ -929,7 +977,7 @@ def recommend_3x3(master_path: str = MASTER, sel_min: float = SEL_MIN) -> Dict[s
         c = dict(c)
         c["loading"] = float(load_star)
         pred = _predict_at(use_st, c)
-        sc = _score(pred["mu_y"], pred["mu_sel"], sel_min)
+        sc = _score_aqy(pred.get("mu_aqy"), pred["mu_sel"], sel_min)
         if sc is None:
             continue
         exploit_scored.append((sc, c, pred))
@@ -956,7 +1004,7 @@ def recommend_3x3(master_path: str = MASTER, sel_min: float = SEL_MIN) -> Dict[s
         load_i = float(c.get("loading") or load_star)
         st_i = _st_for_load(load_i, by_load, global_st)
         pred = _predict_at(st_i, c)
-        sc = _score(pred["mu_y"], pred["mu_sel"], sel_min)
+        sc = _score_aqy(pred.get("mu_aqy"), pred["mu_sel"], sel_min)
         if sc is None:
             continue
         # 主表已有负载优先覆盖；全新插值负载略抬探索分
@@ -1064,7 +1112,7 @@ def recommend_3x3(master_path: str = MASTER, sel_min: float = SEL_MIN) -> Dict[s
         if p.get("o2_in") is not None and abs(float(p["o2_in"]) - INLET_O2_TARGET) <= 0.05
     ]
     pool = inlet_ok if inlet_ok else eligible
-    star = max(pool, key=lambda p: (_score(p["y"], p["sel"]) or -1.0, p["y"]))
+    star = max(pool, key=lambda p: (_score_aqy(p.get("aqy"), p["sel"]) or -1.0, p["y"]))
     proof = {
         "ystar": star["y"],
         "load": star["load"],

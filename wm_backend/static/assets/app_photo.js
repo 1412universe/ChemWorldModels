@@ -154,7 +154,7 @@ const OP_DUR={literature:600, glovebox:900, ai:300, robot:300, xrd:2400, balance
 let best={name:'—',y:-1,s:-1,rec:null};
 let emaY=null, mae=0, maeN=0, rmae=0, rmaeN=0, sampled={};
 let measured=[];                 // 已实测 {(doi,y,r)} —— 世界模型的"自有实验"训练集
-let DATA_MODE='real';            // 实验数据模式：'real'=始终用真实值；'hybrid'=前 N 次用模拟值、第 N+1 次起用真实值；'sim'=纯模拟
+let DATA_MODE='sim';             // 实验数据模式：'real'=始终用真实值；'hybrid'=前 N 次用模拟值、第 N+1 次起用真实值；'sim'=纯模拟（默认）
 let REAL_AFTER_ITER=5;           // hybrid 模式：前 N 次迭代用模拟值作为反馈，第 N+1 次起才开启真实实验闸门
 let supportReuse={};             // 各载体家族累计投料次数（驱动失活约束）
 let expChecks=[];                // 最近一次迭代级的"实验现实性"约束
@@ -2825,7 +2825,7 @@ document.getElementById('btn-play').addEventListener('click',()=>{
   if(running){log('ai',`● 工作室启动（时间倍率 ×${timeScale}）：AI 角色自主跑实验，模拟时钟按真实世界 ${timeScale} 倍加速…`);startIteration();}
   else log('warn','⏸ 已暂停');
 });
-document.getElementById('btn-step').addEventListener('click',()=>{ stepOnce(); });
+document.getElementById('btn-step')?.addEventListener('click',()=>{ stepOnce(); });
 
 // 纯 BO：扫离散网格，列出证明当前最优点还要做的实验
 let _boRunning = false;
@@ -2986,7 +2986,7 @@ document.querySelectorAll('.tsp').forEach(b=>b.addEventListener('click',()=>setT
   const raw=document.getElementById('real-after-wrap');
   function sync(){
     if(!dm) return;
-    DATA_MODE = dm.value || 'real';
+    DATA_MODE = dm.value || 'sim';
     if(ra){ const v=parseInt(ra.value,10); REAL_AFTER_ITER = (isFinite(v)&&v>=1)?v:5; }
     if(raw) raw.style.display = (DATA_MODE==='hybrid') ? 'inline-flex' : 'none';
     updateDataModeTag();
@@ -2995,8 +2995,8 @@ document.querySelectorAll('.tsp').forEach(b=>b.addEventListener('click',()=>setT
   if(ra){ ra.addEventListener('input', sync); ra.addEventListener('change', sync); }
   sync();
 })();
-document.getElementById('btn-neb').addEventListener('click',()=>{
-  nebOn=!nebOn;document.getElementById('btn-neb').classList.toggle('on',nebOn);
+document.getElementById('btn-neb')?.addEventListener('click',()=>{
+  nebOn=!nebOn;const b=document.getElementById('btn-neb');if(b)b.classList.toggle('on',nebOn);
   log('ok',nebOn?'⚛ NEB 路径动画开启（能垒为示意值）':'⚛ NEB 路径动画关闭');
 });
 
@@ -3938,8 +3938,8 @@ function renderRecipePanel(){
       + `合成调制因子 ≈ ${(r.recipeMod!=null?r.recipeMod.toFixed(2):'—')}<br>设备：${devs}</div></div>`;
   }).join('');
 }
-document.getElementById('btn-char').addEventListener('click', renderCharTheory);
-document.getElementById('btn-react').addEventListener('click', renderReactionsReliability);
+document.getElementById('btn-char')?.addEventListener('click', renderCharTheory);
+document.getElementById('btn-react')?.addEventListener('click', renderReactionsReliability);
 function setReaction(react){
   activeReaction = react;
   const rb=document.getElementById('btn-reaction');
@@ -3968,8 +3968,8 @@ function setReaction(react){
   log('ai', `○ 已切换至 <b>${react==='OER'?'OER 电催化（→ H₂O₂/O₂）':'甲烷光催化偶联'}</b> 反应轨道，循环状态已重置；点「▶ 运行」开始该反应的主动学习闭环。`);
   refreshBest();
 }
-document.getElementById('btn-reaction').addEventListener('click', ()=> setReaction(activeReaction==='OER'?'CH4':'OER'));
-document.getElementById('btn-oer-target').addEventListener('click', ()=>{
+document.getElementById('btn-reaction')?.addEventListener('click', ()=> setReaction(activeReaction==='OER'?'CH4':'OER'));
+document.getElementById('btn-oer-target')?.addEventListener('click', ()=>{
   oerTarget = (oerTarget==='H2O2')?'O2':'H2O2';
   const bt=document.getElementById('btn-oer-target'); if(bt) bt.textContent='🎯 OER 目标：'+(oerTarget==='H2O2'?'H₂O₂':'O₂');
   log('ai', `○ OER 目标产物切换为 <b>${oerTarget==='H2O2'?'H₂O₂（两电子）':'O₂（四电子）'}</b>；后续主动学习按此权衡活性×选择性×稳定性。`);
@@ -4815,13 +4815,9 @@ window.addEventListener('load', ()=>{ try{ drawBetaCurve(); drawRegretCurve(); }
   // ===================== 新手引导 =====================
   const STEPS = [
     {sel:'#btn-play', emoji:'🚀', title:'① 运行实验闭环',
-     text:'点「▶ 运行」启动自主实验：AI 先在虚拟合成与表征中反复推理收敛，再进入真实实验反馈并学习更新世界模型。也可「⏭ 单步」一步步看。'},
-    {sel:'#btn-stage-realdata', emoji:'📁', title:'② 录入真实实验数据',
-     text:'每到「真实实验反馈」阶段，点此按钮拖拽/选择你的 .csv/.xlsx/.tif 真实数据，替代模拟值，让世界模型用你的实测精炼。'},
-    {sel:'#ai-chat-head', emoji:'💬', title:'③ AI 对话操控',
-     text:'在这里用自然语言实时操控整套系统：说「开始运行」「单步」「切换到 OER」「上传真实数据」，AI 会直接执行并反馈。'},
-    {sel:'#btn-reaction', emoji:'⚗️', title:'④ 切换反应轨道',
-     text:'在「甲烷光催化偶联」与「OER 电催化（→H₂O₂/O₂）」之间切换，两条反应各有独立的主动学习闭环。'},
+     text:'点「▶ 运行」启动自主实验：AI 先在虚拟合成与表征中反复推理收敛，再进入真实实验反馈并学习更新世界模型。'},
+    {sel:'#ai-chat-head', emoji:'💬', title:'② AI 对话操控',
+     text:'在这里用自然语言实时操控整套系统：说「开始运行」，AI 会直接执行并反馈。'},
   ];
   let obIdx = 0;
   const mask   = document.getElementById('onboard-mask');
@@ -4955,3 +4951,113 @@ window.__CWM_SCENE = {
     try{ log('ai', msg); }catch(_){}
   }
 };
+
+/* =========================================================
+   HCHO 场景面板（ZnO 光热制甲醛 · 纯 BO 首轮补点）
+   - 与 OCM 面板通过顶部标签切换；HCHO 模型层留空，只展示空间定义与 15 条补点。
+   - 数据来自后端 /api/hcho/space、/api/hcho/design；后端不可达时降级提示。
+   ========================================================= */
+(function initHchoPanel(){
+  const tabs = document.querySelectorAll('.scene-tab');
+  const panelOcm = document.getElementById('panel-ocm');
+  const panelHcho = document.getElementById('panel-hcho');
+  if(!tabs.length || !panelHcho) return;
+
+  let hchoLoaded = false;
+
+  // 表格列：key → 表头（短名）
+  const COLUMNS = [
+    ['rank',    '#'],
+    ['m_sub',   '前驱体 mg'],
+    ['omega',   '掺量 wt%'],
+    ['r_hf',    '升温 ℃/min'],
+    ['T_calc',  '焙烧 ℃'],
+    ['t_calc',  '焙烧 min'],
+    ['m_cat',   '装样 mg'],
+    ['Q_dry',   '干CH₄'],
+    ['Q_wet',   '湿CH₄'],
+    ['Q_air',   '空气'],
+    ['Q_ar',    'Ar'],
+    ['T1',      '水浴 ℃'],
+    ['power',   '功率 W'],
+    ['T3',      '外热 ℃'],
+    ['T2',      '进料 ℃'],
+    ['A_cat',   '面积 cm²'],
+    ['why',     '探索理由'],
+  ];
+
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  function renderFixed(fixed){
+    const box = document.getElementById('hcho-fixed');
+    if(!box || !fixed) return;
+    const chips = [
+      `光源 ${esc(fixed.light_source)}`,
+      `波长 ${fixed.wavelength} ${fixed.wavelength_unit}`,
+      `助剂 ${esc(fixed.cocat)}`,
+    ];
+    box.innerHTML = chips.map(c=>`<span class="h-chip">${c}</span>`).join('');
+  }
+
+  function renderOutputs(outputs){
+    const box = document.getElementById('hcho-outputs');
+    if(!box) return;
+    box.innerHTML = (outputs||[]).map(o=>
+      `<div class="h-out">${esc(o.label)}<b>${esc(o.unit)}</b></div>`).join('');
+  }
+
+  function renderTable(points){
+    const thead = document.getElementById('hcho-thead');
+    const tbody = document.getElementById('hcho-tbody');
+    if(!thead || !tbody) return;
+    thead.innerHTML = COLUMNS.map(([,label])=>`<th>${esc(label)}</th>`).join('');
+    tbody.innerHTML = (points||[]).map(p=>{
+      const tds = COLUMNS.map(([key,])=>{
+        const v = p[key];
+        const cls = key==='why' ? ' class="why"' : '';
+        return `<td${cls}>${v==null?'—':esc(v)}</td>`;
+      }).join('');
+      return `<tr>${tds}</tr>`;
+    }).join('');
+    const n = document.getElementById('hcho-n');
+    if(n) n.textContent = String((points||[]).length);
+  }
+
+  async function loadHcho(){
+    if(hchoLoaded) return;
+    const meta = document.getElementById('hcho-meta');
+    try{
+      const base = (typeof backendBase!=='undefined' && backendBase) ? backendBase : '';
+      const [spRes, dRes] = await Promise.all([
+        fetch(base + '/api/hcho/space').then(r=>r.json()),
+        fetch(base + '/api/hcho/design').then(r=>r.json()),
+      ]);
+      renderFixed(spRes.fixed);
+      renderOutputs(spRes.outputs);
+      renderTable(dRes.points);
+      if(meta) meta.textContent = `${spRes.name||'HCHO 场景'} · ${(spRes.space||[]).length} 个自变量 · 纯 BO 探索`;
+      hchoLoaded = true;
+    }catch(e){
+      if(meta) meta.textContent = '后端未连接，探索空间与补点表暂不可用（启动后端后自动加载）。';
+      renderTable([]);
+    }
+  }
+
+  function switchScene(scene){
+    tabs.forEach(t=>t.classList.toggle('active', t.dataset.scene===scene));
+    if(panelOcm) panelOcm.style.display = scene==='ocm' ? '' : 'none';
+    panelHcho.style.display = scene==='hcho' ? '' : 'none';
+    if(scene==='hcho') loadHcho();
+    try{ window.dispatchEvent(new Event('resize')); }catch(_){}
+  }
+
+  tabs.forEach(t=>t.addEventListener('click', ()=>switchScene(t.dataset.scene)));
+
+  // 首轮空间填充设计：默认折叠，点按钮在独立弹窗中打开（非采集结果）
+  const openBtn = document.getElementById('hcho-open-btn');
+  const modal = document.getElementById('hcho-modal');
+  function openModal(){ if(!hchoLoaded) loadHcho(); if(modal) modal.style.display='flex'; }
+  function closeModal(){ if(modal) modal.style.display='none'; }
+  if(openBtn) openBtn.addEventListener('click', openModal);
+  if(modal) modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+})();

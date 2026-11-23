@@ -266,9 +266,14 @@
     undo: [], redo: [],
     dirty: false,
     runState: {},          // uuid -> {state, lockedBy}
-    edgeSvgMap: []
+    edgeSvgMap: [],
+    folds: {},             // groupId -> {id,name,device,collapsed,uuids[],x,y}
+    foldSeq: 0,            // 新建折叠组的自增序号（避免 id 冲突）
+    spacePan: false,       // 按住空格 → 空白处拖拽改为平移画布
+    shiftArmed: false      // Shift 长按已进入「批量删除」态
   };
   var GRID = 10;
+  var refreshBatchBar = function () { };
 
   // ---------- 节点/动作解析 ----------
   function devOf(id) {
@@ -298,7 +303,9 @@
     var d = devOf(n.device_name);
     var a = actionOfNode(n);
     if (n.type === 'Group') {
-      return { dev: '流程分组', label: '分组 / 注释', color: '#94a3b8', icon: '📁', kind: 'group', cmd: null, proto: '' };
+      // 「分组/注释」节点已取消。万一旧文件里还有，给个安全占位，别让渲染崩掉。
+      return { dev: '分组', label: (n.name || '分组'), color: '#94a3b8', icon: '📁',
+               kind: 'group', cmd: null, proto: '' };
     }
     if (!n.device_name) {
       return { dev: '自定义命令', label: n.name || '命令', color: '#64748b', icon: '🖥️', kind: 'script', cmd: null, proto: '' };
@@ -316,7 +323,13 @@
     };
   }
   function refreshDisplay(n) {
+    if (!n || typeof n !== 'object') return { dev: '—', devLabel: '—', label: '—',
+      actionLabel: '—', color: '#94a3b8', icon: '❓', kind: 'script', cmd: null, proto: '' };
     var info = infoOf(n);
+    if (!info) {
+      info = { dev: '—', label: (n.name || '—'), color: '#94a3b8', icon: '❓',
+               kind: 'script', cmd: null, proto: '' };
+    }
     // 同时提供 dev/label 与 devLabel/actionLabel 两套键名：
     // 卡片渲染读 dev/label，属性面板与其它模块读 devLabel/actionLabel。
     // 之前只写了后者，导致节点标题渲染成 "undefined · gn_rotary_stack"。
@@ -397,6 +410,41 @@
   function undo() { if (!state.undo.length) return; state.redo.push(snapshot()); applySnap(state.undo.pop()); }
   function redo() { if (!state.redo.length) return; state.undo.push(snapshot()); applySnap(state.redo.pop()); }
 
+  // ---------- 工作流列表删除的撤销栈 ----------
+  // 画布的 undo 只含节点/连线；删除工作流是文件级操作，单独记一份「删除前的正文」，
+  // Ctrl+Z 优先回滚最近一次工作流删除。
+  var wfTrash = [];   // [{id, name, workflow, isTpl}]
+  // 「双击改名」用时间间隔判定（不依赖浏览器 dblclick / clickCount）
+  var lastGNameClick = { gid: '', t: 0 };
+
+  function pushWfTrash(items) {
+    (items || []).forEach(function (it) { if (it && it.id) wfTrash.push(it); });
+    if (wfTrash.length > 20) wfTrash.splice(0, wfTrash.length - 20);
+  }
+
+  /** 恢复最近一次删除的工作流；成功返回 true */
+  function undoWfDelete() {
+    if (!wfTrash.length) return false;
+    var it = wfTrash.pop();
+    var tid = it.id;
+    delete tplRemoved[tid];
+    var wf = it.workflow || { name: it.name, data: {
+      workflow_uuid: tid, workflow_name: it.name, nodes: [], edges: [], embeds: [] } };
+    return fetch('/api/workflow-templates/' + encodeURIComponent(tid), {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workflow: wf })
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (res && res.ok === false) { wfTrash.push(it); note('err', '撤销失败', res.error || ''); return false; }
+      cacheTemplate(wf);
+      tplList.push({ id: tid, name: it.name || wf.name || '未命名工作流',
+                     nodes: ((wf.data && wf.data.nodes) || []).length,
+                     as_template: !!it.isTpl });
+      renderTplPick();
+      note('ok', '已恢复工作流', '「' + (it.name || '未命名工作流') + '」已放回列表', 3200);
+      return true;
+    }).catch(function () { wfTrash.push(it); return false; });
+  }
+
   // ---------- 渲染：节点 ----------
   var NODE_W = 236;
   function nodeEl(n) {
@@ -457,14 +505,55 @@
       d.appendChild(dis);
     }
     d.appendChild(el('span', 'wfnode-del', '✕'));
+    // 属于某个已展开折叠组的节点：给首节点加一枚「折叠本组」角标
+    if (n._foldGroup) {
+      var gfold = foldState()[n._foldGroup];
+      if (gfold && !gfold.collapsed) {
+        var fb = el('button', 'wfnode-fold', '⌃ ' + esc(shortName(gfold.name)));
+        fb.title = '折叠「' + gfold.name + '」（' + gfold.uuids.length + ' 个节点）';
+        fb.dataset.fold = n._foldGroup;
+        d.appendChild(fb);
+      }
+    }
     d.appendChild(el('span', 'st-dot', ''));
     d.appendChild(el('span', 'lockflag', '设备占用'));
     d.appendChild(el('span', 'port in', ''));
     d.appendChild(el('span', 'port out', ''));
+    // 多出度 / 多入度：补几个小点，直观表示「这里会分叉」
+    var fanOut = fanCount(n.uuid, true), fanIn = fanCount(n.uuid, false);
+    for (var fi = 1; fi < Math.min(fanOut, 5); fi++) {
+      var dot = el('span', 'port-fan out', '');
+      dot.style.top = (44 + fi * 13) + 'px';
+      d.appendChild(dot);
+    }
+    for (var fj = 1; fj < Math.min(fanIn, 5); fj++) {
+      var dot2 = el('span', 'port-fan in', '');
+      dot2.style.top = (44 + fj * 13) + 'px';
+      d.appendChild(dot2);
+    }
     d.appendChild(el('span', 'plabel in', '入'));
     d.appendChild(el('span', 'plabel out', '出'));
     return d;
   }
+  /** 该节点的出/入线数量（折叠组算作一个整体） */
+  function fanCount(uuid, isOut) {
+    var gid = uuid && state.folds ? null : null;
+    var n = findNode(uuid);
+    var g = n && n._foldGroup ? foldState()[n._foldGroup] : null;
+    var self = g ? ('__grp__' + g.id) : uuid;
+    var members = {};
+    if (g) g.uuids.forEach(function (u) { members[u] = 1; });
+    var cnt = 0;
+    (state.wf.data.edges || []).forEach(function (e) {
+      if (!e) return;
+      var fromFolded = members[e.source_node_uuid] ? ('__grp__' + g.id) : e.source_node_uuid;
+      var toFolded = members[e.target_node_uuid] ? ('__grp__' + g.id) : e.target_node_uuid;
+      if (isOut && fromFolded === self && toFolded !== self) cnt++;
+      if (!isOut && toFolded === self && fromFolded !== self) cnt++;
+    });
+    return cnt;
+  }
+
   function fmtVal(v) {
     if (v === null || v === undefined) return '—';
     if (typeof v === 'number') return (Math.abs(v) >= 1000 ? String(v) : String(v));
@@ -495,9 +584,618 @@
     return rows;
   }
 
+  // ============================================================
+  // 折叠组：把「同一设备、沿主链连续」的节点收成一张卡片
+  // ------------------------------------------------------------
+  // 数据约定：
+  //   n._foldGroup = groupId      节点属于哪个折叠组
+  //   state.folds[groupId] = {id,name,device,collapsed,uuids[],x,y}
+  // 折叠只是渲染层隐藏，节点数据、连线全部保留，运行时照常展开执行。
+  // ============================================================
+  function foldState() {
+    if (!state.folds) state.folds = {};
+    return state.folds;
+  }
+
+  /** 沿主链切分出「同设备连续段」：
+   *  - 有 Group 容器（parent_uuid）时，按容器成员整体成组（成员可以是任意设备混排）
+   *  - 无容器的，按「同设备、出度=1、目标入度=1」的链切段
+   */
+  /** 节点所属设备：真实工作流用 device_name，早期草稿用 device */
+  function nodeDev(n) {
+    if (!n) return '';
+    return String(n.device_name || n.device || '').trim();
+  }
+
+  function detectFoldGroups() {
+    var nodes = state.wf.data.nodes, edges = state.wf.data.edges || [];
+    var byId = {}, children = {}, parents = {};
+    var groups = [], used = {};
+    nodes.forEach(function (n) {
+      if (!n.uuid || nodeDev(n)) {
+        if (n.uuid) { byId[n.uuid] = n; children[n.uuid] = []; parents[n.uuid] = []; }
+      }
+    });
+    edges.forEach(function (e) {
+      if (byId[e.source_node_uuid] && byId[e.target_node_uuid]) {
+        children[e.source_node_uuid].push(e.target_node_uuid);
+        parents[e.target_node_uuid].push(e.source_node_uuid);
+      }
+    });
+
+    // ① Group 容器优先：按 parent_uuid 归组（成员 ≥2 才折叠）
+    var containers = {};
+    nodes.forEach(function (n) {
+      if (!n || !n.uuid) return;
+      var p = String(n.parent_uuid || '').trim();
+      if (!p) return;
+      if (!byId[n.uuid]) return;                 // 容器节点自身没有 device_name，不入图
+      (containers[p] = containers[p] || []).push(n);
+    });
+    // 容器名取自 Group 节点（uuid 精确匹配，或尾部段匹配）
+    var groupNameBy = {};
+    nodes.forEach(function (n) {
+      if (!n || n.type !== 'Group') return;
+      groupNameBy[n.uuid] = String(n.name || n.footer || '').trim();
+      var t = String(n.uuid).split('__').pop();
+      if (t) groupNameBy[t] = groupNameBy[n.uuid];
+    });
+    Object.keys(containers).forEach(function (pid) {
+      var mem = containers[pid].filter(function (m) { return !used[m.uuid]; });
+      if (mem.length < 2) return;
+      // 组内按拓扑序排，保证展开后顺序与流程一致
+      var pos = {};
+      mem.forEach(function (m, i) { pos[m.uuid] = i; });
+      var inSet = {};
+      mem.forEach(function (m) { inSet[m.uuid] = 1; });
+      var indeg2 = {};
+      mem.forEach(function (m) {
+        indeg2[m.uuid] = (parents[m.uuid] || []).filter(function (p) { return inSet[p]; }).length;
+      });
+      var order = [], qq = mem.filter(function (m) { return !indeg2[m.uuid]; }).map(function (m) { return m.uuid; });
+      qq.sort(function (a, b) { return pos[a] - pos[b]; });
+      while (qq.length) {
+        var u = qq.shift();
+        if (order.indexOf(u) >= 0) continue;
+        order.push(u);
+        (children[u] || []).forEach(function (v) {
+          if (!inSet[v]) return;
+          indeg2[v]--;
+          if (indeg2[v] === 0) qq.push(v);
+        });
+      }
+      mem.forEach(function (m) { if (order.indexOf(m.uuid) < 0) order.push(m.uuid); });
+      order.forEach(function (u) { used[u] = 1; });
+      var nm = groupNameBy[pid] || groupNameBy[String(pid).split('__').pop()] || '';
+      var devs = {};
+      mem.forEach(function (m) { devs[nodeDev(m)] = 1; });
+      var devKeys = Object.keys(devs).filter(Boolean);
+      groups.push({
+        device: devKeys.length === 1 ? devKeys[0] : '',
+        uuids: order,
+        name: nm,
+        kind: 'container',
+        parent: pid,
+        mixed: devKeys.length > 1
+      });
+    });
+
+    var scan = nodes.filter(function (n) { return byId[n.uuid] && !used[n.uuid]; });
+    scan.forEach(function (n) {
+      if (!byId[n.uuid] || used[n.uuid]) return;
+      // 只从「段首」开始：入边不是同设备单链，或者没有入边
+      var ps = parents[n.uuid] || [];
+      if (ps.length === 1) {
+        var pn = byId[ps[0]];
+        if (pn && nodeDev(pn) === nodeDev(n) &&
+            (children[ps[0]] || []).length === 1) return; // 前面还有同设备的，从更早开始
+      }
+      var chain = [n.uuid];
+      used[n.uuid] = 1;
+      var cur = n.uuid;
+      for (;;) {
+        var cs = children[cur] || [];
+        if (cs.length !== 1) break;
+        var nx = byId[cs[0]];
+        if (!nx || used[nx.uuid]) break;
+        if (nodeDev(nx) !== nodeDev(n)) break;
+        if ((parents[nx.uuid] || []).length !== 1) break;
+        chain.push(nx.uuid);
+        used[nx.uuid] = 1;
+        cur = nx.uuid;
+      }
+      if (chain.length >= 2) groups.push({ device: nodeDev(n), uuids: chain, kind: 'same-device' });
+    });
+    return groups;
+  }
+
+  /** 折叠组的默认名字：容器名优先，其次设备名 + 步数 */
+  function defaultGroupName(raw) {
+    if (raw.name) return raw.name;
+    if (raw.mixed) return '混合流程 · ' + raw.uuids.length + ' 步';
+    var dev = devOf(raw.device);
+    return (dev ? dev.label : (raw.device || '流程')) + ' · ' + raw.uuids.length + ' 步';
+  }
+
+  /** 重建折叠组（保持已有组的名字、折叠状态；新增组按默认折叠） */
+  function rebuildFolds(opts) {
+    opts = opts || {};
+    var prev = foldState();
+    // 用「成员指纹」认人：容器组按 parent，同设备段按首节点
+    var byKey = {};
+    Object.keys(prev).forEach(function (gid) {
+      var g = prev[gid];
+      if (!g || !g.uuids || !g.uuids.length) return;
+      byKey[(g.parent ? 'p:' + g.parent : 'f:' + g.uuids[0])] = g;
+    });
+
+    var fresh = {};
+    var changed = 0;
+    detectFoldGroups().forEach(function (raw, i) {
+      var key = raw.parent ? 'p:' + raw.parent : 'f:' + raw.uuids[0];
+      var old = byKey[key];
+      state.foldSeq = Math.max(state.foldSeq || 0, i + 1);
+      var gid = (old && old.id) || ('fg' + (state.foldSeq) + '_' + String(raw.uuids[0] || '').slice(0, 6));
+      var collapsed = old ? !!old.collapsed : (opts.defaultCollapsed !== false);
+      if (!old) changed++;
+      fresh[gid] = {
+        id: gid,
+        device: raw.device || '',
+        uuids: raw.uuids,
+        name: (old && old.name) || defaultGroupName(raw),
+        collapsed: collapsed,
+        auto: !!(old && old.auto),
+        kind: raw.kind || 'same-device',
+        parent: raw.parent || '',
+        x: old ? old.x : null,
+        y: old ? old.y : null
+      };
+    });
+
+    state.folds = fresh;
+    // 清掉节点上过期的分组标记
+    state.wf.data.nodes.forEach(function (n) { delete n._foldGroup; });
+    Object.keys(fresh).forEach(function (gid) {
+      fresh[gid].uuids.forEach(function (u) {
+        var n = findNode(u);
+        if (n) n._foldGroup = gid;
+      });
+    });
+    return changed;
+  }
+
+  function groupHeadNode(g) {
+    return g && g.uuids && g.uuids.length ? findNode(g.uuids[0]) : null;
+  }
+
+  /** 角标上显示的短名 */
+  function shortName(s) {
+    s = String(s || '');
+    return s.length > 10 ? s.slice(0, 9) + '…' : s;
+  }
+
+  function groupPos(g) {
+    var head = groupHeadNode(g);
+    if (!head || !head.pose || !head.pose.position) return { x: 0, y: 0 };
+    if (g.x === null || g.x === undefined) {
+      g.x = head.pose.position.x;
+      g.y = head.pose.position.y;
+    }
+    return { x: g.x, y: g.y };
+  }
+
+  /** 折叠卡的理想位置：成员包围盒的左上角（成员位置变动后仍能紧凑贴合） */
+  function groupBounds(g) {
+    var xs = [], ys = [];
+    (g.uuids || []).forEach(function (u) {
+      var n = findNode(u);
+      if (n && n.pose && n.pose.position) {
+        xs.push(n.pose.position.x);
+        ys.push(n.pose.position.y);
+      }
+    });
+    if (!xs.length) return null;
+    return { x: Math.min.apply(null, xs), y: Math.min.apply(null, ys),
+             x2: Math.max.apply(null, xs), y2: Math.max.apply(null, ys) };
+  }
+
+  // 展开折叠组时成员之间的水平间距
+  var EXPAND_GAP = 56;
+
+  function setGroupCollapsed(gid, on) {
+    var g = foldState()[gid];
+    if (!g) return;
+    if (!on) { expandGroup(gid); return; }
+    pushUndo();
+    g.collapsed = true;
+    var head = groupHeadNode(g);
+    if (head && head.pose && head.pose.position) {
+      var bb = groupBounds(g);
+      g.x = bb ? bb.x : head.pose.position.x;
+      g.y = bb ? bb.y : head.pose.position.y;
+    }
+    renderNodes(); updatePositions(); afterViewChange();
+  }
+
+  /** 展开一组：把成员排成正常横向链（不再 26px 挤在一起），
+   *  并把位于该组右侧的其它节点整体右移，避免与展开后的节点重叠。 */
+  function expandGroup(gid) {
+    var g = foldState()[gid];
+    if (!g || !g.uuids || g.uuids.length < 2) return;
+    pushUndo();
+    var head = groupHeadNode(g);
+    var bb = groupBounds(g);
+    var gx = (g.x !== null && g.x !== undefined) ? g.x : (bb ? bb.x : (head ? head.pose.position.x : 60));
+    var gy = (g.y !== null && g.y !== undefined) ? g.y : (bb ? bb.y : (head ? head.pose.position.y : 60));
+
+    var step = NODE_W + EXPAND_GAP;
+    var inGroup = {};
+    g.uuids.forEach(function (u) { inGroup[u] = 1; });
+
+    // 1) 先把成员摆成一条正常链
+    var placed = [];
+    g.uuids.forEach(function (u, i) {
+      var n = findNode(u);
+      if (!n || !n.pose) return;
+      if (!n.pose.position) n.pose.position = { x: 0, y: 0, z: 0 };
+      n.pose.position.x = gx + i * step;
+      n.pose.position.y = gy;
+      placed.push({ x: n.pose.position.x, y: gy, w: NODE_W });
+    });
+
+    // 2) 这条链占掉的水平区间
+    var chainRight = gx + (g.uuids.length - 1) * step + NODE_W;
+    var oldRight = gx + NODE_W;
+    var grow = chainRight - oldRight;      // 需要给右侧腾出的宽度
+
+    // 3) 其余可见节点：若起点在组卡片右侧，整体右移 grow，保持相对顺序不重叠
+    if (grow > 0) {
+      var foldedMap = foldedSet();
+      state.wf.data.nodes.forEach(function (n) {
+        if (!n || inGroup[n.uuid]) return;
+        if (foldedMap[n.uuid]) return;      // 其它折叠组成员不动（它们由自己的卡片代表）
+        if (!n.pose || !n.pose.position) return;
+        if (n.pose.position.x >= oldRight) n.pose.position.x += grow;
+      });
+      // 其它折叠组卡片也要跟着右移
+      var f = foldState();
+      Object.keys(f).forEach(function (k) {
+        var o = f[k];
+        if (!o || k === gid || !o.collapsed) return;
+        if (o.x !== null && o.x !== undefined && o.x >= oldRight) {
+          o.x += grow;
+          (o.uuids || []).forEach(function (u) {
+            var m = findNode(u);
+            if (m && m.pose && m.pose.position) m.pose.position.x += grow;
+          });
+        }
+      });
+    }
+
+    g.collapsed = false;
+    g.x = gx; g.y = gy;
+
+    // 4) 垂直避让：展开出的长链可能与其它行节点在矩形上相交，把它们向下推开
+    (function pushDownConflicts() {
+      var bandTop = gy, bandBottom = gy + 132;   // 节点高度约 132
+      var left = gx, right = chainRight;
+      var need = {};
+      var foldedMap2 = foldedSet();
+      state.wf.data.nodes.forEach(function (n) {
+        if (!n || inGroup[n.uuid] || foldedMap2[n.uuid]) return;
+        if (!n.pose || !n.pose.position) return;
+        var el = canvas.querySelector('[data-uuid="' + n.uuid + '"]');
+        var h = el ? el.offsetHeight : 132;
+        var nx = n.pose.position.x, ny = n.pose.position.y;
+        if (nx < right && nx + NODE_W > left && ny < bandBottom && ny + h > bandTop) {
+          need[n.uuid] = bandBottom - ny + 24;   // 推到链下方 24px
+        }
+      });
+      Object.keys(need).forEach(function (u) {
+        var n = findNode(u);
+        if (n && n.pose && n.pose.position) n.pose.position.y += need[u];
+      });
+    })();
+
+    renderNodes(); updatePositions();
+    setTimeout(fitView, 30);
+    afterViewChange();
+  }
+
+  /** 折叠态紧凑化：把每个折叠组内的成员坐标聚到组卡片位置，
+   *  这样「展开」时组内节点不会散落在远处，连线也不会横穿整张画布。 */
+  /** 折叠态：只把组卡片定位到成员包围盒，不改动成员自身坐标。
+   *  （早先会把成员挤到 26px 步长，展开后就会叠在一起，已废弃该做法。） */
+  function compactFolds() {
+    var f = foldState();
+    Object.keys(f).forEach(function (gid) {
+      var g = f[gid];
+      if (!g || !g.uuids || g.uuids.length < 2) return;
+      var bb = groupBounds(g);
+      if (bb) { g.x = bb.x; g.y = bb.y; }
+    });
+    return 0;
+  }
+
+  function toggleFold(gid) {
+    var g = foldState()[gid];
+    if (!g) return;
+    setGroupCollapsed(gid, !g.collapsed);
+  }
+
+  function unfoldAll() {
+    var f = foldState();
+    Object.keys(f).forEach(function (k) { f[k].collapsed = false; });
+    layoutFolded();
+    renderNodes(); updatePositions(); afterViewChange();
+  }
+
+  /** 折叠态布局：把每个折叠组当作一个超级节点，重新按拓扑分层摆放组卡片。
+   *  解决「折叠后组卡片仍摊在 436 节点的原始坐标上、连线横穿整张画布」的问题。 */
+  function layoutFolded() {
+    var f = foldState();
+    var groups = Object.keys(f).filter(function (k) {
+      var g = f[k];
+      return g && g.collapsed && g.uuids.length >= 2;
+    });
+    if (!groups.length) return 0;
+
+    // 建立「超级节点」图：组 + 未折叠的普通节点
+    var memberOf = {};
+    groups.forEach(function (k) { f[k].uuids.forEach(function (u) { memberOf[u] = k; }); });
+    function sid(uuid) { return memberOf[uuid] ? ('#' + memberOf[uuid]) : uuid; }
+
+    var sup = {};
+    groups.forEach(function (k) { sup['#' + k] = { id: '#' + k, gid: k }; });
+    (state.wf.data.nodes || []).forEach(function (n) {
+      if (!n || n.type === 'Group') return;
+      if (memberOf[n.uuid]) return;
+      sup[n.uuid] = { id: n.uuid, node: n };
+    });
+    var kids = {}, par = {};
+    Object.keys(sup).forEach(function (k) { kids[k] = []; par[k] = []; });
+    (state.wf.data.edges || []).forEach(function (e) {
+      if (!e) return;
+      var s = sid(e.source_node_uuid), t = sid(e.target_node_uuid);
+      if (!sup[s] || !sup[t] || s === t) return;
+      if (kids[s].indexOf(t) < 0) kids[s].push(t);
+      if (par[t].indexOf(s) < 0) par[t].push(s);
+    });
+
+    // Kahn 最长路径分层
+    var indeg = {}, rank = {}, q = [];
+    Object.keys(sup).forEach(function (k) { indeg[k] = par[k].length; rank[k] = 0; });
+    Object.keys(sup).forEach(function (k) { if (!indeg[k]) q.push(k); });
+    var seen = {};
+    while (q.length) {
+      var u = q.shift();
+      if (seen[u]) continue;
+      seen[u] = 1;
+      kids[u].forEach(function (v) {
+        rank[v] = Math.max(rank[v] || 0, (rank[u] || 0) + 1);
+        indeg[v]--;
+        if (indeg[v] === 0) q.push(v);
+      });
+    }
+    Object.keys(sup).forEach(function (k) { if (!seen[k]) rank[k] = rank[k] || 0; });
+
+    // 分层 → 行
+    var byRank = {}, rk = [];
+    Object.keys(sup).forEach(function (k) {
+      var r = rank[k];
+      if (!byRank[r]) { byRank[r] = []; rk.push(r); }
+      byRank[r].push(k);
+    });
+    rk.sort(function (a, b) { return a - b; });
+
+    // 同层排序：按上游重心，减少交叉
+    var pos = {};
+    rk.forEach(function (r) { byRank[r].sort(); byRank[r].forEach(function (k, i) { pos[k] = i; }); });
+    for (var pass = 0; pass < 6; pass++) {
+      for (var ri = 1; ri < rk.length; ri++) {
+        var col = byRank[rk[ri]];
+        var bary = {};
+        col.forEach(function (k) {
+          var ps = par[k].filter(function (p) { return pos[p] !== undefined; });
+          bary[k] = ps.length ? ps.reduce(function (a, p) { return a + pos[p]; }, 0) / ps.length : 1e6;
+        });
+        col.sort(function (a, b) { return (bary[a] - bary[b]) || (pos[a] - pos[b]); });
+        col.forEach(function (k, i) { pos[k] = i; });
+      }
+    }
+
+    // 摆放：列距按真实节点宽度收紧，折带控制长宽比
+    var COL = 268, ROW = 168, X0 = 60, Y0 = 60, BAND = 40;
+    var nRk = rk.length;
+    var rowOfR = {};
+    rk.forEach(function (r) { rowOfR[r] = byRank[r].length; });
+    var cr = wrap.getBoundingClientRect();
+    var canvasAR = (cr.width || 1200) / (cr.height || 800);
+    var best = { rpb: nRk, score: Infinity };
+    for (var rpbTry = 1; rpbTry <= nRk; rpbTry++) {
+      var bands = Math.ceil(nRk / rpbTry), Hh = 0;
+      for (var bi = 0; bi < bands; bi++) {
+        var mx = 1;
+        for (var kk = bi * rpbTry; kk < Math.min(nRk, (bi + 1) * rpbTry); kk++) mx = Math.max(mx, rowOfR[rk[kk]] || 1);
+        Hh += mx * ROW + BAND;
+      }
+      var ar = (rpbTry * COL) / Hh;
+      var sc = Math.abs(ar - canvasAR) + 0.12 * Math.abs(Math.log(ar) - Math.log(canvasAR))
+        + 0.5 * Math.max(0, ar / canvasAR - 1.4);
+      if (sc < best.score) best = { rpb: rpbTry, score: sc };
+    }
+    var rpb = best.rpb;
+
+    var y = Y0;
+    for (var b = 0; b * rpb < nRk; b++) {
+      var idxs = [];
+      for (var k2 = b * rpb; k2 < Math.min(nRk, (b + 1) * rpb); k2++) idxs.push(k2);
+      // 本带每行的行高：按该行实际最高元素（折叠卡≈96、节点≈132，都留足余量）
+      var maxRows = 1;
+      idxs.forEach(function (i) { maxRows = Math.max(maxRows, rowOfR[rk[i]]); });
+      // 逐行放置，y 用累加的实际行高（不再固定 ROW，避免折叠卡压在节点上）
+      // 实测节点最高 ~184px、折叠卡 ~94px，行高按 200 留足余量
+      var rowHeights = [];
+      for (var rr = 0; rr < maxRows; rr++) rowHeights.push(0);
+      idxs.forEach(function (i) {
+        var col = byRank[rk[i]];
+        var off = (maxRows - col.length) / 2;
+        col.forEach(function (k, ii) {
+          var rowIdx = Math.round(off + ii);
+          rowHeights[rowIdx] = Math.max(rowHeights[rowIdx], 200);
+        });
+      });
+      var rowY = [];
+      var acc = y;
+      for (var ri2 = 0; ri2 < maxRows; ri2++) {
+        rowY.push(acc);
+        acc += 200 + 40;
+      }
+      idxs.forEach(function (i, jj) {
+        var rankIdx = (b % 2 === 1) ? (idxs.length - 1 - jj) : jj;
+        var col = byRank[rk[i]];
+        var off = (maxRows - col.length) / 2;
+        col.forEach(function (k, ii) {
+          var rowIdx = Math.round(off + ii);
+          var py = rowY[Math.min(rowIdx, maxRows - 1)];
+          var px = X0 + rankIdx * COL;
+          if (sup[k].gid) {
+            var g = f[sup[k].gid];
+            g.x = px; g.y = py;
+            // 成员坐标不在这里铺开：折叠时看不见，展开时由 expandGroup 统一规整成一条链。
+            // （早先在这里把成员按 292px 排开，多个组会共用同一批坐标，展开后互相重叠。）
+          } else if (sup[k].node && sup[k].node.pose) {
+            sup[k].node.pose.position.x = px;
+            sup[k].node.pose.position.y = py;
+          }
+        });
+      });
+      y = acc;
+    }
+    return rpb;
+  }
+
+  function foldAllGroups() {
+    var f = foldState();
+    var n = 0;
+    Object.keys(f).forEach(function (k) {
+      var g = f[k];
+      if (g.uuids && g.uuids.length >= 2) { g.collapsed = true; n++; }
+    });
+    layoutFolded();                 // 折叠态按超级节点重排，连线不再横穿画布
+    renderNodes(); updatePositions(); fitView();
+    if (n) note('ok', '已折叠', n + ' 个同设备连续段被收起，点击卡片可展开。', 3600);
+    afterViewChange();
+  }
+
+  /** 改名：用弹窗输入，避免 contenteditable 被画布重绘打断 */
+  function renameGroup(gid, name) {
+    var g = foldState()[gid];
+    if (!g) return;
+    var v = String(name || '').trim();
+    if (!v || v === g.name) return;
+    pushUndo();
+    g.name = v;
+    renderNodes(); afterViewChange();
+  }
+
+  /** 弹窗改名（改名按钮 / 双击卡片都走这里） */
+  function promptRenameGroup(gid) {
+    var g = foldState()[gid];
+    if (!g) return;
+    askPrompt('重命名这一组', g.name || '', function (v) {
+      renameGroup(gid, v);
+    });
+  }
+
+
+
+  function deleteGroup(gid) {
+    var g = foldState()[gid];
+    if (!g) return;
+    pushUndo();
+    var kill = {};
+    g.uuids.forEach(function (u) { kill[u] = 1; });
+    state.wf.data.nodes = state.wf.data.nodes.filter(function (x) { return !kill[x.uuid]; });
+    state.wf.data.edges = state.wf.data.edges.filter(function (e) {
+      return !kill[e.source_node_uuid] && !kill[e.target_node_uuid];
+    });
+    delete foldState()[gid];
+    state.selectedIds = {}; state.selected = null;
+    renderNodes(); showProps(); updateStats(); afterChange();
+  }
+
+  /** 折叠组卡片 */
+  function groupEl(g) {
+    var head = groupHeadNode(g);
+    var dev = devOf(g.device);
+    var d = el('div', 'wfgroup' + (state.selectedIds['__grp__' + g.id] ? ' selected' : ''));
+    d.dataset.group = g.id;
+    var pos = groupPos(g);
+    d.style.position = 'absolute';
+    d.style.transform = 'translate(' + pos.x + 'px,' + pos.y + 'px)';
+    d.style.width = NODE_W + 'px';
+
+    var steps = g.uuids.map(function (u) {
+      var n = findNode(u);
+      var dd = n ? (n._display || refreshDisplay(n)) : null;
+      return dd ? dd.label : '—';
+    });
+    // 组内涉及的设备（去重）→ 卡片副标题显示，混合设备组也能一眼看懂
+    var devs = {};
+    g.uuids.forEach(function (u) {
+      var n = findNode(u);
+      var dv = devOf(nodeDev(n));
+      if (dv) devs[dv.label] = 1;
+    });
+    var devLabels = Object.keys(devs);
+    var ico = (dev && dev.icon) || (devLabels.length > 1 ? '🔗' : '📦');
+
+    d.appendChild(el('div', 'g-head',
+      '<span class="g-ico">' + ico + '</span>' +
+      '<span class="g-name" data-gname="1" title="双击可重命名">' + esc(g.name) + '</span>' +
+      '<span class="g-count" title="组内节点数">' + g.uuids.length + '</span>'));
+    var sub = devLabels.length > 1 ? devLabels.slice(0, 2).join(' + ') + (devLabels.length > 2 ? ' …' : '')
+      : steps.slice(0, 3).join(' → ') + (steps.length > 3 ? ' …' : '');
+    d.appendChild(el('div', 'g-sub', esc(sub)));
+    var acts = el('div', 'g-acts');
+    var btnEx = el('button', 'g-btn', '展开');
+    btnEx.setAttribute('data-act', 'expand');
+    var btnRe = el('button', 'g-btn', '改名');
+    btnRe.setAttribute('data-act', 'rename');
+    btnRe.title = '重命名这一组（也可双击组名）';
+    acts.appendChild(btnEx);
+    acts.appendChild(btnRe);
+    d.appendChild(acts);
+    var del = el('button', 'g-del', '✕');
+    del.title = '删除整组';
+    d.appendChild(del);
+    return d;
+  }
+
+  function foldedSet() {
+    var hide = {};
+    var f = foldState();
+    Object.keys(f).forEach(function (k) {
+      var g = f[k];
+      if (g && g.collapsed) g.uuids.forEach(function (u) { hide[u] = 1; });
+    });
+    return hide;
+  }
+
   function renderNodes() {
+    var hide = foldedSet();
     var frag = document.createDocumentFragment();
-    state.wf.data.nodes.forEach(function (n) { frag.appendChild(nodeEl(n)); });
+    state.wf.data.nodes.forEach(function (n) {
+      if (hide[n.uuid]) return;
+      if (n && n.type === 'Group') return;   // 分组容器不单独出卡片
+      frag.appendChild(nodeEl(n));
+    });
+    var f = foldState();
+    Object.keys(f).forEach(function (k) {
+      var g = f[k];
+      if (g && g.collapsed && g.uuids.length >= 2) frag.appendChild(groupEl(g));
+    });
     canvas.innerHTML = '';
     canvas.appendChild(frag);
     updatePositions();
@@ -572,15 +1270,89 @@
     svg.appendChild(defs);
     state.edgeSvgMap = [];
 
+    var hideMap = foldedSet();
+    var foldOf = {};
+    (function () {
+      var f = foldState();
+      Object.keys(f).forEach(function (k) {
+        var g = f[k];
+        if (!g || !g.collapsed) return;
+        g.uuids.forEach(function (u) { foldOf[u] = g; });
+      });
+    })();
+    function rectOf(uuid) {
+      if (!hideMap[uuid]) return nodeRect(uuid);
+      var g = foldOf[uuid];
+      if (!g) return null;
+      var ge = canvas.querySelector('[data-group="' + g.id + '"]');
+      var bb = groupBounds(g);
+      var pos = bb ? { x: bb.x, y: bb.y } : groupPos(g);
+      return { x: pos.x, y: pos.y, w: NODE_W, h: ge ? ge.offsetHeight : 110 };
+    }
+    /** 折叠后：把成员 uuid 换成组卡片的身份，避免同组内部重复成线 */
+    function logicalId(uuid) {
+      var g = foldOf[uuid];
+      return g ? ('__grp__' + g.id) : uuid;
+    }
+
+    // —— 端口分摊：同一节点的第 k 条出线/入线在卡片高度上错开，避免全部重叠成一根粗线 ——
+    var outIdx = {}, inIdx = {}, outCnt = {}, inCnt = {};
     state.wf.data.edges.forEach(function (e) {
-      var a = nodeRect(e.source_node_uuid), b = nodeRect(e.target_node_uuid);
+      if (!e) return;
+      var s = logicalId(e.source_node_uuid), t = logicalId(e.target_node_uuid);
+      if (s === t) return;
+      outCnt[s] = (outCnt[s] || 0) + 1;
+      inCnt[t] = (inCnt[t] || 0) + 1;
+    });
+    function portY(uuid, isOut, height) {
+      var id = logicalId(uuid);
+      var k = isOut ? (outIdx[id] || 0) : (inIdx[id] || 0);
+      var n = isOut ? (outCnt[id] || 1) : (inCnt[id] || 1);
+      if (isOut) outIdx[id] = k + 1; else inIdx[id] = k + 1;
+      var h = height || 132;
+      if (n <= 1) return PORT_DY;
+      // 在卡片左/右边缘的竖直区间内均分，留出上下 18px 余量
+      var lo = 26, hi = Math.max(lo + 8, h - 18);
+      var step = (hi - lo) / Math.max(1, n - 1);
+      return lo + step * k;
+    }
+
+    // —— 回绕线（目标在左）按序号分配不同外扩槽，避免叠在一条线上 ——
+    var loopSlot = {};
+
+    state.wf.data.edges.forEach(function (e) {
+      var a = rectOf(e.source_node_uuid), b = rectOf(e.target_node_uuid);
       if (!a || !b) return;
-      // 连线层与节点层共用同一个变换，所以这里全部用世界坐标
-      var x1 = a.x + a.w, y1 = a.y + PORT_DY;
-      var x2 = b.x, y2 = b.y + PORT_DY;
-      var dx = Math.max(40, Math.abs(x2 - x1) * 0.45);
-      var dAttr = 'M' + x1 + ' ' + y1 +
-        ' C' + (x1 + dx) + ' ' + y1 + ',' + (x2 - dx) + ' ' + y2 + ',' + x2 + ' ' + y2;
+      var sa = foldOf[e.source_node_uuid], sb = foldOf[e.target_node_uuid];
+      if (sa && sb && sa.id === sb.id) return;   // 同组内部不画
+
+      var y1 = a.y + portY(e.source_node_uuid, true, a.h);
+      var y2 = b.y + portY(e.target_node_uuid, false, b.h);
+      var x1 = a.x + a.w, x2 = b.x;
+
+      var dAttr;
+      var sameBand = Math.abs((a.y + a.h / 2) - (b.y + b.h / 2)) < Math.max(a.h, b.h) * 0.9;
+      if (x2 >= x1 + 24) {
+        // 正向：中间竖段
+        var midX = (x1 + x2) / 2;
+        if (sameBand) {
+          // 同一行左右相邻：直接水平走，不再折一个多余的小台阶
+          dAttr = 'M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2;
+        } else {
+          dAttr = elbowH(x1, y1, x2, y2, midX);
+        }
+      } else {
+        // 回绕（目标在左 或 几乎同列）：从右侧绕到目标上方/下方，各自一条独立槽位
+        var key = logicalId(e.source_node_uuid) + '>' + logicalId(e.target_node_uuid);
+        var slotN = loopSlot[key] || 0;
+        loopSlot[key] = slotN + 1;
+        var outRight = Math.max(x1, x2 + b.w) + 56 + slotN * 22;
+        dAttr = 'M' + x1 + ' ' + y1 +
+          ' L' + outRight + ' ' + y1 +
+          ' L' + outRight + ' ' + y2 +
+          ' L' + x2 + ' ' + y2;
+      }
+
       var hit = document.createElementNS(ns, 'path');
       hit.setAttribute('d', dAttr);
       hit.setAttribute('class', 'wfedge-hit');
@@ -589,8 +1361,8 @@
       var path = document.createElementNS(ns, 'path');
       path.setAttribute('d', dAttr);
       path.dataset.edge = edgeId(e);
-      var k = edgeKind(e);
-      var cls = 'wfedge' + (k === 'parallel' ? ' parallel' : k === 'material' ? ' material' : '');
+      var k2 = edgeKind(e);
+      var cls = 'wfedge' + (k2 === 'parallel' ? ' parallel' : k2 === 'material' ? ' material' : '');
       if (state.selected && state.selected.type === 'edge' && state.selected.id === edgeId(e)) cls += ' selected';
       path.setAttribute('class', cls);
       path.dataset.id = edgeId(e);
@@ -606,6 +1378,19 @@
       p2.setAttribute('class', 'wfedge-drag');
       svg.appendChild(p2);
     }
+  }
+
+  /** 圆角正交折线：水平 → 竖直 → 水平 */
+  function elbowH(x1, y1, x2, y2, midX) {
+    var r = 8;
+    var vy = (y2 > y1 ? 1 : -1);
+    if (Math.abs(y2 - y1) < r * 2) return 'M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2;
+    return 'M' + x1 + ' ' + y1 +
+      ' L' + (midX - r) + ' ' + y1 +
+      ' Q' + midX + ' ' + y1 + ' ' + midX + ' ' + (y1 + vy * r) +
+      ' L' + midX + ' ' + (y2 - vy * r) +
+      ' Q' + midX + ' ' + y2 + ' ' + (midX + r) + ' ' + y2 +
+      ' L' + x2 + ' ' + y2;
   }
 
   // ---------- 视图 ----------
@@ -637,13 +1422,32 @@
     if (!ns.length) { state.view = { x: 40, y: 40, scale: 1 }; applyView(); updatePositions(); return; }
     var cr = wrap.getBoundingClientRect();
     var minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+    var folded = foldedSet();
     ns.forEach(function (n) {
+      if (folded[n.uuid]) return;      // 被折叠的节点不参与取景，否则会算进远处成员
       var h = (canvas.querySelector('[data-uuid="' + n.uuid + '"]') || {}).offsetHeight || 132;
       minX = Math.min(minX, n.pose.position.x);
       minY = Math.min(minY, n.pose.position.y);
       maxX = Math.max(maxX, n.pose.position.x + NODE_W);
       maxY = Math.max(maxY, n.pose.position.y + h);
     });
+    // 折叠组卡片也要计入视野
+    (function () {
+      var f = foldState();
+      Object.keys(f).forEach(function (gid) {
+        var g = f[gid];
+        if (!g || !g.collapsed || g.uuids.length < 2) return;
+        var ge = canvas.querySelector('[data-group="' + gid + '"]');
+        var bb = groupBounds(g);
+        var px = bb ? bb.x : groupPos(g).x;
+        var py = bb ? bb.y : groupPos(g).y;
+        minX = Math.min(minX, px);
+        minY = Math.min(minY, py);
+        maxX = Math.max(maxX, px + NODE_W);
+        maxY = Math.max(maxY, py + (ge ? ge.offsetHeight : 110));
+      });
+    })();
+    if (minX > maxX) { state.view = { x: 40, y: 40, scale: 1 }; applyView(); updatePositions(); return; }
     var s = Math.min((cr.width - pad * 2) / Math.max(1, maxX - minX), (cr.height - pad * 2) / Math.max(1, maxY - minY));
     s = Math.min(1.6, Math.max(0.2, s));
     state.view.scale = s;
@@ -780,8 +1584,8 @@
   // 特殊节点：流程分组容器 + 真实工作流里出现过的脚本节点
   var SPECIAL_DEV = {
     id: '__special__', label: '特殊节点', protocol: '内置', protocolNodes: 0,
-    desc: '流程分组容器，以及真实工作流里出现过的自定义脚本节点',
-    actions: [{ label: '流程分组 Group', special: 'group', _ico: '📁', inRealWorkflow: true }]
+    desc: '真实工作流里出现过的自定义脚本节点',
+    actions: []
       .concat((LIB.scriptNodes || []).map(function (s) {
         var nm = s && s.name ? s.name : String(s);
         return { label: nm, special: 'script', _ico: '🖥️', inRealWorkflow: true };
@@ -1200,8 +2004,10 @@
       '<div class="props-row"><div class="pval">可整体拖动、复制、删除。批量编辑参数请单选。</div></div></div>' +
       '<div class="props-actions"><button id="btn-del-multi" class="danger">🗑 删除所选</button>' +
       '<button id="btn-dup-multi">⧉ 复制所选</button></div>';
-    document.getElementById('btn-del-multi').addEventListener('click', deleteSelected);
-    document.getElementById('btn-dup-multi').addEventListener('click', duplicateSelected);
+    var bdm = document.getElementById('btn-del-multi');
+    if (bdm) bdm.addEventListener('click', deleteSelected);
+    var bdp = document.getElementById('btn-dup-multi');
+    if (bdp) bdp.addEventListener('click', duplicateSelected);
   }
 
   function renderNodeProps(panel) {
@@ -2121,6 +2927,8 @@
       ' · 设备 ' + Object.keys(devs).length + (par ? ' · 并行分支 ' + par : '');
   }
   function afterChange() { state.dirty = true; scheduleDraft(); renderMinimap(); scheduleTemplateSync(); }
+  /** 仅视图状态变化（折叠/展开/改名）：落草稿即可，不必立刻回写后端模板 */
+  function afterViewChange() { state.dirty = true; scheduleDraft(); renderMinimap(); }
 
   // ---------- 删除 / 复制 ----------
   function deleteNode(uuid) {
@@ -2520,18 +3328,65 @@
     rankKeys.forEach(function (r) {
       byRank[r].sort(function (a, b) { return discover[a.uuid] - discover[b.uuid]; });
     });
-    var pass, ri;
-    for (pass = 0; pass < 4; pass++) {
-      for (ri = 1; ri < rankKeys.length; ri++) {
-        var prev = byRank[rankKeys[ri - 1]];
-        var cur = byRank[rankKeys[ri]];
-        cur.sort(function (a, b) {
-          var ba = baryOf(a, prev), bb = baryOf(b, prev);
-          if (ba !== bb) return ba - bb;
-          return discover[a.uuid] - discover[b.uuid];
-        });
-      }
+    var posInRank = {};
+    function reindex() {
+      rankKeys.forEach(function (r) {
+        byRank[r].forEach(function (n, i) { posInRank[n.uuid] = i; });
+      });
     }
+    function baryByParents(n) {
+      var ps = parents[n.uuid] || [];
+      var s = 0, c = 0;
+      ps.forEach(function (p) { if (posInRank[p] !== undefined) { s += posInRank[p]; c++; } });
+      return c ? s / c : 1e6;
+    }
+    function baryByChildren(n) {
+      var cs = children[n.uuid] || [];
+      var s = 0, c = 0;
+      cs.forEach(function (v) { if (posInRank[v] !== undefined) { s += posInRank[v]; c++; } });
+      return c ? s / c : 1e6;
+    }
+
+    // 下扫 + 上扫交替，8 轮收敛，比单向 4 轮明显少交叉
+    for (var pass = 0; pass < 8; pass++) {
+      if (pass % 2 === 0) {
+        for (var ri2 = 1; ri2 < rankKeys.length; ri2++) {
+          byRank[rankKeys[ri2]].sort(function (a, b) {
+            var ba = baryByParents(a), bb = baryByParents(b);
+            if (Math.abs(ba - bb) > 1e-9) return ba - bb;
+            return discover[a.uuid] - discover[b.uuid];
+          });
+          reindex();
+        }
+      } else {
+        for (var ri3 = rankKeys.length - 2; ri3 >= 0; ri3--) {
+          byRank[rankKeys[ri3]].sort(function (a, b) {
+            var ba = baryByChildren(a), bb = baryByChildren(b);
+            if (Math.abs(ba - bb) > 1e-9) return ba - bb;
+            return discover[a.uuid] - discover[b.uuid];
+          });
+          reindex();
+        }
+      }
+      reindex();
+    }
+
+    // 同源多出边：把同一父节点的子节点排在一起（避免「一个模块连两个模块」散落）
+    rankKeys.forEach(function (r) {
+      if (r === 0) return;
+      var col = byRank[r];
+      var keyed = col.map(function (n) {
+        var ps = parents[n.uuid] || [];
+        var pk = ps.length === 1 ? (posInRank[ps[0]] !== undefined ? posInRank[ps[0]] : 9999) : 9998;
+        return { n: n, pk: pk };
+      });
+      keyed.sort(function (a, b) {
+        if (a.pk !== b.pk) return a.pk - b.pk;
+        return posInRank[a.n.uuid] - posInRank[b.n.uuid];
+      });
+      byRank[r] = keyed.map(function (x) { return x.n; });
+      reindex();
+    });
 
     var nR = rankKeys.length;
     var rowOf = {};
@@ -2541,16 +3396,22 @@
     var canvasAR = (cr.width || 1200) / (cr.height || 800);
     var best = { rpb: nR, score: Infinity };
     for (var rpbTry = 1; rpbTry <= nR; rpbTry++) {
-      var bands = Math.ceil(nR / rpbTry), maxRows = 1;
+      var bands = Math.ceil(nR / rpbTry);
+      // 逐带累计真实高度（每带高度 = 该带最大列行数 × ROW + BAND_GAP）
+      var H = 0;
       for (var bi = 0; bi < bands; bi++) {
-        var mx = 0;
+        var mx = 1;
         for (var k = bi * rpbTry; k < Math.min(nR, (bi + 1) * rpbTry); k++) {
-          mx = Math.max(mx, rowOf[rankKeys[k]]);
+          mx = Math.max(mx, rowOf[rankKeys[k]] || 1);
         }
-        maxRows = Math.max(maxRows, mx || 1);
+        H += mx * LAYOUT.ROW + LAYOUT.BAND_GAP;
       }
-      var W = rpbTry * LAYOUT.COL, H = bands * (maxRows * LAYOUT.ROW + LAYOUT.BAND_GAP);
-      var score = Math.abs((W / H) - canvasAR) + 0.12 * Math.abs(Math.log(W / H) - Math.log(canvasAR));
+      var W = rpbTry * LAYOUT.COL;
+      // 目标：内容长宽比接近画布；单带过长（横条）额外加罚
+      var ar = W / H;
+      var score = Math.abs(ar - canvasAR)
+        + 0.12 * Math.abs(Math.log(ar) - Math.log(canvasAR))
+        + 0.5 * Math.max(0, ar / canvasAR - 1.5);
       if (score < best.score) best = { rpb: rpbTry, score: score };
     }
     var rpb = opts.ranksPerBand || best.rpb;
@@ -2561,6 +3422,13 @@
       for (var k2 = b * rpb; k2 < Math.min(nR, (b + 1) * rpb); k2++) idxs.push(k2);
       var maxRows2 = 1;
       idxs.forEach(function (i) { maxRows2 = Math.max(maxRows2, rowOf[rankKeys[i]]); });
+      // 列距按该列真实行数收紧：单行窄列不必占满 300px，横条能短一截
+      var xs = [], accX = LAYOUT.X0;
+      for (var ci = 0; ci < idxs.length; ci++) {
+        var nr = rowOf[rankKeys[idxs[ci]]] || 1;
+        xs.push(accX);
+        accX += (nr <= 1 ? 214 : (nr === 2 ? 266 : LAYOUT.COL));
+      }
       idxs.forEach(function (i, jj) {
         var rankIdx = (b % 2 === 1) ? (idxs.length - 1 - jj) : jj;
         var rk = rankKeys[i];
@@ -2569,13 +3437,50 @@
         colNodes.forEach(function (n, ii) {
           if (!n.pose) n.pose = {};
           if (!n.pose.position) n.pose.position = { x: 0, y: 0, z: 0 };
-          n.pose.position.x = LAYOUT.X0 + rankIdx * LAYOUT.COL;
+          n.pose.position.x = xs[rankIdx];
           n.pose.position.y = y + (offset + ii) * LAYOUT.ROW;
         });
       });
       y += maxRows2 * LAYOUT.ROW + LAYOUT.BAND_GAP;
     }
 
+    // —— 拉直：只在同一带内、且是相邻层直连时才对齐同一行 ——
+    (function straighten() {
+      var rowH = LAYOUT.ROW;
+      var posOf = {}, rankOf = {}, bandOf = {};
+      nodes.forEach(function (n) {
+        posOf[n.uuid] = { x: n.pose.position.x, y: n.pose.position.y };
+        rankOf[n.uuid] = rank[n.uuid];
+        bandOf[n.uuid] = Math.floor(rankKeys.indexOf(rank[n.uuid]) / rpb);
+      });
+      rankKeys.forEach(function (r) {
+        var col = byRank[r] || [];
+        var occupied = {};
+        col.forEach(function (n) { occupied[Math.round(posOf[n.uuid].y / rowH)] = n.uuid; });
+        col.forEach(function (n) {
+          var ps = (parents[n.uuid] || []);
+          if (ps.length !== 1) return;
+          var p = findNode(ps[0]);
+          if (!p) return;
+          if ((rankOf[n.uuid] || 0) - (rankOf[p.uuid] || 0) !== 1) return;
+          if ((children[p.uuid] || []).length !== 1) return;
+          if (bandOf[n.uuid] !== bandOf[p.uuid]) return;   // 跨带不对齐，否则带会被压扁
+          var wantY = posOf[p.uuid].y;
+          var wantRow = Math.round(wantY / rowH);
+          var owner = occupied[wantRow];
+          if (owner && owner !== n.uuid) return;
+          var oldRow = Math.round(posOf[n.uuid].y / rowH);
+          delete occupied[oldRow];
+          occupied[wantRow] = n.uuid;
+          n.pose.position.y = wantY;
+          posOf[n.uuid].y = wantY;
+        });
+      });
+    })();
+
+    // 布局后重算折叠组（位置变了，组坐标要跟着走）
+    rebuildFolds();
+    compactFolds();     // 折叠态：把组内成员聚到组卡片处，避免展开时散落
     renderNodes(); showProps(); afterChange();
     fitView();
     setTimeout(fitView, 60);
@@ -2589,7 +3494,7 @@
   // ---------- 草稿 ----------
   var draftTimer = null;
   function writeDraftNow() {
-    try { localStorage.setItem('wfed_draft', JSON.stringify({ name: state.wf.name, wf: collectLinked(), at: Date.now() })); } catch (e) { }
+    try { localStorage.setItem('wfed_draft', JSON.stringify({ name: state.wf.name, wf: collectLinked({ withFolds: true }), at: Date.now() })); } catch (e) { }
   }
   function scheduleDraft() {
     if (draftTimer) clearTimeout(draftTimer);
@@ -2695,6 +3600,22 @@
         drawGuides(guides);
         updatePositions();
       }
+      if (state.groupDrag) {
+        var wp1 = screenToCanvas(mx, my);
+        var g1 = foldState()[state.groupDrag.gid];
+        if (g1) {
+          g1.x = Math.round((wp1.x - state.groupDrag.dx) / GRID) * GRID;
+          g1.y = Math.round((wp1.y - state.groupDrag.dy) / GRID) * GRID;
+          var hd = groupHeadNode(g1);
+          if (hd && hd.pose && hd.pose.position) {
+            hd.pose.position.x = g1.x;
+            hd.pose.position.y = g1.y;
+          }
+          var ge = canvas.querySelector('[data-group="' + g1.id + '"]');
+          if (ge) ge.style.transform = 'translate(' + g1.x + 'px,' + g1.y + 'px)';
+          renderEdges();
+        }
+      }
       if (state.pan) {
         state.view.x = state.pan.vx + (cx - state.pan.sx);
         state.view.y = state.pan.vy + (cy - state.pan.sy);
@@ -2708,14 +3629,38 @@
         var a = screenToCanvas(x1, y1), b = screenToCanvas(x1 + w2, y1 + h2);
         state.selectedIds = {};
         state.wf.data.nodes.forEach(function (n) {
+          if (!n || n.type === 'Group') return;
           var nd = canvas.querySelector('[data-uuid="' + n.uuid + '"]');
           var nh = nd ? nd.offsetHeight : 132;
           if (n.pose.position.x < b.x && n.pose.position.x + NODE_W > a.x &&
               n.pose.position.y < b.y && n.pose.position.y + nh > a.y) state.selectedIds[n.uuid] = 1;
         });
+        // 折叠组卡片也参与框选（整组选中）
+        (function () {
+          var f = foldState();
+          Object.keys(f).forEach(function (gid) {
+            var g = f[gid];
+            if (!g || !g.collapsed || g.uuids.length < 2) return;
+            var ge = canvas.querySelector('[data-group="' + gid + '"]');
+            if (!ge) return;
+            var gp = groupPos(g);
+            var gh = ge.offsetHeight;
+            if (gp.x < b.x && gp.x + NODE_W > a.x && gp.y < b.y && gp.y + gh > a.y) {
+              state.selectedIds['__grp__' + gid] = 1;
+            }
+          });
+        })();
         Array.prototype.forEach.call(canvas.children, function (d) {
-          d.classList.toggle('selected', !!state.selectedIds[d.dataset.uuid]);
+          var on = !!state.selectedIds[d.dataset.uuid] ||
+            (d.dataset.group && !!state.selectedIds['__grp__' + d.dataset.group]);
+          d.classList.toggle('selected', on);
         });
+        if (typeof refreshBatchBar === 'function') refreshBatchBar();
+      }
+      if (touchMode === 'shiftkill' && shiftKill.on) {
+        var el3 = document.elementFromPoint(cx, cy);
+        var nd2 = el3 && el3.closest ? el3.closest('.wfnode') : null;
+        if (nd2) { shiftKill.ids[nd2.dataset.uuid] = 1; paintShiftKill(); }
       }
       if (state.ghost) ghostMove(cx, cy);
     }
@@ -2756,10 +3701,22 @@
         renderEdges();
       }
       if (state.dragMul) { finishEmbedDrag(); state.dragMul = null; drawGuides([]); }
+      if (touchMode === 'shiftkill') {
+        touchMode = null;
+        if (shiftKill.on) runShiftKill();
+        wrap.classList.remove('shift-mode');
+      }
+      if (state.groupDrag) { state.groupDrag = null; afterChange(); }
       if (state.pan) state.pan = null;
       if (state.marquee) {
+        var hadSel = Object.keys(state.selectedIds).length;
         state.marquee = null; marqueeEl.style.display = 'none';
         showProps();
+        if (typeof refreshBatchBar === 'function') refreshBatchBar();
+        if (hadSel >= 2) {
+          note('info', '已框选 ' + hadSel + ' 个节点',
+            '可直接在底部浮条里「禁用 / 启用」，或按 Delete 删除；Esc 取消选择。', 3200);
+        }
       }
       // 注意：幽灵节点（从库里拖出来的）不在这里清理，统一由 dropGhost 收，
       // 否则鼠标松手时会被提前删掉，落点判定就没机会跑了。
@@ -2769,8 +3726,28 @@
     /** 从一个按下点决定这次手势做什么（鼠标左右键、触屏单指共用） */
     function decideGesture(ev, cx, cy) {
       var tgt = ev.target;
+      // 折叠组卡片：按住拖动
+      var grpEl = tgt.closest ? tgt.closest('.wfgroup') : null;
+      if (grpEl && !(tgt.closest('.g-btn') || tgt.closest('.g-del') || tgt.closest('.g-name'))) {
+        var gid0 = grpEl.dataset.group;
+        var g0 = foldState()[gid0];
+        if (g0) {
+          var wp0 = worldPt(cx, cy);
+          var gp0 = groupPos(g0);
+          state.groupDrag = { gid: gid0, dx: wp0.x - gp0.x, dy: wp0.y - gp0.y };
+          return 'groupdrag';
+        }
+      }
       var portEl = tgt.classList && tgt.classList.contains('port') ? tgt : null;
       var node = tgt.closest ? tgt.closest('.wfnode') : null;
+
+      // Shift + 节点 = 进入/继续批量删除态（长按 Shift 已进入时，点一下也能追加标记）
+      if (ev.shiftKey && node) {
+        if (!shiftKill.on) armShiftKill([node.dataset.uuid]);
+        else { shiftKill.ids[node.dataset.uuid] = 1; paintShiftKill(); }
+        return 'shiftkill';
+      }
+
       if (node && portEl && portEl.classList.contains('out')) { beginLink(node.dataset.uuid); return 'link'; }
       if (node) {
         if (tgt.classList.contains('wfnode-del') || tgt.classList.contains('wfnode-dis')) return 'none';
@@ -2797,8 +3774,14 @@
         expandPropsPanel();
         return 'none';
       }
-      if (ev.shiftKey || state.marqueeMode) { beginMarquee(cx, cy); return 'marquee'; }
-      beginPan(cx, cy); select(null);
+      // 空白处：默认平移画布（手感与原版一致）。
+      // 只有在「按住 Shift」时才框选，避免和画布拖拽抢手势。
+      if (ev.shiftKey || state.marqueeMode) {
+        beginMarquee(cx, cy);
+        return 'marquee';
+      }
+      beginPan(cx, cy);
+      select(null);
       return 'pan';
     }
 
@@ -2966,6 +3949,24 @@
       ev.preventDefault();
     });
 
+    // 空格按住 = 临时平移模式（框选让位给平移）
+    document.addEventListener('keydown', function (ev) {
+      if (ev.code !== 'Space') return;
+      var tag = (ev.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || ev.target.isContentEditable) return;
+      state.spacePan = true;
+      wrap.classList.add('pan-mode');
+    });
+    document.addEventListener('keyup', function (ev) {
+      if (ev.code !== 'Space') return;
+      state.spacePan = false;
+      wrap.classList.remove('pan-mode');
+    });
+    window.addEventListener('blur', function () {
+      state.spacePan = false;
+      wrap.classList.remove('pan-mode');
+    });
+
     // 滚轮缩放；运行抽屉内交给原生滚动（触控板 / 滚轮）
     wrap.addEventListener('wheel', function (ev) {
       var t = ev.target;
@@ -2975,8 +3976,14 @@
       setZoom(state.view.scale * (ev.deltaY < 0 ? 1.12 : 0.9), ev.clientX - cr.left, ev.clientY - cr.top);
     }, { passive: false });
 
-    // 双击空白重置 / 双击节点编辑说明
+    // 双击空白重置 / 双击节点编辑说明 / 双击折叠卡改名
     wrap.addEventListener('dblclick', function (ev) {
+      var grpCard = ev.target.closest ? ev.target.closest('.wfgroup') : null;
+      if (grpCard) {
+        if (ev.target.closest('.g-btn') || ev.target.closest('.g-del')) return;
+        promptRenameGroup(grpCard.dataset.group);
+        return;
+      }
       var node = ev.target.closest ? ev.target.closest('.wfnode') : null;
       if (node) {
         var n = findNode(node.dataset.uuid);
@@ -2991,6 +3998,45 @@
     });
 
     canvas.addEventListener('click', function (ev) {
+      // —— 折叠组卡片 ——
+      var grp = ev.target.closest ? ev.target.closest('.wfgroup') : null;
+      if (grp) {
+        var gid = grp.dataset.group;
+        var g = foldState()[gid];
+        if (!g) return;
+        if (ev.target.classList.contains('g-del')) {
+          if (confirm('删除整组 ' + g.name + '（' + g.uuids.length + ' 个节点）？')) deleteGroup(gid);
+          return;
+        }
+        var btn = ev.target.closest ? ev.target.closest('.g-btn') : null;
+        if (btn && btn.getAttribute('data-act') === 'expand') { setGroupCollapsed(gid, false); return; }
+        // 双击名字进入重命名
+        var nm = ev.target.closest ? ev.target.closest('.g-name') : null;
+        if (nm) {
+          if (nm.getAttribute('contenteditable') === 'true') return;
+          nm.setAttribute('contenteditable', 'true');
+          nm.focus();
+          var r = document.createRange();
+          r.selectNodeContents(nm);
+          var sel2 = window.getSelection();
+          sel2.removeAllRanges(); sel2.addRange(r);
+          nm.addEventListener('blur', function () {
+            nm.setAttribute('contenteditable', 'false');
+            renameGroup(gid, nm.textContent);
+          }, { once: true });
+          nm.addEventListener('keydown', function (ke) {
+            if (ke.key === 'Enter') { ke.preventDefault(); nm.blur(); }
+            if (ke.key === 'Escape') { nm.textContent = g.name; nm.blur(); }
+          });
+          return;
+        }
+        // 点在卡片空白：选中整组
+        state.selectedIds = {}; state.selectedIds['__grp__' + gid] = 1;
+        state.selected = { type: 'group', id: gid };
+        renderNodes(); showProps();
+        return;
+      }
+
       var node = ev.target.closest ? ev.target.closest('.wfnode') : null;
       if (!node) return;
       if (ev.target.classList.contains('wfnode-del')) { deleteNode(node.dataset.uuid); return; }
@@ -3004,6 +4050,144 @@
         afterChange();
       }
     });
+    // ============================================================
+    // 批量操作浮条
+    // ============================================================
+    var batchbar = document.getElementById('wfed-batchbar');
+
+    function syncBatchBar() {
+      var bar = document.getElementById('wfed-batchbar');
+      if (!bar) return;
+      var keys = Object.keys(state.selectedIds);
+      var nNode = keys.filter(function (k) { return k.indexOf('__grp__') !== 0; }).length;
+      var nGrp = keys.length - nNode;
+      var show = nNode >= 2 || nGrp >= 1;
+      bar.classList.toggle('on', show);
+      var el2 = document.getElementById('bb-n');
+      if (el2) el2.textContent = nNode + (nGrp ? (' + ' + nGrp + ' 组') : '');
+    }
+    // 暴露给框选逻辑用
+    refreshBatchBar = syncBatchBar;
+
+    function selNodeIds() {
+      return Object.keys(state.selectedIds).filter(function (k) {
+        return k.indexOf('__grp__') !== 0 && findNode(k);
+      });
+    }
+
+    function batchSetDisabled(off) {
+      var ids = selNodeIds();
+      var grpIds = Object.keys(state.selectedIds).filter(function (k) { return k.indexOf('__grp__') === 0; });
+      // 选中的折叠组：整组成员一起启用/禁用
+      grpIds.forEach(function (k) {
+        var gid = k.slice('__grp__'.length);
+        var g = foldState()[gid];
+        if (!g) return;
+        g.uuids.forEach(function (u) { if (ids.indexOf(u) < 0) ids.push(u); });
+      });
+      if (!ids.length) return;
+      pushUndo();
+      ids.forEach(function (id) {
+        var n = findNode(id);
+        if (n && n.type !== 'Group') n.disabled = off;
+      });
+      renderNodes(); showProps(); afterChange();
+      note('ok', off ? '已禁用' : '已启用', ids.length + ' 个节点', 2600);
+    }
+
+    // 批量浮条按钮统一由 document 级事件委托处理（见 init 末尾）
+
+
+    // 每次渲染后刷新浮条
+    var _origRender = renderNodes;
+    renderNodes = function () {
+      _origRender.apply(null, arguments);
+      syncBatchBar();
+    };
+
+    // ============================================================
+    // Shift 长按划删：按住 Shift 划过节点 → 标红，松开 Shift 确认删除
+    // ============================================================
+    var shiftKill = { on: false, ids: {} };
+
+    function paintShiftKill() {
+      Array.prototype.forEach.call(canvas.querySelectorAll('.wfnode'), function (d) {
+        d.classList.toggle('shift-kill', !!shiftKill.ids[d.dataset.uuid]);
+      });
+    }
+
+    function runShiftKill() {
+      var ids = Object.keys(shiftKill.ids);
+      shiftKill.on = false;
+      shiftKill.ids = {};
+      paintShiftKill();
+      if (!ids.length) return;
+      pushUndo();
+      var kill = {};
+      ids.forEach(function (i) { kill[i] = 1; });
+      state.wf.data.nodes = state.wf.data.nodes.filter(function (x) { return !kill[x.uuid]; });
+      state.wf.data.edges = state.wf.data.edges.filter(function (e) {
+        return !kill[e.source_node_uuid] && !kill[e.target_node_uuid];
+      });
+      state.selectedIds = {}; state.selected = null;
+      renderNodes(); showProps(); updateStats(); afterChange();
+      note('ok', '已删除', ids.length + ' 个节点（Ctrl+Z 可撤销）', 3200);
+    }
+
+    // Shift 的两种用法：
+    //   · 长按 Shift（约 450ms）→ 进入「批量删除」态，之后划过/点过的节点标红，松开 Shift 或点空白确认删除
+    //   · Shift + 在节点上按下  → 立刻进入同一删除态（兼容老习惯）
+    //   · Shift + 在空白处拖动  → 框选多选（不删）
+    var shiftHoldTimer = null;
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Shift' || shiftHoldTimer) return;
+      var tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) return;
+      shiftHoldTimer = setTimeout(function () {
+        shiftHoldTimer = null;
+        // 若此刻鼠标正按着（多半是在拖动框选或拖节点），不进入划删态
+        if (mouseDown || state.marquee || state.pan || state.dragMul) return;
+        if (!shiftKill.on) armShiftKill([]);
+      }, 450);
+    });
+    // 鼠标一按下就取消「长按 Shift 划删」的待办：说明用户要的是 Shift+拖动框选
+    window.addEventListener('pointerdown', function () {
+      if (shiftHoldTimer) { clearTimeout(shiftHoldTimer); shiftHoldTimer = null; }
+    }, true);
+
+    document.addEventListener('keyup', function (e) {
+      if (e.key !== 'Shift') return;
+      if (shiftHoldTimer) { clearTimeout(shiftHoldTimer); shiftHoldTimer = null; }
+      wrap.classList.remove('shift-mode');
+      state.shiftArmed = false;
+      if (shiftKill.on) runShiftKill();
+    });
+
+    window.addEventListener('blur', function () {
+      if (shiftHoldTimer) { clearTimeout(shiftHoldTimer); shiftHoldTimer = null; }
+      if (shiftKill.on) { shiftKill.on = false; shiftKill.ids = {}; paintShiftKill(); }
+      wrap.classList.remove('shift-mode');
+      state.shiftArmed = false;
+    });
+
+    /** 进入批量删除态；seed 为初始标记的节点 */
+    function armShiftKill(seed) {
+      shiftKill.on = true;
+      shiftKill.ids = {};
+      (seed || []).forEach(function (u) { shiftKill.ids[u] = 1; });
+      state.shiftArmed = true;
+      wrap.classList.add('shift-mode');
+      paintShiftKill();
+    }
+
+    canvas.addEventListener('mouseover', function (e) {
+      if (!shiftKill.on) return;
+      var nd = e.target.closest ? e.target.closest('.wfnode') : null;
+      if (!nd) return;
+      shiftKill.ids[nd.dataset.uuid] = 1;
+      paintShiftKill();
+    });
+
     svg.addEventListener('click', function (ev) {
       var p = ev.target;
       if (p && p.dataset && p.dataset.id) {
@@ -3151,7 +4335,8 @@
     document.getElementById('zoom-reset').addEventListener('click', function () {
       state.view = { x: 40, y: 40, scale: 1 }; applyView(); updatePositions();
     });
-    document.getElementById('btn-fit').addEventListener('click', function () { fitView(); });
+    var _bfit = document.getElementById('btn-fit');
+    if (_bfit) _bfit.addEventListener('click', function () { fitView(); });
     // 框选模式：触屏没有 Shift 键，用一个开关代替（鼠标也更好按）
     var mqBtn = document.getElementById('zoom-marquee');
     if (mqBtn) mqBtn.addEventListener('click', function () {
@@ -3168,7 +4353,13 @@
       var tag = (ev.target.tagName || '').toLowerCase();
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
       var mod = ev.ctrlKey || ev.metaKey;
-      if (mod && ev.key.toLowerCase() === 'z') { ev.preventDefault(); ev.shiftKey ? redo() : undo(); return; }
+      if (mod && ev.key.toLowerCase() === 'z') {
+        ev.preventDefault();
+        if (ev.shiftKey) { redo(); return; }
+        // 优先回滚「工作流删除」（文件级操作），没有才回滚画布
+        if (wfTrash.length) { undoWfDelete(); return; }
+        undo(); return;
+      }
       if (mod && ev.key.toLowerCase() === 'y') { ev.preventDefault(); redo(); return; }
       if (mod && ev.key.toLowerCase() === 'a') {
         ev.preventDefault();
@@ -3361,7 +4552,56 @@
     delete n.param.tip_rack_slots;
     return n;
   }
-  function collectLinked() {
+  /** 折叠组落盘：只存「可重建」的最小信息（成员首节点 / 容器 id、名字、折叠态、坐标） */
+  function foldsForSave() {
+    var f = foldState();
+    var out = [];
+    Object.keys(f).forEach(function (gid) {
+      var g = f[gid];
+      if (!g || !g.uuids || g.uuids.length < 2) return;
+      out.push({
+        id: g.id,
+        name: g.name,
+        device: g.device || '',
+        kind: g.kind || '',
+        parent: g.parent || '',
+        collapsed: !!g.collapsed,
+        anchor: g.uuids[0],
+        uuids: g.uuids.slice(),
+        x: (g.x === undefined ? null : g.x),
+        y: (g.y === undefined ? null : g.y)
+      });
+    });
+    return out;
+  }
+
+  /** 从工作流文件恢复折叠组（成员仍在才算数） */
+  function foldsFromSave(list) {
+    var fresh = {};
+    (list || []).forEach(function (g) {
+      if (!g || !g.uuids || g.uuids.length < 2) return;
+      var keep = g.uuids.filter(function (u) { return !!findNode(u); });
+      if (keep.length < 2) return;
+      var gid = g.id || ('fg_' + String(keep[0] || '').slice(0, 6));
+      fresh[gid] = {
+        id: gid, device: g.device || '', uuids: keep, name: g.name || '流程组',
+        collapsed: g.collapsed !== false, kind: g.kind || '', parent: g.parent || '',
+        x: (g.x === undefined ? null : g.x), y: (g.y === undefined ? null : g.y)
+      };
+    });
+    state.folds = fresh;
+    state.wf.data.nodes.forEach(function (n) { delete n._foldGroup; });
+    Object.keys(fresh).forEach(function (gid) {
+      fresh[gid].uuids.forEach(function (u) {
+        var n = findNode(u);
+        if (n) n._foldGroup = gid;
+      });
+    });
+    return Object.keys(fresh).length;
+  }
+
+  function collectLinked(opts) {
+    opts = opts || {};
     var name = (document.getElementById('wf-name').value || '').trim() || '未命名工作流';
     state.wf.name = name;
     state.wf.data.workflow_name = name;
@@ -3376,6 +4616,9 @@
       var c = cloneData(e); delete c._embed; return c;
     });
     out.data.embeds = cloneData(state.wf.data.embeds || []);
+    // 折叠组只有「显式保存 / 导出」才落盘；自动同步不带它，避免纯视图状态污染后端模板
+    if (opts.withFolds) out.data.folds = foldsForSave();
+    else delete out.data.folds;
     return out;
   }
   function renderTplPick() {
@@ -3401,17 +4644,34 @@
       var name = r.name || '未命名工作流';
       var asTpl = r.live ? !!(state.wf.data && state.wf.data.as_template) : !!r.as_template;
       var badge = asTpl ? '<span class="wt">模版</span>' : '';
-      return '<div class="wf-pick-item' + (r.live ? ' on' : '') + '" data-tid="' + esc(r.id) + '" data-tpl="' + (asTpl ? '1' : '0') + '" role="button" tabindex="0" title="点击切换。右键可新建、重命名、转为模版或删除">' +
+      var picked = !!(r.id && wfPickSet[r.id]);
+      return '<div class="wf-pick-item' + (r.live ? ' on' : '') + (picked ? ' picked' : '') +
+        '" data-tid="' + esc(r.id) + '" data-tpl="' + (asTpl ? '1' : '0') + '" role="button" tabindex="0" title="点击切换 · Shift+点击多选删除 · 右键新建">' +
         '<span class="wr"><span class="wn" title="' + esc(name) + '">' + esc(name) + '</span>' + badge + '</span>' +
         '<span class="wm">' + esc(meta) + '</span></div>';
     }).join('');
+    renderWfPickBar();
     Array.prototype.forEach.call(box.querySelectorAll('.wf-pick-item'), function (b) {
       var open = function () {
         var tid = b.getAttribute('data-tid') || '';
         if (!tid || tid === wfUuid(state.wf)) return;
         editTemplate(tid);
       };
-      b.addEventListener('click', open);
+      b.addEventListener('click', function (ev) {
+        // Shift+点击：勾选/取消勾选，用于批量删除（不打开）
+        if (ev.shiftKey) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          var tid0 = b.getAttribute('data-tid') || '';
+          if (!tid0) return;
+          if (wfPickSet[tid0]) delete wfPickSet[tid0];
+          else wfPickSet[tid0] = 1;
+          renderTplPick();
+          return;
+        }
+        if (Object.keys(wfPickSet).length) { wfPickSet = {}; renderTplPick(); }
+        open();
+      });
       b.addEventListener('keydown', function (ev) {
         if (ev.target !== b) return;
         if (ev.key !== 'Enter' && ev.key !== ' ') return;
@@ -3425,6 +4685,128 @@
         showWfMenu(ev.clientX, ev.clientY, b.getAttribute('data-tid') || '', (nameEl && nameEl.textContent) || '', b.getAttribute('data-tpl') === '1');
       });
     });
+  }
+
+  // ---------- 工作流列表：Shift+点击多选 → 批量删除 ----------
+  var wfPickSet = {};
+
+  function renderWfPickBar() {
+    var old = document.getElementById('wf-pick-bar');
+    var box = document.getElementById('wf-pick-list');
+    if (!box) return;
+    var n = Object.keys(wfPickSet).length;
+    if (!n) { if (old) old.remove(); return; }
+    var bar = old || document.createElement('div');
+    bar.id = 'wf-pick-bar';
+    bar.className = 'wf-pick-bar';
+    bar.innerHTML = '<span>已选 <b>' + n + '</b> 项</span>' +
+      '<button type="button" id="wpb-del">删除所选</button>' +
+      '<button type="button" id="wpb-clear">取消</button>';
+    if (!old) box.parentNode.insertBefore(bar, box);
+    var delBtn = bar.querySelector('#wpb-del');
+    var clrBtn = bar.querySelector('#wpb-clear');
+    delBtn.onclick = function (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      batchDeleteWorkflows(Object.keys(wfPickSet));
+    };
+    clrBtn.onclick = function (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      wfPickSet = {};
+      renderTplPick();
+    };
+  }
+
+  function batchDeleteWorkflows(ids) {
+    var list = (ids || []).filter(Boolean);
+    if (!list.length) return;
+    var curId = wfUuid(state.wf);
+    var withCur = list.indexOf(curId) >= 0;
+    var names = list.map(function (id) {
+      if (id === curId) return '（正在编辑）' + ((document.getElementById('wf-name').value || '').trim() || '未命名工作流');
+      var hit = tplList.filter(function (t) { return t.id === id; })[0];
+      return (hit && hit.name) || '未命名工作流';
+    });
+    var body = '将删除 ' + list.length + ' 份工作流：' + names.slice(0, 5).join('、') +
+      (names.length > 5 ? ' …' : '') + (withCur ? '\n其中包含正在编辑的这份，删除后画布会换成空白。' : '') +
+      '\n（删除后可用 Ctrl+Z 撤回）';
+    askConfirm('批量删除工作流', body, function () {
+      if (tplSyncTimer) { clearTimeout(tplSyncTimer); tplSyncTimer = null; }
+      // 删除前把正文存进回收栈，供 Ctrl+Z 恢复
+      var trashItems = [];
+      list.forEach(function (tid) {
+        if (tplPutTimer[tid]) { clearTimeout(tplPutTimer[tid]); delete tplPutTimer[tid]; }
+        var cached = tplCache[tid];
+        var fromList = tplList.filter(function (t) { return t.id === tid; })[0];
+        trashItems.push({
+          id: tid,
+          name: (fromList && fromList.name) || (cached && cached.name) || '未命名工作流',
+          isTpl: !!(fromList && fromList.as_template),
+          workflow: cached ? JSON.parse(JSON.stringify(cached)) : null
+        });
+        tplRemoved[tid] = 1;
+        delete tplCache[tid];
+      });
+      // 正文缺失的（未缓存）先拉一次再删
+      var needPull = trashItems.filter(function (t) { return !t.workflow; });
+      var proceed = function () {
+        pushWfTrash(trashItems);
+        doBatchDelete(list, withCur, curId);
+      };
+      if (!needPull.length) { proceed(); return; }
+      var pending = needPull.length;
+      needPull.forEach(function (t) {
+        fetch('/api/workflow-templates/' + encodeURIComponent(t.id))
+          .then(function (r) { return r.json(); })
+          .then(function (j) { if (j && j.workflow) t.workflow = j.workflow; })
+          .catch(function () { })
+          .then(function () { if (--pending === 0) proceed(); });
+      });
+    });
+  }
+
+  /** 真正执行批量删除（正文已存入回收栈） */
+  function doBatchDelete(list, withCur, curId) {
+    {
+      tplList = tplList.filter(function (t) { return list.indexOf(t.id) < 0; });
+      if (withCur) {
+        state.wf = freshWorkflow();
+        state.tplRegistered = false;
+        state.dirty = false;
+        document.getElementById('wf-name').value = state.wf.name;
+        state.selected = null; state.selectedIds = {};
+        state.undo = []; state.redo = [];
+        tplSel = '';
+        emptyHint.style.display = '';
+        try {
+          var draft = JSON.parse(localStorage.getItem('wfed_draft') || 'null');
+          if (draft && draft.wf && list.indexOf(wfUuid(draft.wf)) >= 0) localStorage.removeItem('wfed_draft');
+        } catch (e) { }
+      } else {
+        list.forEach(function (tid) { if (tid !== curId) dropEmbedsOf(tid); });
+        if (list.indexOf(tplSel) >= 0) tplSel = curId;
+      }
+      wfPickSet = {};
+      renderNodes(); showProps(); updateStats(); renderTplPick();
+
+      var done = 0, failed = [];
+      var after = function () {
+        done++;
+        if (done < list.length) return;
+        if (failed.length) note('warn', '部分删除失败', failed);
+        else note('ok', '已删除', list.length + ' 份工作流（Ctrl+Z 可撤回）', 3600);
+      };
+      list.forEach(function (tid) {
+        fetch('/api/workflow-templates/' + encodeURIComponent(tid), { method: 'DELETE' })
+          .then(function (r) { return r.json(); })
+          .then(function (res) {
+            if (!res || res.ok === false) { delete tplRemoved[tid]; failed.push(tid); }
+            after();
+          })
+          .catch(function () { delete tplRemoved[tid]; failed.push(tid); after(); });
+      });
+    }
   }
   function hideWfMenu() {
     var m = document.getElementById('wf-ctx');
@@ -3591,7 +4973,12 @@
       if (gen !== tplListGen) return;
       bootListArrived = true;
       tplList = ((res && res.templates) || []).filter(function (t) { return t && t.id && !tplRemoved[t.id]; });
+      try { console.log('[模板列表] 收到', tplList.length, '条'); } catch (e) { }
       renderTplPick();
+      try {
+        var bx = document.getElementById('wf-pick-list');
+        console.log('[模板列表] 渲染后 DOM 子项', bx ? bx.children.length : -1);
+      } catch (e) { }
       reconcileSavedWorkflow();
     }).catch(function () { if (gen === tplListGen) renderTplPick(); });
   }
@@ -3925,9 +5312,11 @@
       if (!tplCache[tid]) { note('err', '读不到这份模版', tid); return; }
       state.tplRegistered = true;
       openWorkflow(cloneData(tplCache[tid]));
-    }).catch(function () {
+    }).catch(function (e) {
       if (gen !== tplSwitchGen) return;
-      note('err', '切换失败', '网络或后端没有响应。');
+      try { console.error('[切换工作流]', e); } catch (e2) { }
+      var msg = (e && (e.message || e.err)) || '网络或后端没有响应。';
+      note('err', '切换失败', msg + '（详情见控制台）');
     });
   }
   function dropEmbedsOf(tid) {
@@ -3965,9 +5354,36 @@
     var body = tid === cur
       ? '正在编辑的这份会从列表里去掉，画布换成空白。其它工作流里插入的这块也会去掉。'
       : '「' + name + '」会从列表里去掉。其它工作流里插入的这块也会去掉。';
+    body += '\n（删除后可用 Ctrl+Z 撤回）';
     askConfirm('删除工作流', body, function () {
       if (tplSyncTimer) { clearTimeout(tplSyncTimer); tplSyncTimer = null; }
       if (tplPutTimer[tid]) { clearTimeout(tplPutTimer[tid]); delete tplPutTimer[tid]; }
+      // 删除前把正文存进回收栈，供 Ctrl+Z 恢复
+      var cached = tplCache[tid];
+      var fromList = tplList.filter(function (t) { return t.id === tid; })[0];
+      var entry = {
+        id: tid,
+        name: name || (fromList && fromList.name) || '未命名工作流',
+        isTpl: !!(fromList && fromList.as_template),
+        workflow: cached ? JSON.parse(JSON.stringify(cached)) : null
+      };
+      var doDelete = function () {
+        pushWfTrash([entry]);
+        reallyDeleteTemplate(tid, cur, true);
+      };
+      if (entry.workflow) { doDelete(); return; }
+      // 没缓存：先拉正文，避免撤回时只能恢复一个空壳
+      fetch('/api/workflow-templates/' + encodeURIComponent(tid))
+        .then(function (r) { return r.json(); })
+        .then(function (j) { if (j && j.workflow) entry.workflow = j.workflow; })
+        .catch(function () { })
+        .then(doDelete);
+    });
+  }
+
+  /** 单份删除的实际动作（正文已存入回收栈） */
+  function reallyDeleteTemplate(tid, cur, alreadyConfirmed) {
+    {
       tplRemoved[tid] = 1;
       delete tplCache[tid];
       tplList = tplList.filter(function (t) { return t.id !== tid; });
@@ -4003,14 +5419,14 @@
             return;
           }
           fetchTplList();
-          note('ok', '已删除', name, 3200);
+          note('ok', '已删除', '（Ctrl+Z 可撤回）', 3200);
         })
         .catch(function () {
           delete tplRemoved[tid];
           note('err', '删除失败', '网络或后端没有响应。');
           fetchTplList();
         });
-    }, '删除');
+    }
   }
   function bindTplPick() {
     var pick = document.getElementById('wf-pick');
@@ -4070,13 +5486,46 @@
     if (!wf.data.workflow_uuid) wf.data.workflow_uuid = uid();
     wf.data.edges = wf.data.edges || [];
     if (!wf.data.embeds) wf.data.embeds = [];
+    // 旧文件里的「分组/注释」节点：剥离，改由折叠组承担分组显示
+    var _grpNodes = wf.data.nodes.filter(function (n) { return n && n.type === 'Group'; });
+    if (_grpNodes.length) {
+      var _gid = {};
+      _grpNodes.forEach(function (n) { if (n.uuid) _gid[n.uuid] = 1; });
+      wf.data.nodes = wf.data.nodes.filter(function (n) { return !n || n.type !== 'Group'; });
+      wf.data.edges = (wf.data.edges || []).filter(function (e) {
+        return e && !_gid[e.source_node_uuid] && !_gid[e.target_node_uuid];
+      });
+      wf._importGroupNames = _grpNodes.map(function (n) {
+        return String(n.name || n.footer || '').trim();
+      }).filter(Boolean);
+    }
     wf.data.nodes.forEach(normalizeNode);
     document.getElementById('wf-name').value = wf.name || wf.data.workflow_name || '未命名工作流';
     state.selected = null; state.selectedIds = {}; state.undo = []; state.redo = [];
+    state.folds = {};   // 新工作流：折叠组全部重建
     state.tplRegistered = true;
     cacheTemplate(collectLinked());
     var paint = function () {
       expandAllEmbeds();
+      try {
+        var savedFolds = (wf.data.folds || []).slice();
+        rebuildFolds();        // 容器组 + 同设备连续段
+        if (savedFolds.length) {
+          // 文件里带了折叠组：优先按存档还原（名字 / 折叠态 / 坐标）
+          var restored = foldsFromSave(savedFolds);
+          if (!restored) rebuildFolds();
+        } else if (state.wf._importGroupNames && state.wf._importGroupNames.length) {
+          var names = state.wf._importGroupNames.slice();
+          Object.keys(foldState()).forEach(function (k, i) {
+            if (names[i]) foldState()[k].name = names[i];
+          });
+        }
+      } catch (eFold) {
+        try { console.error('[折叠组]', eFold); } catch (e2) { }
+        state.folds = {};
+        note('warn', '折叠未生效', '节点照常显示，可先用「自动布局」。原因：' + (eFold.message || eFold), 6000);
+      }
+      layoutFolded();
       renderNodes(); showProps(); updateStats(); renderTplPick();
       emptyHint.style.display = state.wf.data.nodes.length ? 'none' : '';
       setTimeout(function () {
@@ -4101,6 +5550,7 @@
     out.data.workflow_name = name;
     out.data.nodes = state.wf.data.nodes.map(function (n) { return pruneTransferParam(stripRuntime(n)); });
     out.data.edges = state.wf.data.edges.map(function (e) { var c = cloneData(e); delete c._embed; return c; });
+    out.data.folds = foldsForSave();
     delete out.data.embeds;
     return out;
   }
@@ -4136,7 +5586,7 @@
     // 在这里再绑一次会读两遍、弹两次预览）。
     document.getElementById('btn-save').addEventListener('click', function () {
       var name = (document.getElementById('wf-name').value || '').trim() || '未命名工作流';
-      var wf = collectLinked();
+      var wf = collectLinked({ withFolds: true });
       fetch('/api/workflow-save', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name, workflow: wf })
@@ -4239,6 +5689,35 @@
       fixes.push('丢弃 ' + (wf.data.edges.length - keepEdges.length) + ' 条指向不存在节点的连线');
     }
     wf.data.edges = keepEdges;
+
+    // 导入的 Group 节点：作为折叠容器保留语义（成员靠 parent_uuid 归属），
+    // 但不再渲染成灰色占位卡 —— 容器自身不进节点表，只做命名与成组依据。
+    var groupNodes = wf.data.nodes.filter(function (n) { return n && n.type === 'Group'; });
+    if (groupNodes.length) {
+      wf._importGroupNames = groupNodes.map(function (n) {
+        return String(n.name || n.footer || '').trim();
+      }).filter(Boolean);
+      var gid2 = {};
+      groupNodes.forEach(function (n) { if (n && n.uuid) gid2[n.uuid] = 1; });
+      wf.data.nodes = wf.data.nodes.filter(function (n) { return !n || n.type !== 'Group'; });
+      wf.data.edges = wf.data.edges.filter(function (e) {
+        return !gid2[e.source_node_uuid] && !gid2[e.target_node_uuid];
+      });
+      // 成员数：parent_uuid 指向容器的那些节点
+      var owner = {};
+      groupNodes.forEach(function (n) {
+        if (!n || !n.uuid) return;
+        owner[n.uuid] = String(n.name || n.footer || '').trim() || '流程分组';
+        owner[String(n.uuid).split('__').pop()] = owner[n.uuid];
+      });
+      var memCnt = 0;
+      wf.data.nodes.forEach(function (n) {
+        var p = String((n && n.parent_uuid) || '').trim();
+        if (p && owner[p]) memCnt++;
+      });
+      fixes.push('识别 ' + groupNodes.length + ' 个流程分组（覆盖 ' + memCnt +
+        ' 个节点），已按分组收成折叠卡片，可点「展开」查看');
+    }
     return { wf: wf, fmt: fmt, fixes: fixes };
   }
 
@@ -4779,6 +6258,213 @@
   function init() {
     renderLib();
     bind();
+
+    // ---- 折叠 / 批量按钮：capture 阶段直接接管 ----
+    // 注意：按钮可能在本脚本执行后才由 shell.js 注入，所以要延迟绑定。
+    (function tryBindFolds() {
+      if (!document.getElementById('btn-fold')) {
+        // 还没渲染出来，等下一帧再试
+        setTimeout(tryBindFolds, 50);
+        return;
+      }
+      bindFoldsNow();
+    })();
+
+    function bindFoldsNow() {
+      function on(id, fn) {
+        var e = document.getElementById(id);
+        if (!e || e.dataset.wfClickBound) return;
+        e.dataset.wfClickBound = '1';
+        e.addEventListener('click', function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          try { fn(ev); }
+          catch (err) {
+            console.error('[按钮 ' + id + ']', err);
+            note('err', '操作失败', String(err && err.message || err), 4000);
+          }
+        }, true);
+      }
+      on('btn-fold', function () { rebuildFolds(); foldAllGroups(); });
+      on('btn-unfold', function () { unfoldAll(); });
+      on('bb-fold', function () { rebuildFolds(); foldAllGroups(); });
+      on('bb-unfold', function () { unfoldAll(); });
+      on('bb-disable', function () {
+        var ids = Object.keys(state.selectedIds).filter(function (k) {
+          return k.indexOf('__grp__') !== 0 && findNode(k);
+        });
+        if (!ids.length) { note('warn', '没有选中节点', '先框选几个节点。', 3000); return; }
+        pushUndo();
+        ids.forEach(function (id) { var n2 = findNode(id); if (n2) n2.disabled = true; });
+        renderNodes(); showProps(); afterChange();
+        note('ok', '已禁用', ids.length + ' 个节点', 2400);
+      });
+      on('bb-enable', function () {
+        var ids = Object.keys(state.selectedIds).filter(function (k) {
+          return k.indexOf('__grp__') !== 0 && findNode(k);
+        });
+        if (!ids.length) { note('warn', '没有选中节点', '先框选几个节点。', 3000); return; }
+        pushUndo();
+        ids.forEach(function (id) { var n2 = findNode(id); if (n2) n2.disabled = false; });
+        renderNodes(); showProps(); afterChange();
+        note('ok', '已启用', ids.length + ' 个节点', 2400);
+      });
+      on('bb-del', function () {
+        var n = Object.keys(state.selectedIds).filter(function (k) {
+          return k.indexOf('__grp__') !== 0;
+        }).length;
+        if (!n) return;
+        if (!confirm('删除选中的 ' + n + ' 个节点？')) return;
+        deleteSelected();
+      });
+      on('bb-clear', function () {
+        state.selectedIds = {}; state.selected = null;
+        var bar = document.getElementById('wfed-batchbar');
+        if (bar) bar.classList.remove('on');
+        renderNodes(); showProps();
+      });
+    }
+
+    // ============================================================
+    // 折叠 / 批量操作：统一用 document 级事件委托
+    // 不用直接绑按钮，因为：① 按钮可能在 DOM 重建后消失；
+    // ② 点击卡片会被 pointerdown 的 select(null) 抢先重绘。
+    // ============================================================
+    // pointerdown 阶段就拦下折叠卡片里的按钮：否则 decideGesture 会先 select(null)
+    // 触发重绘，DOM 一换 click 就落空了。
+    document.addEventListener('pointerdown', function (ev) {
+      var t0 = ev.target;
+      if (!t0 || !t0.closest) return;
+      var btn0 = t0.closest('.g-btn');
+      var del0 = t0.closest('.g-del');
+      var foldBadge = t0.closest('.wfnode-fold');
+      if (foldBadge) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        toggleFold(foldBadge.dataset.fold);
+        return;
+      }
+      if (!btn0 && !del0) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      var card0 = t0.closest('.wfgroup');
+      if (!card0) return;
+      var gid00 = card0.dataset.group;
+      if (del0) {
+        var g00 = foldState()[gid00];
+        if (g00 && confirm('删除整组 ' + g00.name + '（' + g00.uuids.length + ' 个节点）？')) deleteGroup(gid00);
+        return;
+      }
+      var act = btn0 && btn0.getAttribute('data-act');
+      if (act === 'expand') setGroupCollapsed(gid00, false);
+      else if (act === 'collapse') setGroupCollapsed(gid00, true);
+      else if (act === 'rename') promptRenameGroup(gid00);
+    }, true);
+
+    document.addEventListener('click', function (ev) {
+      var t2 = ev.target;
+      if (!t2) return;
+
+      // —— 工具栏：折叠 / 全部展开 ——
+      if (t2.id === 'btn-fold') {
+        ev.preventDefault(); ev.stopPropagation();
+        try {
+          rebuildFolds();
+          foldAllGroups();
+        } catch (e) {
+          console.error('[折叠]', e);
+          note('err', '折叠失败', String(e && e.message || e));
+        }
+        return;
+      }
+      if (t2.id === 'btn-unfold') {
+        ev.preventDefault(); ev.stopPropagation();
+        try { unfoldAll(); } catch (e) { console.error('[展开]', e); }
+        return;
+      }
+
+      // —— 批量浮条按钮 ——
+      if (t2.id === 'bb-disable' || t2.id === 'bb-enable') {
+        ev.preventDefault(); ev.stopPropagation();
+        var off = t2.id === 'bb-disable';
+        var ids = Object.keys(state.selectedIds).filter(function (k) {
+          return k.indexOf('__grp__') !== 0 && findNode(k);
+        });
+        if (!ids.length) { note('warn', '没有选中节点', '先框选或按住 Ctrl 点选几个节点。', 3000); return; }
+        pushUndo();
+        ids.forEach(function (id) {
+          var n2 = findNode(id);
+          if (n2 && n2.type !== 'Group') n2.disabled = off;
+        });
+        renderNodes(); showProps(); afterChange();
+        note('ok', off ? '已禁用' : '已启用', ids.length + ' 个节点', 2400);
+        return;
+      }
+      if (t2.id === 'bb-fold') {
+        ev.preventDefault(); ev.stopPropagation();
+        try { rebuildFolds(); foldAllGroups(); } catch (e) { console.error(e); }
+        return;
+      }
+      if (t2.id === 'bb-unfold') {
+        ev.preventDefault(); ev.stopPropagation();
+        try { unfoldAll(); } catch (e) { console.error(e); }
+        return;
+      }
+      if (t2.id === 'bb-del') {
+        ev.preventDefault(); ev.stopPropagation();
+        var cnt = Object.keys(state.selectedIds).filter(function (k) {
+          return k.indexOf('__grp__') !== 0;
+        }).length;
+        if (!cnt) return;
+        if (!confirm('删除选中的 ' + cnt + ' 个节点？')) return;
+        deleteSelected();
+        return;
+      }
+      if (t2.id === 'bb-clear') {
+        ev.preventDefault(); ev.stopPropagation();
+        state.selectedIds = {}; state.selected = null;
+        document.getElementById('wfed-batchbar').classList.remove('on');
+        renderNodes(); showProps();
+        return;
+      }
+
+      // —— 折叠卡片内的按钮（展开 / 删除 / 改名）——
+      var gbtn = t2.closest ? t2.closest('.g-btn') : null;
+      if (gbtn && gbtn.getAttribute('data-act') === 'expand') {
+        ev.preventDefault(); ev.stopPropagation();
+        var card = gbtn.closest('.wfgroup');
+        if (card) setGroupCollapsed(card.dataset.group, false);
+        return;
+      }
+      var gdel = t2.closest ? t2.closest('.g-del') : null;
+      if (gdel) {
+        ev.preventDefault(); ev.stopPropagation();
+        var c2 = gdel.closest('.wfgroup');
+        var g2 = c2 ? foldState()[c2.dataset.group] : null;
+        if (g2 && confirm('删除整组 ' + g2.name + '（' + g2.uuids.length + ' 个节点）？')) {
+          deleteGroup(c2.dataset.group);
+        }
+        return;
+      }
+      var gname = t2.closest ? t2.closest('.g-name') : null;
+      if (gname) {
+        var c3 = gname.closest('.wfgroup');
+        if (c3) {
+          // 自己判双击：浏览器 dblclick 依赖 clickCount，某些输入路径不触发，这里用时间间隔兜底
+          var now = Date.now();
+          var gid3 = c3.dataset.group;
+          if (lastGNameClick.gid === gid3 && now - lastGNameClick.t < 420) {
+            lastGNameClick = { gid: '', t: 0 };
+            ev.preventDefault(); ev.stopPropagation();
+            promptRenameGroup(gid3);
+            return;
+          }
+          lastGNameClick = { gid: gid3, t: now };
+        }
+        return;
+      }
+    }, true);
+
     bindOpenSave();
     bindImport();
     bindTplPick();
@@ -4816,6 +6502,15 @@
       addNode: addNode,
       openWorkflow: openWorkflow,
       collectWorkflow: collectWorkflow,
+      // ---- 折叠组（自检 / 外部脚本用）----
+      foldState: foldState,
+      rebuildFolds: rebuildFolds,
+      compactFolds: compactFolds,
+      layoutFolded: layoutFolded,
+      foldAllGroups: foldAllGroups,
+      unfoldAll: unfoldAll,
+      setGroupCollapsed: setGroupCollapsed,
+      groupBounds: groupBounds,
       // ---- 右栏属性面板（窄栏「固定展开」+ PRCXI 板位点选器，给自检用）----
       setPropPinned: function (on) { if (setPropPinnedFn) setPropPinnedFn(on); },
       isPropPinned: function () {

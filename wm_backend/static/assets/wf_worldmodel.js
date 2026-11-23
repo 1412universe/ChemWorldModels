@@ -53,6 +53,27 @@
       '.wm-verdict.go{background:#ecfdf5;border-color:#a7f3d0;color:#065f46;}',
       '.wm-verdict.risk{background:#fffbeb;border-color:#fde68a;color:#92400e;}',
       '.wm-verdict.reject{background:#fef2f2;border-color:#fecaca;color:#991b1b;}',
+      '.wm-by{font-size:10px;opacity:.75;margin-top:2px;}',
+      '.wm-voices{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}',
+      '.wm-voice{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;}',
+      '.wm-voice.go{background:#f0fdf4;border-color:#bbf7d0;}',
+      '.wm-voice.risk{background:#fffbeb;border-color:#fde68a;}',
+      '.wm-voice.reject{background:#fef2f2;border-color:#fecaca;}',
+      '.wm-voice .who{flex:0 0 52px;font-size:11px;font-weight:800;color:#334155;}',
+      '.wm-voice .say{flex:1;min-width:0;}',
+      '.wm-voice .say .v{font-size:11.5px;font-weight:650;color:#0f172a;line-height:1.4;}',
+      '.wm-voice .say .w{font-size:10.5px;color:#64748b;margin-top:2px;line-height:1.35;}',
+      '.wm-conflict{font-size:11px;line-height:1.5;color:#92400e;background:#fffbeb;border:1px dashed #fcd34d;border-radius:9px;padding:8px 10px;margin-bottom:10px;}',
+      '.wm-action{border:1px solid #99f6e4;background:#f0fdfa;border-radius:11px;padding:10px 11px;margin-bottom:10px;}',
+      '.wm-action .t{font-size:11px;font-weight:800;color:#0f766e;margin-bottom:4px;}',
+      '.wm-action .a{font-size:11.5px;font-weight:650;color:#0f172a;line-height:1.45;}',
+      '.wm-action .w{font-size:10.5px;color:#64748b;margin-top:4px;line-height:1.4;}',
+      '.wm-more details{border:1px solid #e2e8f0;border-radius:9px;padding:0 10px;margin-bottom:6px;background:#fff;}',
+      '.wm-more summary{cursor:pointer;font-size:11px;font-weight:700;color:#475569;padding:8px 0;list-style:none;}',
+      '.wm-more summary::-webkit-details-marker{display:none;}',
+      '.wm-more summary:before{content:"▸ ";color:#94a3b8;}',
+      '.wm-more details[open] summary:before{content:"▾ ";}',
+      '.wm-more .inner{padding-bottom:9px;}',
       '.wm-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px;}',
       '.wm-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px;}',
       '.wm-card .k{font-size:10px;color:#64748b;font-weight:600;}',
@@ -121,7 +142,11 @@
       '  <div class="wm-row wm-3">' +
       '    <label>氧气浓度 %<input id="wm-o2pct" type="number" min="0" max="50" step="0.1" value="1"></label>' +
       '    <label>负载量 wt%<input id="wm-loading" type="number" min="0.02" max="10" step="0.005" value="0.1"></label>' +
-      '    <label>光照 mW/cm²<input id="wm-light" type="number" min="1" max="500" step="1" value="100"></label>' +
+      '    <label>光照<input id="wm-light" type="number" min="1" max="600" step="0.1" value="257.3"></label>' +
+      '    <label>光照单位<select id="wm-light-unit">' +
+      '      <option value="lpd">mW/cm²</option>' +
+      '      <option value="W">灯功率 W</option>' +
+      '    </select></label>' +
       '  </div>' +
       '  <div class="wm-actions">' +
       '    <button type="button" class="wm-run" id="wm-run">预演</button>' +
@@ -143,7 +168,7 @@
       $('wm-ar').value = '10';
       $('wm-o2pct').value = '1';
       $('wm-loading').value = '0.1';
-      $('wm-light').value = '100';
+      $('wm-light').value = '257.3';
       runPreview();
     });
     return panel;
@@ -578,104 +603,109 @@
     var inp = j.input || {};
     var html = '';
 
+    // ① 结论
     html += '<div class="wm-verdict ' + esc(v.level || '') + '">' +
       '<b>' + esc(v.label || '—') + '</b>' +
-      '<span>' + esc(v.why || '') + '</span></div>';
+      '<span>' + esc(v.why || '') + '</span>' +
+      (v.decided_by ? '<div class="wm-by">这条结论由「' + esc(v.decided_by) + '」决定</div>' : '') +
+      '</div>';
     html += '<div class="wm-hint">' +
-      esc((j.metric && j.metric.y) || 'p_C2+') +
-      ' · 负载 ' + esc(inp.loading) + ' wt% · 氧浓 ' + esc(inp.o2_pct) +
-      '% · 光照 ' + esc(inp.light) + ' · 流量 ' +
+      '负载 ' + esc(inp.loading) + ' wt% · 氧浓 ' + esc(inp.o2_pct) +
+      '% · 光照 ' + esc(inp.light) + ' mW/cm² · 流量 ' +
       esc((inp.flows || {}).ch4) + '/' + esc((inp.flows || {}).o2) + '/' + esc((inp.flows || {}).ar) +
       '</div>';
 
-    // ① 经验层
-    html += '<div class="wm-layer emp">' +
-      '<div class="wm-sec">① ' + esc(emp.name || '经验层 · 数学') +
-      ' <small>' + esc((emp.verdict && emp.verdict.label) || '') + '</small></div>' +
-      '<div class="wm-hint">' + esc(emp.role || '') + ' · ' + esc(emp.tag || '') + '</div>' +
-      predBlock(emp.predict, '经验 p_C2+');
-    var hh = emp.history || {};
-    html += '<div class="wm-hint">主表 n=' + (hh.n || 0) +
-      ' · 均值 ' + (hh.mean_y != null ? hh.mean_y : '—') +
-      ' · 最高 ' + (hh.max_y != null ? hh.max_y : '—') + '</div>';
-    var nbs = emp.neighbors || [];
-    if (nbs.length) {
-      html += '<div class="wm-clist">';
-      for (var ni = 0; ni < Math.min(nbs.length, 4); ni++) {
-        var nb = nbs[ni];
-        html += '<div class="wm-citem pass"><span class="wm-b pass">w=' + esc(nb.w) + '</span>' +
-          '<div class="wm-ct"><div class="n">p_C2+ ' + esc(nb.y) + ' · sel ' + esc(nb.sel) + '%</div>' +
-          '<div class="d">负载 ' + esc(nb.load) + ' · ' +
-          esc(nb.ch4) + '/' + esc(nb.o2) + '/' + esc(nb.ar) +
-          ' · 光 ' + esc(nb.lpd) + ' · d=' + esc(nb.d) + '</div></div></div>';
+    // ② 三方言
+    var voices = v.voices || [];
+    if (voices.length) {
+      html += '<div class="wm-voices">';
+      for (var vi = 0; vi < voices.length; vi++) {
+        var vo = voices[vi];
+        html += '<div class="wm-voice ' + esc(vo.tone || '') + '">' +
+          '<div class="who">' + esc(vo.who) + '</div>' +
+          '<div class="say"><div class="v">' + esc(vo.value) + '</div>' +
+          '<div class="w">' + esc(vo.why) + '</div></div></div>';
       }
       html += '</div>';
     }
-    html += '</div>';
+    if (v.conflict) {
+      html += '<div class="wm-conflict">' + esc(v.conflict) + '</div>';
+    }
 
-    // ② 世界模型
-    html += '<div class="wm-layer wm">' +
-      '<div class="wm-sec">② ' + esc(wm.name || '世界模型层') +
-      ' <small>' + esc((wm.verdict && wm.verdict.label) || '') + '</small></div>' +
-      '<div class="wm-hint">' + esc(wm.role || '') + ' · ' + esc((wm.verdict && wm.verdict.why) || '') + '</div>' +
-      predBlock(wm.predict, '世界模型 p_C2+');
-    if (wm.factors) {
-      html += '<div class="wm-fac"><div class="wm-kgrid">' +
-        Object.keys(wm.factors).map(function (key) {
-          return '<span>' + esc(key) + ' <b>' + wm.factors[key] + '</b></span>';
-        }).join('') + '</div></div>';
+    // ③ 一个动作
+    if (v.action && v.action.text) {
+      html += '<div class="wm-action">' +
+        '<div class="t">下一组做这个</div>' +
+        '<div class="a">' + esc(v.action.text) + '</div>' +
+        '<div class="w">' + esc(v.action.why || '') + '</div>' +
+        '</div>';
     }
-    var k = wm.kinetics || j.kinetics;
-    if (k) {
-      html += '<div class="wm-kin"><div class="wm-kgrid">' +
-        '<span>act <b>' + k.act + '</b></span>' +
-        '<span>red <b>' + k.red + '</b></span>' +
-        '<span>absorb <b>' + k.absorb + '</b></span>' +
-        '<span>h_sel <b>' + k.h_sel + '</b></span>' +
-        '<span>flow_sel <b>' + k.flow_sel + '</b></span>' +
-        '</div></div>';
-    }
+
+    // ④ 明细折叠
     var cs = j.constraints || [];
     var csum = wm.constraints_summary || {};
-    html += '<div class="wm-sec">物理约束 <small>失败 ' + (csum.fails || 0) +
-      ' · 告警 ' + (csum.warns || 0) + ' · 共 ' + (csum.n || cs.length) + '</small></div>';
-    html += '<div class="wm-clist">';
-    for (var i = 0; i < Math.min(cs.length, 8); i++) {
-      var c = cs[i];
-      html += '<div class="wm-citem ' + esc(c.st || '') + '">' +
-        stBadge(c.st) +
-        '<div class="wm-ct"><div class="n">' + esc(c.name || c.k) + '</div>' +
-        '<div class="d">' + esc(c.d || '') + '</div></div></div>';
-    }
-    if (cs.length > 8) {
-      html += '<div class="wm-hint">… 另有 ' + (cs.length - 8) + ' 条约束</div>';
-    }
-    html += '</div></div>';
+    var hh = emp.history || {};
+    var nbs = emp.neighbors || [];
+    var h4 = '';
 
-    // ③ 主动学习
-    html += '<div class="wm-layer ai">' +
-      '<div class="wm-sec">③ ' + esc(ai.name || '主动学习层') +
-      ' <small>' + esc(ai.strategy || 'UCB') + '</small></div>' +
-      '<div class="wm-hint">' + esc(ai.role || '') + ' · ' + esc(ai.note || '') + '</div>';
-    var sug = ai.suggestions || [];
-    if (!sug.length) {
-      html += '<div class="wm-empty">暂无采集建议</div>';
-    } else {
-      html += '<div class="wm-clist">';
-      for (var si = 0; si < sug.length; si++) {
-        var s = sug[si];
-        html += '<div class="wm-citem warn">' +
-          '<span class="wm-b warn">#' + (si + 1) + '</span>' +
-          '<div class="wm-ct"><div class="n">UCB ' + esc(s.ucb) +
-          ' · μ ' + esc(s.mu_y) + ' ±' + esc(s.sigma) + '</div>' +
-          '<div class="d">负载 ' + esc(s.load) + ' · CH₄/O₂/Ar ' +
-          esc(s.ch4) + '/' + esc(s.o2) + '/' + esc(s.ar) +
-          ' · 光 ' + esc(s.lpd) + ' · 氧浓 ' + esc(s.o2_in) +
-          '% · d=' + esc(s.d_min) + ' · ' + esc(s.why) + '</div></div></div>';
+    if (nbs.length) {
+      h4 += '<details><summary>邻近实测 ' + nbs.length + ' 条</summary><div class="inner">';
+      for (var ni = 0; ni < nbs.length; ni++) {
+        var nb = nbs[ni];
+        h4 += '<div class="wm-citem pass"><span class="wm-b pass">权重 ' + esc(nb.w) + '</span>' +
+          '<div class="wm-ct"><div class="n">p_C2+ ' + esc(nb.y) + ' · 选择性 ' + esc(nb.sel) + '%</div>' +
+          '<div class="d">负载 ' + esc(nb.load) + ' · 流量 ' +
+          esc(nb.ch4) + '/' + esc(nb.o2) + '/' + esc(nb.ar) +
+          ' · 光 ' + esc(nb.lpd) + ' mW/cm² · 距离 ' + esc(nb.d) + '</div></div></div>';
       }
-      html += '</div>';
+      h4 += '<div class="wm-hint">主表 ' + (hh.n || 0) + ' 条 · 均值 ' +
+        (hh.mean_y != null ? hh.mean_y : '—') + ' · 最高 ' +
+        (hh.max_y != null ? hh.max_y : '—') + '</div>';
+      h4 += '</div></details>';
     }
-    html += '</div>';
+
+    if (cs.length) {
+      h4 += '<details><summary>物理约束 ' + cs.length + ' 条（失败 ' + (csum.fails || 0) +
+        ' · 告警 ' + (csum.warns || 0) + '）</summary><div class="inner">';
+      for (var ci = 0; ci < cs.length; ci++) {
+        var c = cs[ci];
+        h4 += '<div class="wm-citem ' + esc(c.st || '') + '">' + stBadge(c.st) +
+          '<div class="wm-ct"><div class="n">' + esc(c.name || c.k) + '</div>' +
+          '<div class="d">' + esc(c.d || '') + '</div></div></div>';
+      }
+      h4 += '</div></details>';
+    }
+
+    var ex = wm.predict || {};
+    h4 += '<details><summary>模型明细</summary><div class="inner">';
+    if (ex.y != null) {
+      h4 += '<div class="wm-hint">外推值 ' + esc(ex.y) + ' ± ' + esc(ex.unc) +
+        '（区间 ' + esc(ex.y_lo) + ' ~ ' + esc(ex.y_hi) + '）· 与经验融合 ' +
+        esc(ex.y_blend) + '</div>';
+    }
+    var f = wm.factors || {};
+    if (Object.keys(f).length) {
+      var FN = { act: '活化', flow: '流量', h_sel: '选择性', absorb: '吸光', load: '负载', light: '光照' };
+      h4 += '<div class="wm-hint">各因素相对参考点的倍数：' +
+        Object.keys(f).map(function (key) {
+          return (FN[key] || key) + ' ' + f[key];
+        }).join(' · ') + '</div>';
+    }
+    var kk = wm.kinetics || j.kinetics || {};
+    if (Object.keys(kk).length) {
+      h4 += '<div class="wm-hint">微动力学特征：' +
+        '活化 ' + kk.act + ' · 还原 ' + kk.red + ' · 吸光 ' + kk.absorb +
+        ' · 选择性 ' + kk.h_sel + ' · 流量 ' + kk.flow_sel + '</div>';
+    }
+    var sug = ai.suggestions || [];
+    if (sug.length > 1) {
+      h4 += '<div class="wm-hint">备选点：' + sug.slice(1, 4).map(function (s) {
+        return '负载 ' + s.load + ' / 流量 ' + s.ch4 + '-' + s.o2 + '-' + s.ar + ' / 光 ' + s.lpd;
+      }).join('；') + '</div>';
+    }
+    h4 += '</div></details>';
+
+    html += '<div class="wm-more">' + h4 + '</div>';
 
     out.innerHTML = html;
   }
@@ -692,7 +722,8 @@
       ar: parseFloat($('wm-ar').value) || 0,
       o2_pct: parseFloat($('wm-o2pct').value) || 0,
       loading: parseFloat($('wm-loading').value) || 0,
-      light: parseFloat($('wm-light').value) || 0
+      light: parseFloat($('wm-light').value) || 0,
+      light_unit: ($('wm-light-unit') && $('wm-light-unit').value) || 'lpd'
     };
     fetch('/api/worldmodel/preview', {
       method: 'POST',

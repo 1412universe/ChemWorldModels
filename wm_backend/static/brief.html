@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数据空间总览 · Pd–P25</title>
+<script src="assets/vendor/three.min.js"></script>
+<script src="assets/vendor/OrbitControls.js"></script>
+<style>
+  :root{
+    --bg:#f5f7fa; --card:#fff; --ink:#0f172a; --sub:#64748b; --line:#e2e8f0;
+    --teal:#0f766e; --amber:#b45309; --red:#b91c1c; --blue:#1d4ed8;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1120px; margin:0 auto; padding:26px 24px 56px;}
+
+  header.top{display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:4px;}
+  h1{font-size:20px; margin:0; font-weight:800;}
+  .meta{font-size:12px; color:var(--sub);}
+  .subline{font-size:13px; color:var(--sub); margin-bottom:20px;}
+
+  .back{display:inline-flex; align-items:center; gap:5px; margin-bottom:14px;
+    padding:5px 11px 5px 9px; border-radius:8px; border:1px solid var(--line);
+    background:#fff; color:var(--sub); font-size:12px; font-weight:600;
+    text-decoration:none; transition:all .15s ease;}
+  .back:hover{border-color:#a7e8dd; color:var(--teal); background:#f7fefd;}
+  .back svg{display:block;}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin-bottom:14px;}
+  .card h2{font-size:12px; margin:0 0 13px; color:var(--sub); font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase;}
+  .card h2 small{float:right; font-size:10.5px; font-weight:600; color:#94a3b8; letter-spacing:0; text-transform:none;}
+
+  /* 结论 */
+  .verdict{background:linear-gradient(135deg,#0f766e,#134e4a); color:#ecfeff; border:0;}
+  .verdict h2{color:#99f6e4;}
+  .verdict .big{font-size:24px; font-weight:800; line-height:1.3;}
+  .verdict .big em{font-style:normal; color:#fde68a;}
+  .verdict .why{margin-top:9px; font-size:12.5px; opacity:.9; line-height:1.6;}
+  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px;}
+  .kpi{background:rgba(255,255,255,.1); border-radius:9px; padding:9px 11px;}
+  .kpi .k{font-size:10px; opacity:.8;}
+  .kpi .v{font-size:17px; font-weight:800; margin-top:2px;}
+  .kpi .s{font-size:10px; opacity:.72; margin-top:2px;}
+
+  /* 图 */
+  canvas#chart{width:100%; height:290px; display:block;}
+  .legend{display:flex; gap:16px; font-size:11px; color:var(--sub); margin-top:9px; flex-wrap:wrap;}
+  .legend i{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:4px; vertical-align:-1px;}
+  .note{font-size:11px; color:var(--sub); line-height:1.6; margin-top:11px;
+    padding-top:11px; border-top:1px dashed var(--line);}
+  .note b{color:var(--ink);}
+
+  /* 三维 */
+  .space-grid{display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;}
+  .space-view{flex:1 1 560px; min-width:300px;}
+  #space3d{width:100%; height:380px; border-radius:12px; overflow:hidden;
+    background:linear-gradient(160deg,#fbfdfe 0%,#eef4f7 55%,#e6eef3 100%);
+    border:1px solid #dbe6ec; position:relative;}
+  .hint{position:absolute; left:12px; bottom:9px; font-size:10px; color:#93a9b5; pointer-events:none;}
+  .space-side{flex:0 0 190px; min-width:170px;}
+  .space-side label{display:flex; flex-direction:column; gap:4px; font-size:10.5px;
+    color:var(--sub); font-weight:600; margin-bottom:10px;}
+  .space-side select{border:1px solid #d7dde8; border-radius:8px; padding:5px 8px;
+    font-size:12px; background:#fff; color:var(--ink);}
+  .side-title{font-size:11px; font-weight:750; color:#334155; margin:0 0 9px;}
+  .stat{border-top:1px dashed var(--line); padding-top:9px; margin-top:3px;
+    font-size:10.5px; color:var(--sub); line-height:1.65;}
+
+  /* 预测 */
+  .predict{background:linear-gradient(160deg,#f7fefd 0%,#eefaf7 100%); border-color:#a7e8dd;}
+  .predict h2{color:var(--teal);}
+  .pred-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:9px; margin-bottom:11px;}
+  .pred-grid label{display:flex; flex-direction:column; gap:3px; font-size:10px;
+    color:var(--sub); font-weight:600;}
+  .pred-grid input,.pred-grid select{border:1px solid #cfdfe6; border-radius:7px;
+    padding:6px 7px; font-size:12px; background:#fff; color:var(--ink); width:100%;}
+  .pred-actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:13px;}
+  button.run{border:0; border-radius:8px; padding:7px 18px; cursor:pointer;
+    background:var(--teal); color:#fff; font-weight:700; font-size:12.5px;}
+  button.run:hover{background:#0d9488;}
+  button.run:disabled{background:#9bb8b4; cursor:default;}
+  button.preset{border:1px solid #b8e4dc; background:#fff; color:var(--teal);
+    border-radius:7px; padding:5px 10px; cursor:pointer; font-size:11px; font-weight:650;}
+  button.preset:hover{background:#ecfdf9;}
+
+  .pred-out{display:none;}
+  .pred-out.on{display:block;}
+  .pred-row{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  .pbox{background:#fff; border:1px solid #d9ece7; border-radius:10px; padding:11px 12px;}
+  .pbox .k{font-size:10px; color:var(--sub); font-weight:600;}
+  .pbox .v{font-size:20px; font-weight:800; margin-top:3px; color:var(--teal);}
+  .pbox .v small{font-size:11px; font-weight:600; color:#94a3b8;}
+  .pbox .s{font-size:10px; color:#94a3b8; margin-top:3px; line-height:1.4;}
+  .pbox.warn{border-color:#fde68a; background:#fffdf7;}
+  .pbox.warn .v{color:var(--amber);}
+  .pbox.bad{border-color:#fecaca; background:#fef7f7;}
+  .pbox.bad .v{color:var(--red);}
+  .pmsg{margin-top:11px; font-size:11.5px; line-height:1.65; padding:9px 11px;
+    border-radius:9px; background:#fff; border:1px solid #d9ece7; color:#334155;}
+  .pmsg.warn{background:#fffdf7; border-color:#fde68a; color:#92400e;}
+  .pmsg.bad{background:#fef7f7; border-color:#fecaca; color:#991b1b;}
+
+  /* 表格 */
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  th,td{padding:8px 9px; text-align:left; border-bottom:1px solid var(--line);}
+  th{font-size:10.5px; color:var(--sub); font-weight:700; letter-spacing:.4px; text-transform:uppercase;}
+  td.num{font-variant-numeric:tabular-nums; text-align:right;}
+  tr.thin td{background:#fffbeb;}
+  tr.empty td{background:#fef2f2;}
+  .tag{display:inline-block; font-size:10px; font-weight:700; padding:1px 7px; border-radius:99px;}
+  .tag.ok{background:#dcfce7; color:#166534;}
+  .tag.thin{background:#fef3c7; color:#92400e;}
+  .tag.empty{background:#fee2e2; color:#991b1b;}
+  .tag.out{background:#e0e7ff; color:#3730a3;}
+  .tag.mid{background:#fef3c7; color:#92400e;}
+  .tag.bad{background:#fee2e2; color:#991b1b;}
+
+  .gap{display:flex; align-items:flex-start; gap:11px; padding:11px 0; border-bottom:1px solid var(--line);}
+  .gap:last-child{border-bottom:0; padding-bottom:0;}
+  .gap .idx{flex:0 0 24px; height:24px; border-radius:6px; background:var(--teal); color:#fff;
+    font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center;}
+  .gap .body{flex:1;}
+  .gap .t{font-size:13px; font-weight:700;}
+  .gap .d{font-size:11.5px; color:var(--sub); margin-top:2px; line-height:1.5;}
+  .gap .badge{flex:0 0 auto; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:99px;
+    background:#fffbeb; color:#92400e; border:1px solid #fde68a;}
+  .gap .badge.now{background:#fef2f2; color:#991b1b; border-color:#fecaca;}
+
+  .rule{background:#f8fafc; border-left:3px solid var(--teal); padding:11px 13px;
+    font-size:12px; line-height:1.6; color:#334155; border-radius:0 8px 8px 0;}
+  .rule b{color:var(--teal);}
+  .rule.warn{border-left-color:var(--amber); background:#fffdf7;}
+  .rule.warn b{color:var(--amber);}
+
+  .surf-grid{display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;}
+  .surf-view{flex:1 1 520px; min-width:300px;}
+  #surf{width:100%; height:400px; display:block; border-radius:10px;
+    border:1px solid #dbe6ec; position:relative; overflow:hidden;
+    background:linear-gradient(170deg,#fbfdfe 0%,#eef4f7 60%,#e4edf2 100%);}
+  .surf-fallback{position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;text-align:center;padding:24px;color:#7b93a0;
+    font-size:12px;line-height:1.85;}
+  .surf-side{flex:0 0 230px; min-width:200px;}
+  .best-box{background:linear-gradient(135deg,#0f766e,#134e4a); color:#ecfeff;
+    border-radius:11px; padding:12px 14px; margin-bottom:12px;}
+  .best-box .lb{font-size:10px; opacity:.8; letter-spacing:.4px;}
+  .best-box .v{font-size:17px; font-weight:800; margin-top:3px; line-height:1.35;}
+  .best-box .v small{font-size:11px; font-weight:600; opacity:.85;}
+  .best-box .s{font-size:10.5px; opacity:.78; margin-top:5px;}
+  .scale-bar{height:9px; border-radius:5px; margin:7px 0 4px;
+    background:linear-gradient(90deg,#0f766e,#22d3ee,#f59e0b);}
+  .scale-txt{display:flex; justify-content:space-between; font-size:10px; color:var(--sub);}
+
+  footer{font-size:11px; color:var(--sub); margin-top:22px; line-height:1.65;}
+  .err{padding:40px; text-align:center; color:var(--red); font-size:13px;}
+  @media (max-width:900px){
+    .pred-grid{grid-template-columns:repeat(3,1fr);}
+    .pred-row{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:820px){
+    .kpis{grid-template-columns:repeat(2,1fr);}
+    .verdict .big{font-size:20px;}
+    .wrap{padding:18px 14px 40px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="overview_photo.html" title="返回光催化闭环总览">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+    <span>返回</span>
+  </a>
+
+  <header class="top">
+    <h1>数据空间总览 · Pd–P25</h1>
+    <div class="meta" id="meta">加载中…</div>
+  </header>
+  <div class="subline">甲烷氧化偶联（OCM）光催化 · 实测分布 + 模型预测 + 下一步建议</div>
+
+  <!-- ① 当前结论 -->
+  <div class="card verdict">
+    <h2>当前结论</h2>
+    <div class="big" id="verdictBig">—</div>
+    <div class="why" id="verdictWhy"></div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+
+  <!-- ② 在线预测（核心） -->
+  <div class="card predict">
+    <h2>条件预测<small>输入条件 → 产率与选择性</small></h2>
+    <div class="pred-grid">
+      <label>负载 wt%<input id="pLoad" type="number" min="0.005" max="10" step="0.005" value="0.05"></label>
+      <label>CH₄ mL/min<input id="pCh4" type="number" min="0" max="500" step="1" value="90"></label>
+      <label>O₂ mL/min<input id="pO2" type="number" min="0" max="200" step="0.5" value="10"></label>
+      <label>Ar mL/min<input id="pAr" type="number" min="0" max="200" step="1" value="0"></label>
+      <label>光强 mW/cm²<input id="pLight" type="number" min="1" max="600" step="0.1" value="257.3"></label>
+    </div>
+    <div class="pred-actions">
+      <button class="run" id="pRun">预测</button>
+      <button class="preset" data-p="0.05,90,10,0,257.3">0.05% 标准</button>
+      <button class="preset" data-p="0.05,90,10,0,433.9">0.05% 旧灯</button>
+      <button class="preset" data-p="3,90,10,0,257.3">3% 新灯</button>
+      <button class="preset" data-p="0.5,90,10,0,257.3">0.5%</button>
+    </div>
+    <div class="pred-out" id="pOut"></div>
+  </div>
+
+  <!-- ③ 负载-产率分布 -->
+  <div class="card">
+    <h2>负载-产率分布</h2>
+    <canvas id="chart"></canvas>
+    <div class="legend">
+      <span><i style="background:#0f766e"></i>中位产率</span>
+      <span><i style="background:#94a3b8"></i>单条实测</span>
+      <span><i style="background:#f59e0b"></i>样本不足（n &lt; 5）</span>
+    </div>
+    <div class="note" id="chartNote"></div>
+  </div>
+
+  <!-- ④ 三维数据空间 -->
+  <div class="card">
+    <h2>三维数据空间 · 负载 × 光强 × 甲烷比例</h2>
+    <div class="space-grid">
+      <div class="space-view">
+        <div id="space3d"><div class="hint">拖拽旋转 · 滚轮缩放 · 右键平移</div></div>
+        <div class="legend" style="margin-top:9px;">
+          <span><i style="background:#0f766e"></i>低产率</span>
+          <span><i style="background:#22d3ee"></i>中</span>
+          <span><i style="background:#f59e0b"></i>高产率</span>
+          <span style="margin-left:auto;">球越大 = 选择性越高</span>
+        </div>
+      </div>
+      <div class="space-side">
+        <div class="side-title">筛选</div>
+        <label>负载<select id="fLoad"></select></label>
+        <label>光源<select id="fLamp"></select></label>
+        <div class="stat" id="spaceStat">—</div>
+      </div>
+    </div>
+    <div class="note">
+      <b>怎么看：</b>三个轴是实验中真正变过的量，每个球一条实测。球密的地方数据充分，空白的地方模型不能外推。
+    </div>
+  </div>
+
+  <!-- ④b 旧灯流量响应曲面 -->
+  <div class="card" style="border-color:#a7e8dd; background:#f7fefd;">
+    <h2 style="color:#0f766e;">旧灯流量响应曲面<small>0.05 wt% · 434 mW/cm²</small></h2>
+    <div class="surf-grid">
+      <div class="surf-view">
+        <div id="surf"><div class="hint">拖拽旋转 · 滚轮缩放 · 右键平移</div></div>
+        <div class="legend" style="margin-top:9px;">
+          <span>X = CH₄ 体积分数 %</span>
+          <span>Z = 总流量 mL/min</span>
+          <span>高度 + 颜色 = 产率</span>
+          <span style="margin-left:auto;">缺口 = 无实测支撑</span>
+        </div>
+      </div>
+      <div class="surf-side">
+        <div class="best-box" id="bestBox">
+          <div class="lb">当前最优点</div>
+          <div class="v">—</div>
+        </div>
+        <div style="font-size:10.5px;color:var(--sub);margin-bottom:4px;">产率色阶</div>
+        <div class="scale-bar"></div>
+        <div class="scale-txt"><span id="scMin">—</span><span id="scMax">—</span></div>
+        <div class="stat" id="surfStat" style="margin-top:11px;">—</div>
+      </div>
+    </div>
+    <div class="note" id="surfNote"></div>
+  </div>
+
+  <!-- ⑤ 各负载档数据量 -->
+  <div class="card">
+    <h2>各负载档数据量</h2>
+    <table>
+      <thead><tr>
+        <th>负载 wt%</th><th style="text-align:right">n</th>
+        <th style="text-align:right">产率中位</th><th style="text-align:right">最高</th>
+        <th style="text-align:right">选择性中位</th><th>判断</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="note">
+      <b>判据：</b>单档少于 5 条时，中位数会被单次实验波动主导。「可作结论」只表示样本量够，不代表该档条件已优化。
+    </div>
+  </div>
+
+  <!-- ⑥ 模型自检 -->
+  <div class="card" style="border-color:#99f6e4;">
+    <h2 style="color:#0f766e;">模型自检 · 它在哪里能用，哪里不能用</h2>
+    <div id="checkIntro" class="rule" style="margin-bottom:12px;"></div>
+    <table>
+      <thead><tr>
+        <th>负载</th><th style="text-align:right">实测中位</th><th style="text-align:right">n</th>
+        <th style="text-align:right">模型预测</th><th style="text-align:right">偏差</th>
+        <th>域内</th><th>判定</th>
+      </tr></thead>
+      <tbody id="checkBody"></tbody>
+    </table>
+    <div class="note">
+      <b>用途：</b>证明系统知道自己什么时候不该给数。偏差超 ±30% 或判为域外时，输出只能当趋势参考。
+      <br><b>探测条件：</b>Pd–P25，CH₄/O₂/Ar = 90/10/0，光强 257.3 mW/cm²。
+    </div>
+  </div>
+
+  <!-- ⑦ 数据缺口 -->
+  <div class="card">
+    <h2>数据缺口 → 建议补的点</h2>
+    <div id="gaps"></div>
+    <div class="rule" id="rule" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- ⑧ 机理模型 -->
+  <div class="card" style="border-color:#99f6e4; background:#f7fefd;">
+    <h2 style="color:#0f766e;">机理模型 · 流量响应</h2>
+    <div id="flowIntro" class="rule" style="margin-bottom:12px;"></div>
+    <table>
+      <thead><tr>
+        <th>流量 CH₄/O₂/Ar</th><th style="text-align:right">实测 y</th><th style="text-align:right">模型 y</th>
+        <th style="text-align:right">偏差</th><th style="text-align:right">实测 sel</th><th style="text-align:right">模型 sel</th>
+      </tr></thead>
+      <tbody id="flowBody"></tbody>
+    </table>
+    <div class="note" id="flowNote"></div>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+(function(){
+  var DATA=null;
+
+  function fmt(v,d){
+    if(v===null||v===undefined||isNaN(v)) return '—';
+    return Number(v).toLocaleString('zh-CN',
+      {maximumFractionDigits:d===undefined?0:d, minimumFractionDigits:0});
+  }
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
+  }
+  function loadLabel(v){ return (v===null||v===undefined)?'—':(v+'%'); }
+
+  /* ================= ① 结论 ================= */
+  function renderVerdict(){
+    var p=DATA.peak, b=DATA.best;
+    if(!p){ document.getElementById('verdictBig').textContent='数据不足'; return; }
+    document.getElementById('verdictBig').innerHTML =
+      '最优负载 <em>'+p.load+' wt%</em> · 中位产率 '+fmt(p.median)+
+      ' · 选择性中位 '+fmt(p.sel_median,1)+'%';
+
+    var t=['该档 <b>'+p.n+'</b> 条实测，是全表唯一数据充分的负载点。'];
+    if(b && b.y>p.median){
+      t.push('全表最高产率 <b>'+fmt(b.y)+'</b> 也在这里'+
+        (b.top_sel?'，最高选择性 <b>'+fmt(b.top_sel,1)+'%</b>':'')+'。');
+    }
+    document.getElementById('verdictWhy').innerHTML=t.join(' ');
+
+    document.getElementById('kpis').innerHTML=[
+      {k:'可用实测',v:fmt(DATA.n_total),s:'有产率+选择性'},
+      {k:'最优档样本',v:fmt(p.n),s:p.load+' wt%'},
+      {k:'单档不足5条',v:fmt(DATA.n_thin),s:'不能单独下结论'},
+      {k:'光照集中度',v:DATA.light.share_pct!==null?fmt(DATA.light.share_pct,1)+'%':'—',
+       s:DATA.light.top_lpd?DATA.light.top_lpd+' mW/cm²':'—'}
+    ].map(function(x){
+      return '<div class="kpi"><div class="k">'+x.k+'</div><div class="v">'+x.v+
+             '</div><div class="s">'+x.s+'</div></div>';
+    }).join('');
+  }
+
+  /* ================= ② 在线预测 ================= */
+  function runPredict(){
+    var btn=document.getElementById('pRun');
+    var out=document.getElementById('pOut');
+    var body={
+      loading: parseFloat(document.getElementById('pLoad').value)||0.05,
+      ch4: parseFloat(document.getElementById('pCh4').value)||0,
+      o2: parseFloat(document.getElementById('pO2').value)||0,
+      ar: parseFloat(document.getElementById('pAr').value)||0,
+      light: parseFloat(document.getElementById('pLight').value)||257.3,
+      light_unit: 'lpd'
+    };
+    btn.disabled=true; btn.textContent='计算中…';
+    out.classList.remove('on');
+    out.innerHTML='';
+
+    fetch('/api/worldmodel/layered/predict',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    }).then(function(r){return r.json();})
+      .then(function(j){
+        btn.disabled=false; btn.textContent='预测';
+        if(!j || !j.ok){
+          out.classList.add('on');
+          out.innerHTML='<div class="pmsg bad">预测失败：'+esc((j&&j.error)||'未知错误')+'</div>';
+          return;
+        }
+        renderPredict(j, body);
+      })
+      .catch(function(e){
+        btn.disabled=false; btn.textContent='预测';
+        out.classList.add('on');
+        out.innerHTML='<div class="pmsg bad">请求失败：'+esc(e.message)+'</div>';
+      });
+  }
+
+  function renderPredict(j, body){
+    var out=document.getElementById('pOut');
+    var dom=j.domain||{};
+    var inDomain=j.in_domain!==false;
+    var dmin=dom.d_min!==undefined?dom.d_min:null;
+
+    var tone = !inDomain ? 'bad' : (dmin!==null && dmin>1.2 ? 'warn' : '');
+    var selTone = j.sel>=60 ? '' : 'warn';
+
+    var html='<div class="pred-row">'+
+      '<div class="pbox '+tone+'"><div class="k">产率</div>'+
+        '<div class="v">'+fmt(j.y)+'<small> ±'+fmt(j.unc)+'</small></div>'+
+        '<div class="s">区间 '+fmt(j.y_lo)+' – '+fmt(j.y_hi)+'</div></div>'+
+      '<div class="pbox '+selTone+'"><div class="k">C₂⁺ 选择性</div>'+
+        '<div class="v">'+fmt(j.sel,1)+'%</div>'+
+        '<div class="s">'+(j.sel>=60?'过 60% 门槛':'低于 60% 门槛')+'</div></div>'+
+      '<div class="pbox '+tone+'"><div class="k">可信度</div>'+
+        '<div class="v" style="font-size:16px">'+(inDomain?'域内':'域外')+'</div>'+
+        '<div class="s">'+(dmin!==null?('最近实测距离 '+fmt(dmin,2)):'')+'</div></div>'+
+      '<div class="pbox"><div class="k">机理先验</div>'+
+        '<div class="v" style="font-size:16px">'+(j.prior?fmt(j.prior.y):'—')+'</div>'+
+        '<div class="s">残差权重 '+fmt(j.residual_blend,2)+'</div></div>'+
+      '</div>';
+
+    var msg, cls='pmsg';
+    if(!inDomain){
+      cls='pmsg bad';
+      msg='<b>这个条件超出训练范围。</b>最近实测距离 '+(dmin!==null?fmt(dmin,2):'—')+
+        '，'+(dmin!==null&&dmin>1.2?'离得很远':'已出凸包')+
+        '。上面的数字只能当趋势参考，要做它请先补邻近实验。';
+    } else if(dmin!==null && dmin>0.6){
+      cls='pmsg warn';
+      msg='<b>在域内但离实测偏远。</b>距离 '+fmt(dmin,2)+
+        '，区间宽度 ±'+fmt(j.unc)+'，建议先做一次验证再放大。';
+    } else {
+      msg='<b>这个条件有邻近实测支撑。</b>距离 '+(dmin!==null?fmt(dmin,2):'—')+
+        '，预测区间 ±'+fmt(j.unc)+'，可以直接排实验。';
+    }
+    if(j.sel!==undefined && j.sel<60){
+      msg+=' <b>注意：</b>选择性只有 '+fmt(j.sel,1)+'%，低于 60% 硬门槛，产物会大量走向 COₓ。';
+    }
+    html+='<div class="'+cls+'">'+msg+'</div>';
+
+    out.innerHTML=html;
+    out.classList.add('on');
+  }
+
+  function bindPredict(){
+    document.getElementById('pRun').addEventListener('click',runPredict);
+    Array.prototype.forEach.call(document.querySelectorAll('.preset'),function(b){
+      b.addEventListener('click',function(){
+        var v=b.getAttribute('data-p').split(',');
+        document.getElementById('pLoad').value=v[0];
+        document.getElementById('pCh4').value=v[1];
+        document.getElementById('pO2').value=v[2];
+        document.getElementById('pAr').value=v[3];
+        document.getElementById('pLight').value=v[4];
+        runPredict();
+      });
+    });
+  }
+
+  /* ================= ③ 二维散点 ================= */
+  function drawChart(){
+    var cv=document.getElementById('chart');
+    var dpr=window.devicePixelRatio||1;
+    var W=cv.clientWidth, H=cv.clientHeight||290;
+    cv.width=W*dpr; cv.height=H*dpr;
+    var g=cv.getContext('2d');
+    g.setTransform(dpr,0,0,dpr,0,0);
+    g.clearRect(0,0,W,H);
+
+    var pad={l:56,r:16,t:12,b:38};
+    var iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+    var loads=DATA.curve.map(function(c){return c.load;});
+    var minL=Math.log10(Math.min.apply(null,loads));
+    var maxL=Math.log10(Math.max.apply(null,loads));
+    if(maxL-minL<0.5) maxL=minL+0.5;
+
+    var allY=[];
+    DATA.curve.forEach(function(c){ allY.push(c.q25,c.q75,c.max,c.median); });
+    var maxY=Math.max.apply(null,allY)*1.08;
+
+    var X=function(l){ return pad.l+((Math.log10(l)-minL)/(maxL-minL))*iw; };
+    var Y=function(v){ return pad.t+ih-(v/maxY)*ih; };
+
+    g.strokeStyle='#eef2f7'; g.lineWidth=1;
+    for(var i=0;i<=5;i++){
+      var yv=maxY*i/5, yy=Y(yv);
+      g.beginPath(); g.moveTo(pad.l,yy); g.lineTo(W-pad.r,yy); g.stroke();
+      g.fillStyle='#94a3b8'; g.font='10.5px ui-sans-serif,system-ui'; g.textAlign='right';
+      g.fillText(fmt(yv/1000)+'k', pad.l-7, yy+4);
+    }
+    g.textAlign='center';
+    DATA.curve.forEach(function(c){
+      g.fillStyle='#94a3b8'; g.font='10.5px ui-sans-serif,system-ui';
+      g.fillText(c.load+'%', X(c.load), H-pad.b+16);
+    });
+    g.strokeStyle='#cbd5e1'; g.beginPath();
+    g.moveTo(pad.l,pad.t+ih); g.lineTo(W-pad.r,pad.t+ih); g.stroke();
+
+    DATA.curve.forEach(function(c){
+      if(c.n<2) return;
+      var x=X(c.load);
+      g.strokeStyle=c.thin?'rgba(245,158,11,.45)':'rgba(15,118,110,.26)';
+      g.lineWidth=7; g.lineCap='round';
+      g.beginPath(); g.moveTo(x,Y(c.q25)); g.lineTo(x,Y(c.q75)); g.stroke();
+    });
+
+    g.strokeStyle='#0f766e'; g.lineWidth=2; g.lineJoin='round';
+    g.beginPath();
+    DATA.curve.forEach(function(c,i){
+      var x=X(c.load), y=Y(c.median);
+      if(i===0) g.moveTo(x,y); else g.lineTo(x,y);
+    });
+    g.stroke();
+
+    DATA.curve.forEach(function(c){
+      var x=X(c.load), y=Y(c.median);
+      g.beginPath(); g.arc(x,y,3.8,0,Math.PI*2);
+      g.fillStyle=c.thin?'#f59e0b':'#0f766e'; g.fill();
+      g.strokeStyle='#fff'; g.lineWidth=1.5; g.stroke();
+    });
+
+    var pk=DATA.peak;
+    if(pk){
+      var px=X(pk.load), py=Y(pk.median);
+      g.fillStyle='#0f766e'; g.font='700 11.5px ui-sans-serif,system-ui'; g.textAlign='center';
+      var lb='最优 '+pk.load+'%';
+      var tw=g.measureText(lb).width;
+      var bx=Math.min(Math.max(px,pad.l+tw/2+6),W-pad.r-tw/2-6);
+      g.fillText(lb,bx,py-12);
+    }
+  }
+
+  /* ================= ④ 三维 ================= */
+  var S={scene:null,cam:null,rd:null,ctrl:null,group:null};
+
+  function colorOf(t){
+    var c1=new THREE.Color(0x0f766e), c2=new THREE.Color(0x22d3ee), c3=new THREE.Color(0xf59e0b);
+    var c=new THREE.Color();
+    if(t<0.6) c.copy(c1).lerp(c2,t/0.6);
+    else c.copy(c2).lerp(c3,(t-0.6)/0.4);
+    return c;
+  }
+  function webglOK(){
+    try{ var c=document.createElement('canvas');
+      return !!(window.WebGLRenderingContext&&(c.getContext('webgl')||c.getContext('experimental-webgl')));
+    }catch(e){ return false; }
+  }
+  function fallback(msg){
+    var h=document.getElementById('space3d');
+    if(!h) return;
+    h.innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;'+
+      'justify-content:center;text-align:center;padding:30px;color:#7b93a0;font-size:12px;line-height:1.9">'+
+      '<div><div style="color:#0f766e;font-weight:700;font-size:13px;margin-bottom:6px">三维视图需要 WebGL</div>'+
+      esc(msg||'请用 Chrome / Edge 打开，或开启显卡加速。')+'</div></div>';
+  }
+
+  function initSpace(){
+    if(S.rd) return true;
+    var host=document.getElementById('space3d');
+    if(!host) return false;
+    if(typeof THREE==='undefined'){ fallback('Three.js 未加载。'); return false; }
+    if(!webglOK()){ fallback(); return false; }
+    var W=host.clientWidth, H=host.clientHeight;
+    if(!W||!H) return false;
+
+    var scene=new THREE.Scene();
+    scene.background=null;
+    var cam=new THREE.PerspectiveCamera(40,W/H,0.1,500);
+    cam.position.set(12,10,14);
+    var rd;
+    try{ rd=new THREE.WebGLRenderer({antialias:true,alpha:true}); }
+    catch(e){ fallback('WebGL 初始化失败：'+e.message); return false; }
+    rd.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    rd.setSize(W,H);
+    rd.setClearColor(0x000000,0);
+    host.appendChild(rd.domElement);
+    rd.domElement.style.display='block';
+
+    scene.add(new THREE.HemisphereLight(0xffffff,0xdfeaf0,1.05));
+    var d1=new THREE.DirectionalLight(0xffffff,0.75); d1.position.set(7,12,9); scene.add(d1);
+    var d2=new THREE.DirectionalLight(0x8fd8e8,0.35); d2.position.set(-8,-3,-7); scene.add(d2);
+
+    var ctrl=null;
+    if(THREE.OrbitControls){
+      ctrl=new THREE.OrbitControls(cam,rd.domElement);
+      ctrl.enableDamping=true; ctrl.dampingFactor=.08;
+      ctrl.rotateSpeed=.6; ctrl.zoomSpeed=.8;
+      ctrl.minDistance=8; ctrl.maxDistance=42;
+    }
+    scene.add(makeAxes());
+    S.scene=scene; S.cam=cam; S.rd=rd; S.ctrl=ctrl;
+    S.group=new THREE.Group(); scene.add(S.group);
+    (function loop(){ requestAnimationFrame(loop);
+      if(ctrl) ctrl.update(); rd.render(scene,cam); })();
+    return true;
+  }
+
+  function makeAxes(){
+    var g=new THREE.Group(), L=10, h=L/2;
+    var lm=new THREE.LineBasicMaterial({color:0x9fb6c2});
+    [[[h,0,0],[-h,0,0]],[[-h,0,0],[-h,L,0]],[[-h,0,0],[-h,0,L]]].forEach(function(s){
+      var geo=new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(s[0][0],s[0][1],s[0][2]),
+        new THREE.Vector3(s[1][0],s[1][1],s[1][2])]);
+      g.add(new THREE.Line(geo,lm));
+    });
+    var grid=new THREE.GridHelper(L,10,0xc3d5de,0xdfe9ef);
+    g.add(grid);
+    g.add(label('负载',new THREE.Vector3(h+0.9,0,0)));
+    g.add(label('光强',new THREE.Vector3(-h-0.9,L+0.5,0)));
+    g.add(label('CH₄%',new THREE.Vector3(-h,0,L+0.9)));
+    return g;
+  }
+
+  function label(text,pos){
+    var cv=document.createElement('canvas');
+    cv.width=256; cv.height=64;
+    var c=cv.getContext('2d');
+    c.font='bold 32px ui-sans-serif,system-ui';
+    c.fillStyle='#4a6572'; c.textAlign='center'; c.textBaseline='middle';
+    c.fillText(text,128,32);
+    var sp=new THREE.Sprite(new THREE.SpriteMaterial(
+      {map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));
+    sp.position.copy(pos); sp.scale.set(2.2,.55,1);
+    return sp;
+  }
+
+  function toXYZ(p,ax){
+    var lx=Math.log10(Math.max(p.load,1e-4));
+    var lo=Math.log10(Math.max(ax.x.min,1e-4)), hi=Math.log10(Math.max(ax.x.max,1e-4));
+    var tx=(lx-lo)/Math.max(hi-lo,1e-6);
+    var ty=(p.lpd-ax.y.min)/Math.max(ax.y.max-ax.y.min,1e-6);
+    var tz=(p.x_ch4-ax.z.min)/Math.max(ax.z.max-ax.z.min,1e-6);
+    return new THREE.Vector3(-5+tx*10, ty*9+0.35, tz*10);
+  }
+
+  function renderSpace(){
+    var D=window.__SPACE;
+    if(!D||!D.ok) return;
+    if(!initSpace()) return;
+    var ax=D.axes;
+    var fL=document.getElementById('fLoad').value;
+    var fP=document.getElementById('fLamp').value;
+
+    var kept=D.points.filter(function(p){
+      if(fL!=='all'&&String(p.load)!==fL) return false;
+      if(fP!=='all'&&String(p.lamp||'')!==fP) return false;
+      return true;
+    });
+
+    var g=S.group;
+    while(g.children.length){
+      var c=g.children.pop();
+      if(c.geometry) c.geometry.dispose();
+      if(c.material) c.material.dispose();
+    }
+    var lo=Math.log10(Math.max(ax.color.min,1)), hi=Math.log10(Math.max(ax.color.max,1));
+    kept.forEach(function(p){
+      var v=toXYZ(p,ax);
+      var t=(Math.log10(Math.max(p.y,1))-lo)/Math.max(hi-lo,1e-6);
+      var size=.07+((p.sel===null?60:p.sel)/100)*.13;
+      var col=colorOf(t);
+      var m=new THREE.Mesh(
+        new THREE.SphereGeometry(size,12,10),
+        new THREE.MeshStandardMaterial({
+          color:col, emissive:col, emissiveIntensity:.14,
+          metalness:.05, roughness:.55, transparent:true, opacity:.88}));
+      m.position.copy(v);
+      g.add(m);
+    });
+
+    var peak=kept.reduce(function(a,b){ return (b.y>(a?a.y:0))?b:a; },null);
+    document.getElementById('spaceStat').innerHTML=
+      '显示 '+kept.length+' / '+D.n+' 点'+
+      (peak?('<br>最高 '+fmt(peak.y)+'<br>负载 '+peak.load+'% · 光强 '+fmt(peak.lpd)+
+             ' · CH₄ '+fmt(peak.x_ch4,0)+'%'):'');
+  }
+
+  function bootSpace(){
+    var D=window.__SPACE;
+    if(!D||!D.ok){ fallback('数据空间未加载。'); return; }
+    var loads=['all'].concat(Array.from(new Set(D.points.map(function(p){return String(p.load);})))
+      .sort(function(a,b){return +a-+b;}));
+    document.getElementById('fLoad').innerHTML=loads.map(function(v){
+      return '<option value="'+v+'">'+(v==='all'?'全部':v+' wt%')+'</option>';}).join('');
+    var lamps=['all'].concat(Array.from(new Set(D.points.map(function(p){return p.lamp||'';})))
+      .filter(Boolean));
+    document.getElementById('fLamp').innerHTML=lamps.map(function(v){
+      return '<option value="'+esc(v)+'">'+(v==='all'?'全部':esc(v))+'</option>';}).join('');
+    ['fLoad','fLamp'].forEach(function(id){
+      document.getElementById(id).addEventListener('change',renderSpace);});
+    renderSpace();
+  }
+
+  /* ================= ④b 旧灯曲面（三维） ================= */
+  var SF={scene:null,cam:null,rd:null,ctrl:null,group:null};
+
+  function surfColor(t){
+    var c1=new THREE.Color(0x0f766e), c2=new THREE.Color(0x22d3ee), c3=new THREE.Color(0xf59e0b);
+    var c=new THREE.Color();
+    if(t<0.55) c.copy(c1).lerp(c2,t/0.55);
+    else c.copy(c2).lerp(c3,(t-0.55)/0.45);
+    return c;
+  }
+
+  function surfFallback(msg){
+    var h=document.getElementById('surf');
+    if(!h) return;
+    h.innerHTML='<div class="surf-fallback"><div><div style="color:#0f766e;'+
+      'font-weight:700;font-size:13px;margin-bottom:6px">三维曲面需要 WebGL</div>'+
+      esc(msg||'请用 Chrome / Edge 打开，或开启显卡加速。')+'</div></div>';
+  }
+
+  function initSurf(){
+    if(SF.rd) return true;
+    var host=document.getElementById('surf');
+    if(!host) return false;
+    if(typeof THREE==='undefined'){ surfFallback('Three.js 未加载。'); return false; }
+    if(!webglOK()){ surfFallback(); return false; }
+    var W=host.clientWidth, H=host.clientHeight;
+    if(!W||!H) return false;
+
+    var scene=new THREE.Scene();
+    var cam=new THREE.PerspectiveCamera(38,W/H,0.1,800);
+    cam.position.set(11,9.5,13);
+    var rd;
+    try{ rd=new THREE.WebGLRenderer({antialias:true,alpha:true}); }
+    catch(e){ surfFallback('WebGL 初始化失败：'+e.message); return false; }
+    rd.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    rd.setSize(W,H);
+    rd.setClearColor(0x000000,0);
+    host.appendChild(rd.domElement);
+    rd.domElement.style.display='block';
+
+    scene.add(new THREE.HemisphereLight(0xffffff,0xe2edf2,1.15));
+    var d1=new THREE.DirectionalLight(0xffffff,0.8); d1.position.set(8,14,9); scene.add(d1);
+    var d2=new THREE.DirectionalLight(0x9fe3ef,0.32); d2.position.set(-9,-5,-8); scene.add(d2);
+
+    var ctrl=null;
+    if(THREE.OrbitControls){
+      ctrl=new THREE.OrbitControls(cam,rd.domElement);
+      ctrl.enableDamping=true; ctrl.dampingFactor=.08;
+      ctrl.rotateSpeed=.6; ctrl.zoomSpeed=.85;
+      ctrl.minDistance=10; ctrl.maxDistance=46;
+    }
+    SF.scene=scene; SF.cam=cam; SF.rd=rd; SF.ctrl=ctrl;
+    SF.group=new THREE.Group(); scene.add(SF.group);
+    (function loop(){ requestAnimationFrame(loop);
+      if(ctrl) ctrl.update(); rd.render(scene,cam); })();
+    return true;
+  }
+
+  function surfAxes(){
+    var g=new THREE.Group(), L=10, h=L/2;
+    // 底面框架
+    var frame=[[[-h,0,-h],[h,0,-h]],[[h,0,-h],[h,0,h]],[[h,0,h],[-h,0,h]],[[-h,0,h],[-h,0,-h]]];
+    var fm=new THREE.LineBasicMaterial({color:0xb9cdd6});
+    frame.forEach(function(s){
+      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(s[0][0],s[0][1],s[0][2]),
+        new THREE.Vector3(s[1][0],s[1][1],s[1][2])]), fm));
+    });
+    var grid=new THREE.GridHelper(L,10,0xc3d5de,0xe2ecf1);
+    g.add(grid);
+    // 侧框
+    var vf=new THREE.LineBasicMaterial({color:0xd3e2e9});
+    [[[-h,0,-h],[-h,L*0.62,-h]],[[-h,0,h],[-h,L*0.62,h]],
+     [[h,0,-h],[h,L*0.62,-h]],[[h,0,h],[h,L*0.62,h]]].forEach(function(s){
+      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(s[0][0],s[0][1],s[0][2]),
+        new THREE.Vector3(s[1][0],s[1][1],s[1][2])]), vf));
+    });
+    g.add(sLabel('CH₄ %',new THREE.Vector3(h+1.1,0,0)));
+    g.add(sLabel('流量',new THREE.Vector3(0,0,h+1.1)));
+    g.add(sLabel('产率',new THREE.Vector3(-h-1.1,L*0.62,0)));
+    return g;
+  }
+
+  function sLabel(text,pos){
+    var cv=document.createElement('canvas');
+    cv.width=256; cv.height=64;
+    var c=cv.getContext('2d');
+    c.font='bold 30px ui-sans-serif,system-ui';
+    c.fillStyle='#4a6572'; c.textAlign='center'; c.textBaseline='middle';
+    c.fillText(text,128,32);
+    var sp=new THREE.Sprite(new THREE.SpriteMaterial(
+      {map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));
+    sp.position.copy(pos); sp.scale.set(2.4,.6,1);
+    return sp;
+  }
+
+  function drawSurface(){
+    var D=window.__SURF;
+    if(!D||!D.ok){ surfFallback('曲面数据不可用。'); return; }
+    if(!initSurf()) return;
+
+    var d=D.domain, n=D.grid;
+    var xlo=d.x[0], xhi=d.x[1], qlo=d.q[0], qhi=d.q[1];
+    var ys=D.cells.map(function(c){return c.y;});
+    var ymin=Math.min.apply(null,ys), ymax=Math.max.apply(null,ys);
+    var lmin=Math.log10(Math.max(ymin,1)), lmax=Math.log10(Math.max(ymax,1));
+
+    var g=SF.group;
+    while(g.children.length){
+      var c=g.children.pop();
+      if(c.geometry) c.geometry.dispose();
+      if(c.material){ if(c.material.map) c.material.map.dispose(); c.material.dispose(); }
+    }
+    g.add(surfAxes());
+
+    var HMAX=7.2;
+    var step=10.0/(n-1);
+    var map={};
+    D.cells.forEach(function(c){
+      var i=Math.round((c.x-xlo)/Math.max(xhi-xlo,1e-6)*(n-1));
+      var j=Math.round((c.q-qlo)/Math.max(qhi-qlo,1e-6)*(n-1));
+      map[i+'_'+j]=c;
+    });
+    var pos=function(i,j){
+      return new THREE.Vector3(-5+i*step, 0, -5+j*step);
+    };
+
+    // 三角面片
+    var geoms=[];
+    for(var i=0;i<n-1;i++){
+      for(var j=0;j<n-1;j++){
+        var cs=[map[i+'_'+j],map[(i+1)+'_'+j],map[(i+1)+'_'+(j+1)],map[i+'_'+(j+1)]];
+        if(cs.some(function(x){return !x;})) continue;
+        var dmax=Math.max.apply(null,cs.map(function(x){return x.d;}));
+        if(dmax>0.72) continue;   // 太稀疏不画
+        var op = dmax<=0.22 ? 1.0 : (dmax<=0.45 ? 0.72 : 0.38);
+        var avgY=cs.reduce(function(a,x){return a+x.y;},0)/4;
+        var t=(Math.log10(Math.max(avgY,1))-lmin)/Math.max(lmax-lmin,1e-6);
+        var col=surfColor(Math.max(0,Math.min(1,t)));
+        var mat=new THREE.MeshStandardMaterial({
+          color:col, side:THREE.DoubleSide, metalness:.06, roughness:.62,
+          transparent:op<1, opacity:op, flatShading:false });
+        var verts=[];
+        [[0,1,2],[0,2,3]].forEach(function(tri){
+          tri.forEach(function(k){
+            var x=cs[k];
+            var p=pos(k===0||k===3?i:i+1, k<2?j:j+1);
+            var hh=(Math.log10(Math.max(x.y,1))-lmin)/Math.max(lmax-lmin,1e-6);
+            verts.push(p.x, 0.15+hh*HMAX, p.z);
+          });
+        });
+        var geo=new THREE.BufferGeometry();
+        geo.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
+        geo.computeVertexNormals();
+        g.add(new THREE.Mesh(geo,mat));
+      }
+    }
+
+    // 实测点
+    var pm=new THREE.MeshBasicMaterial({color:0x0f172a, transparent:true, opacity:.42});
+    D.points.forEach(function(p){
+      var tx=(p.x-xlo)/Math.max(xhi-xlo,1e-6);
+      var tq=(p.q-qlo)/Math.max(qhi-qlo,1e-6);
+      if(tx<0||tx>1||tq<0||tq>1) return;
+      var hh=(Math.log10(Math.max(p.y,1))-lmin)/Math.max(lmax-lmin,1e-6);
+      var m=new THREE.Mesh(new THREE.SphereGeometry(0.055,8,6), pm);
+      m.position.set(-5+tx*10, 0.17+hh*HMAX, -5+tq*10);
+      g.add(m);
+    });
+
+    // 最优点：立柱 + 顶球
+    if(D.best){
+      var bx=(D.best.x-xlo)/Math.max(xhi-xlo,1e-6);
+      var bq=(D.best.q-qlo)/Math.max(qhi-qlo,1e-6);
+      var by=(Math.log10(Math.max(D.best.y,1))-lmin)/Math.max(lmax-lmin,1e-6);
+      var X=-5+bx*10, Z=-5+bq*10, Y=0.15+by*HMAX;
+      var lm=new THREE.LineBasicMaterial({color:0x0f172a,transparent:true,opacity:.5});
+      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(X,0,Z), new THREE.Vector3(X,Y,Z)]), lm));
+      var bm=new THREE.Mesh(new THREE.SphereGeometry(0.16,16,12),
+        new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xffffff,
+          emissiveIntensity:.35,roughness:.3}));
+      bm.position.set(X,Y,Z); g.add(bm);
+    }
+
+    // 侧栏
+    document.getElementById('scMin').textContent=fmt(ymin);
+    document.getElementById('scMax').textContent=fmt(ymax);
+    var b=D.best;
+    document.getElementById('bestBox').innerHTML = b
+      ? '<div class="lb">当前最优点</div>'+
+        '<div class="v">'+fmt(b.y)+'</div>'+
+        '<div class="s">CH₄ '+fmt(b.x,0)+'% · 总流量 '+fmt(b.q)+
+        '<br>选择性 '+fmt(b.sel,1)+'% · 距最近实测 '+fmt(b.d,2)+'</div>'
+      : '<div class="lb">当前最优点</div><div class="v">—</div>';
+
+    var dense=D.cells.filter(function(c){return c.d<=0.22;}).length;
+    document.getElementById('surfStat').innerHTML=
+      '实测 '+D.n_points+' 条<br>网格 '+D.grid+'×'+D.grid+
+      '（'+dense+' 格有支撑）<br>范围 CH₄ '+d.x[0]+'–'+d.x[1]+
+      '% · 流量 '+d.q[0]+'–'+d.q[1];
+
+    document.getElementById('surfNote').innerHTML=
+      '<b>怎么读：</b>高度和颜色都是产率，深色小点是实测，白色圆球是当前最优点。'+
+      '曲面上颜色淡的区块离实测远、可信度低；<b>缺口</b>是数据太稀疏，直接不画，避免外推。'+
+      '<br><b>更新方式：</b>新的旧灯 0.05% 数据进主表后刷新页面，曲面自动重算。';
+  }
+
+  /* ================= ⑤ 数据表 ================= */
+  function renderTable(){
+    var rows=DATA.curve.map(function(c){
+      var cls=c.n===0?'empty':(c.thin?'thin':'');
+      var tag=c.n===0?'<span class="tag empty">空白</span>'
+             :(c.thin?'<span class="tag thin">样本不足</span>'
+                     :'<span class="tag ok">可作结论</span>');
+      return '<tr class="'+cls+'">'+
+        '<td><b>'+loadLabel(c.load)+'</b></td>'+
+        '<td class="num">'+c.n+'</td>'+
+        '<td class="num">'+fmt(c.median)+'</td>'+
+        '<td class="num">'+fmt(c.max)+'</td>'+
+        '<td class="num">'+(c.sel_median!==null?fmt(c.sel_median,1)+'%':'—')+'</td>'+
+        '<td>'+tag+'</td></tr>';
+    });
+    var have={};
+    DATA.curve.forEach(function(c){ have[String(c.load)]=1; });
+    (DATA.planned||[]).forEach(function(l){
+      if(!have[String(l)]){
+        rows.push('<tr class="empty"><td><b>'+loadLabel(l)+'</b></td>'+
+          '<td class="num">0</td><td class="num">—</td><td class="num">—</td>'+
+          '<td class="num">—</td><td><span class="tag empty">空白</span></td></tr>');
+      }
+    });
+    document.getElementById('tbody').innerHTML=rows.join('');
+  }
+
+  /* ================= ⑥ 模型自检 ================= */
+  function renderSelfCheck(){
+    var SC=window.__SC;
+    if(!SC||!SC.ok){
+      document.getElementById('checkIntro').textContent='模型自检不可用。'; return;
+    }
+    document.getElementById('checkIntro').innerHTML='<b>'+SC.summary+'</b><br>'+
+      '只有 0.05% 那一档模型能给可信数值，其余档位给的是趋势。';
+
+    var V={reliable:['ok','可用'],biased:['mid','偏差偏大'],off:['bad','不可用'],
+           extrapolate:['out','仅外推'],'no-data':['empty','无实测']};
+    document.getElementById('checkBody').innerHTML=(SC.rows||[]).map(function(r){
+      var v=V[r.verdict]||['empty',r.verdict];
+      var cls=(r.verdict==='off'||r.verdict==='extrapolate')?'thin':'';
+      var e=(r.err_pct===null||r.err_pct===undefined)?'—':((r.err_pct>0?'+':'')+fmt(r.err_pct)+'%');
+      var d=r.in_domain===null?'—':(r.in_domain?'<span class="tag ok">域内</span>'
+                                                   :'<span class="tag out">域外</span>');
+      return '<tr class="'+cls+'">'+
+        '<td><b>'+loadLabel(r.load)+'</b></td>'+
+        '<td class="num">'+(r.measured!==null?fmt(r.measured):'—')+'</td>'+
+        '<td class="num">'+r.n+'</td>'+
+        '<td class="num">'+(r.predicted!==null?fmt(r.predicted):'—')+'</td>'+
+        '<td class="num">'+e+'</td><td>'+d+'</td>'+
+        '<td><span class="tag '+v[0]+'">'+v[1]+'</span></td></tr>';
+    }).join('');
+  }
+
+  /* ================= ⑦ 缺口 ================= */
+  function renderGaps(){
+    var box=document.getElementById('gaps');
+    var gs=DATA.gaps||[];
+    if(!gs.length){
+      box.innerHTML='<div class="gap"><div class="idx">✓</div><div class="body">'+
+        '<div class="t">计划内的负载点都已达标</div>'+
+        '<div class="d">每档至少 '+DATA.min_n+' 条实测。</div></div></div>';
+      document.getElementById('rule').style.display='none';
+      return;
+    }
+    box.innerHTML=gs.map(function(g,i){
+      var empty=g.n===0;
+      var badge=empty?'<span class="badge now">完全空白</span>'
+                     :'<span class="badge">缺 '+g.need+' 条</span>';
+      var detail=empty?'这一档没有任何实测。'
+        :('现有 '+g.n+' 条'+(g.median!==null?'，中位 '+fmt(g.median):'')+
+          '；补满 '+DATA.min_n+' 条才能判断。');
+      return '<div class="gap"><div class="idx">'+(i+1)+'</div>'+
+        '<div class="body"><div class="t">补 '+loadLabel(g.load)+' — '+
+        (empty?'完全没有数据':'样本不足')+'</div>'+
+        '<div class="d">'+detail+'</div></div>'+badge+'</div>';
+    }).join('');
+
+    var sp=DATA.plan_span;
+    var txt='<b>为什么先补这几个点：</b>最优负载 '+
+      (DATA.peak?DATA.peak.load:'—')+' wt% 已确定';
+    if(DATA.cliff){
+      txt+='，往上到 '+DATA.cliff.to_load+'% 跌幅 '+fmt(DATA.cliff.drop_pct,0)+
+        '%，而那一档只有 '+DATA.cliff.n_next+' 条数据';
+    }
+    if(sp&&sp.ratio<1.3){
+      txt+='。高负载区现有产率全在 '+fmt(sp.min)+' ~ '+fmt(sp.max)+
+        '（差 '+fmt((sp.ratio-1)*100,0)+'%），做出来是几条分不开的平线。';
+    }
+    document.getElementById('rule').innerHTML=txt;
+  }
+
+  /* ================= ⑧ 机理模型 ================= */
+  function renderFlow(){
+    var F=window.__FLOW;
+    if(!F||!F.ok){
+      document.getElementById('flowIntro').textContent='流量模型不可用。'; return;
+    }
+    document.getElementById('flowIntro').innerHTML='<b>'+F.summary+'</b><br>'+
+      'θ_O 与 θ_C 是竞争吸附覆盖度，产率正比于两者乘积。参数全部来自最小二乘拟合。'+
+      '<br><b>适用范围：</b>0.05 wt% · 430 mW/cm² · O₂ 5–30% · CH₄ 30–90% · 总流量 100 mL/min';
+    document.getElementById('flowBody').innerHTML=(F.rows||[]).map(function(r){
+      var bad=Math.abs(r.err_pct)>15;
+      return '<tr class="'+(bad?'thin':'')+'">'+
+        '<td>'+esc(r.flows)+'</td>'+
+        '<td class="num">'+fmt(r.measured_y)+'</td>'+
+        '<td class="num">'+fmt(r.pred_y)+'</td>'+
+        '<td class="num">'+(r.err_pct>0?'+':'')+fmt(r.err_pct,1)+'%</td>'+
+        '<td class="num">'+fmt(r.measured_sel,1)+'%</td>'+
+        '<td class="num">'+fmt(r.pred_sel,1)+'%</td></tr>';
+    }).join('');
+    document.getElementById('flowNote').innerHTML=
+      '<b>能做什么：</b>在适用范围内替代一次实验做插值（平均偏差 '+F.mape_y+
+      '%，选择性偏差 '+F.mae_sel+' 点）。'+
+      '<br><b>不能做什么：</b>外推到没测过的组合区域误差 33–56%；换负载（如 3%）完全不适用。';
+  }
+
+  /* ================= 启动 ================= */
+  function boot(){
+    var get=function(u){
+      return fetch(u,{cache:'no-store'}).then(function(r){return r.json();})
+        .catch(function(){return null;});
+    };
+    Promise.all([get('/api/brief'),get('/api/data-space'),
+                 get('/api/selfcheck'),get('/api/flow-model'),
+                 get('/api/old-lamp-surface')])
+      .then(function(res){
+        var j=res[0];
+        window.__SPACE=res[1]; window.__SC=res[2]; window.__FLOW=res[3];
+        window.__SURF=res[4];
+        if(!j||!j.ok){
+          document.body.innerHTML='<div class="err">数据读取失败：'+
+            ((j&&j.error)||'无法连接后端')+'</div>';
+          return;
+        }
+        DATA=j;
+        renderVerdict();
+        bindPredict();
+        renderTable();
+        renderSelfCheck();
+        renderGaps();
+        renderFlow();
+
+        document.getElementById('meta').textContent=
+          '有效实测 '+DATA.n_total+' 条 · 负载档 '+DATA.curve.length+' 个';
+        document.getElementById('chartNote').innerHTML=
+          '<b>怎么读：</b>灰点是单条实测，绿线连的是各档中位数。'+
+          '0.05% 那档有 '+(DATA.peak?DATA.peak.n:0)+' 条，上下四分位跨度很大（'+
+          (DATA.peak?fmt(DATA.peak.q25)+' ~ '+fmt(DATA.peak.q75):'—')+
+          '），说明同一负载下流量、光强的影响远大于负载本身。橙色档位样本不足 5 条。';
+        document.getElementById('foot').innerHTML=
+          '数据来源 data/OCM_master.xlsx · 统计口径为按负载分组的中位数与四分位。'+
+          '预测由分层世界模型（机理先验 + 条件残差）给出，域外时自动降置信。';
+
+        drawChart();
+        bootSpace();
+        drawSurface();
+        window.addEventListener('resize',function(){
+          clearTimeout(window.__rt);
+          window.__rt=setTimeout(function(){ drawChart(); drawSurface(); },160);
+        });
+      })
+      .catch(function(e){
+        document.body.innerHTML='<div class="err">请求失败：'+e.message+'</div>';
+      });
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>

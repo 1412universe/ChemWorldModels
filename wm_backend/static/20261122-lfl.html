@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数据空间总览 · Pd–P25（独立版）</title>
+<script src="assets/vendor/three.min.js"></script>
+<script src="assets/vendor/OrbitControls.js"></script>
+<style>
+  :root{
+    --bg:#f5f7fa; --card:#fff; --ink:#0f172a; --sub:#64748b; --line:#e2e8f0;
+    --teal:#0f766e; --amber:#b45309; --red:#b91c1c; --blue:#1d4ed8;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1120px; margin:0 auto; padding:26px 24px 56px;}
+
+  header.top{display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:4px;}
+  h1{font-size:20px; margin:0; font-weight:800;}
+  .meta{font-size:12px; color:var(--sub);}
+  .subline{font-size:13px; color:var(--sub); margin-bottom:20px;}
+
+  .back{display:inline-flex; align-items:center; gap:5px; margin-bottom:14px;
+    padding:5px 11px 5px 9px; border-radius:8px; border:1px solid var(--line);
+    background:#fff; color:var(--sub); font-size:12px; font-weight:600;
+    text-decoration:none; transition:all .15s ease;}
+  .back:hover{border-color:#a7e8dd; color:var(--teal); background:#f7fefd;}
+  .back svg{display:block;}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin-bottom:14px;}
+  .card h2{font-size:12px; margin:0 0 13px; color:var(--sub); font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase;}
+  .card h2 small{float:right; font-size:10.5px; font-weight:600; color:#94a3b8; letter-spacing:0; text-transform:none;}
+
+  /* 结论 */
+  .verdict{background:linear-gradient(135deg,#0f766e,#134e4a); color:#ecfeff; border:0;}
+  .verdict h2{color:#99f6e4;}
+  .verdict .big{font-size:24px; font-weight:800; line-height:1.3;}
+  .verdict .big em{font-style:normal; color:#fde68a;}
+  .verdict .why{margin-top:9px; font-size:12.5px; opacity:.9; line-height:1.6;}
+  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px;}
+  .kpi{background:rgba(255,255,255,.1); border-radius:9px; padding:9px 11px;}
+  .kpi .k{font-size:10px; opacity:.8;}
+  .kpi .v{font-size:17px; font-weight:800; margin-top:2px;}
+  .kpi .s{font-size:10px; opacity:.72; margin-top:2px;}
+
+  /* 图 */
+  canvas#chart{width:100%; height:290px; display:block;}
+  .legend{display:flex; gap:16px; font-size:11px; color:var(--sub); margin-top:9px; flex-wrap:wrap;}
+  .legend i{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:4px; vertical-align:-1px;}
+  .note{font-size:11px; color:var(--sub); line-height:1.6; margin-top:11px;
+    padding-top:11px; border-top:1px dashed var(--line);}
+  .note b{color:var(--ink);}
+
+  /* 三维 */
+  .space-grid{display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;}
+  .space-view{flex:1 1 560px; min-width:300px;}
+  #space3d{width:100%; height:380px; border-radius:12px; overflow:hidden;
+    background:linear-gradient(160deg,#fbfdfe 0%,#eef4f7 55%,#e6eef3 100%);
+    border:1px solid #dbe6ec; position:relative;}
+  .hint{position:absolute; left:12px; bottom:9px; font-size:10px; color:#93a9b5; pointer-events:none;}
+  .space-side{flex:0 0 190px; min-width:170px;}
+  .space-side label{display:flex; flex-direction:column; gap:4px; font-size:10.5px;
+    color:var(--sub); font-weight:600; margin-bottom:10px;}
+  .space-side select{border:1px solid #d7dde8; border-radius:8px; padding:5px 8px;
+    font-size:12px; background:#fff; color:var(--ink);}
+  .side-title{font-size:11px; font-weight:750; color:#334155; margin:0 0 9px;}
+  .stat{border-top:1px dashed var(--line); padding-top:9px; margin-top:3px;
+    font-size:10.5px; color:var(--sub); line-height:1.65;}
+
+  /* 预测 */
+  .predict{background:linear-gradient(160deg,#f7fefd 0%,#eefaf7 100%); border-color:#a7e8dd;}
+  .predict h2{color:var(--teal);}
+  .pred-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:9px; margin-bottom:11px;}
+  .pred-grid label{display:flex; flex-direction:column; gap:3px; font-size:10px;
+    color:var(--sub); font-weight:600;}
+  .pred-grid input,.pred-grid select{border:1px solid #cfdfe6; border-radius:7px;
+    padding:6px 7px; font-size:12px; background:#fff; color:var(--ink); width:100%;}
+  .pred-actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:13px;}
+  button.run{border:0; border-radius:8px; padding:7px 18px; cursor:pointer;
+    background:var(--teal); color:#fff; font-weight:700; font-size:12.5px;}
+  button.run:hover{background:#0d9488;}
+  button.run:disabled{background:#9bb8b4; cursor:default;}
+  button.preset{border:1px solid #b8e4dc; background:#fff; color:var(--teal);
+    border-radius:7px; padding:5px 10px; cursor:pointer; font-size:11px; font-weight:650;}
+  button.preset:hover{background:#ecfdf9;}
+
+  .pred-out{display:none;}
+  .pred-out.on{display:block;}
+  .pred-row{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  .pbox{background:#fff; border:1px solid #d9ece7; border-radius:10px; padding:11px 12px;}
+  .pbox .k{font-size:10px; color:var(--sub); font-weight:600;}
+  .pbox .v{font-size:20px; font-weight:800; margin-top:3px; color:var(--teal);}
+  .pbox .v small{font-size:11px; font-weight:600; color:#94a3b8;}
+  .pbox .s{font-size:10px; color:#94a3b8; margin-top:3px; line-height:1.4;}
+  .pbox.warn{border-color:#fde68a; background:#fffdf7;}
+  .pbox.warn .v{color:var(--amber);}
+  .pbox.bad{border-color:#fecaca; background:#fef7f7;}
+  .pbox.bad .v{color:var(--red);}
+  .pmsg{margin-top:11px; font-size:11.5px; line-height:1.65; padding:9px 11px;
+    border-radius:9px; background:#fff; border:1px solid #d9ece7; color:#334155;}
+  .pmsg.warn{background:#fffdf7; border-color:#fde68a; color:#92400e;}
+  .pmsg.bad{background:#fef7f7; border-color:#fecaca; color:#991b1b;}
+
+  /* 表格 */
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  th,td{padding:8px 9px; text-align:left; border-bottom:1px solid var(--line);}
+  th{font-size:10.5px; color:var(--sub); font-weight:700; letter-spacing:.4px; text-transform:uppercase;}
+  td.num{font-variant-numeric:tabular-nums; text-align:right;}
+  tr.thin td{background:#fffbeb;}
+  tr.empty td{background:#fef2f2;}
+  .tag{display:inline-block; font-size:10px; font-weight:700; padding:1px 7px; border-radius:99px;}
+  .tag.ok{background:#dcfce7; color:#166534;}
+  .tag.thin{background:#fef3c7; color:#92400e;}
+  .tag.empty{background:#fee2e2; color:#991b1b;}
+  .tag.out{background:#e0e7ff; color:#3730a3;}
+  .tag.mid{background:#fef3c7; color:#92400e;}
+  .tag.bad{background:#fee2e2; color:#991b1b;}
+
+  .gap{display:flex; align-items:flex-start; gap:11px; padding:11px 0; border-bottom:1px solid var(--line);}
+  .gap:last-child{border-bottom:0; padding-bottom:0;}
+  .gap .idx{flex:0 0 24px; height:24px; border-radius:6px; background:var(--teal); color:#fff;
+    font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center;}
+  .gap .body{flex:1;}
+  .gap .t{font-size:13px; font-weight:700;}
+  .gap .d{font-size:11.5px; color:var(--sub); margin-top:2px; line-height:1.5;}
+  .gap .badge{flex:0 0 auto; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:99px;
+    background:#fffbeb; color:#92400e; border:1px solid #fde68a;}
+  .gap .badge.now{background:#fef2f2; color:#991b1b; border-color:#fecaca;}
+
+  .rule{background:#f8fafc; border-left:3px solid var(--teal); padding:11px 13px;
+    font-size:12px; line-height:1.6; color:#334155; border-radius:0 8px 8px 0;}
+  .rule b{color:var(--teal);}
+  .rule.warn{border-left-color:var(--amber); background:#fffdf7;}
+  .rule.warn b{color:var(--amber);}
+
+  .surf-grid{display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;}
+  .surf-view{flex:1 1 520px; min-width:300px;}
+  #surf{width:100%; height:400px; display:block; border-radius:10px;
+    border:1px solid #dbe6ec; position:relative; overflow:hidden;
+    background:linear-gradient(170deg,#fbfdfe 0%,#eef4f7 60%,#e4edf2 100%);}
+  .surf-fallback{position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;text-align:center;padding:24px;color:#7b93a0;
+    font-size:12px;line-height:1.85;}
+  .surf-side{flex:0 0 230px; min-width:200px;}
+  .best-box{background:linear-gradient(135deg,#0f766e,#134e4a); color:#ecfeff;
+    border-radius:11px; padding:12px 14px; margin-bottom:12px;}
+  .best-box .lb{font-size:10px; opacity:.8; letter-spacing:.4px;}
+  .best-box .v{font-size:17px; font-weight:800; margin-top:3px; line-height:1.35;}
+  .best-box .v small{font-size:11px; font-weight:600; opacity:.85;}
+  .best-box .s{font-size:10.5px; opacity:.78; margin-top:5px;}
+  .scale-bar{height:9px; border-radius:5px; margin:7px 0 4px;
+    background:linear-gradient(90deg,#0f766e,#22d3ee,#f59e0b);}
+  .scale-txt{display:flex; justify-content:space-between; font-size:10px; color:var(--sub);}
+
+  footer{font-size:11px; color:var(--sub); margin-top:22px; line-height:1.65;}
+  .err{padding:40px; text-align:center; color:var(--red); font-size:13px;}
+  @media (max-width:900px){
+    .pred-grid{grid-template-columns:repeat(3,1fr);}
+    .pred-row{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:820px){
+    .kpis{grid-template-columns:repeat(2,1fr);}
+    .verdict .big{font-size:20px;}
+    .wrap{padding:18px 14px 40px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="overview_photo.html" title="返回光催化闭环总览">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+    <span>返回</span>
+  </a>
+
+  <header class="top">
+    <h1>数据空间总览 · Pd–P25</h1>
+    <div class="meta" id="meta">加载中…</div>
+  </header>
+  <div class="subline">甲烷氧化偶联（OCM）光催化 · 实测分布 + 模型预测 + 下一步建议 · <span style="color:#94a3b8">数据快照，离线可看</span></div>
+
+  <!-- ① 当前结论 -->
+  <div class="card verdict">
+    <h2>当前结论</h2>
+    <div class="big" id="verdictBig">—</div>
+    <div class="why" id="verdictWhy"></div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+
+  <!-- ② 在线预测（核心） -->
+  <div class="card predict">
+    <h2>条件预测<small>输入条件 → 产率与选择性</small></h2>
+    <div class="pred-grid">
+      <label>负载 wt%<input id="pLoad" type="number" min="0.005" max="10" step="0.005" value="0.05"></label>
+      <label>CH₄ mL/min<input id="pCh4" type="number" min="0" max="500" step="1" value="90"></label>
+      <label>O₂ mL/min<input id="pO2" type="number" min="0" max="200" step="0.5" value="10"></label>
+      <label>Ar mL/min<input id="pAr" type="number" min="0" max="200" step="1" value="0"></label>
+      <label>光强 mW/cm²<input id="pLight" type="number" min="1" max="600" step="0.1" value="257.3"></label>
+    </div>
+    <div class="pred-actions">
+      <button class="run" id="pRun">预测</button>
+      <button class="preset" data-p="0.05,90,10,0,257.3">0.05% 标准</button>
+      <button class="preset" data-p="0.05,90,10,0,433.9">0.05% 旧灯</button>
+      <button class="preset" data-p="3,90,10,0,257.3">3% 新灯</button>
+      <button class="preset" data-p="0.5,90,10,0,257.3">0.5%</button>
+    </div>
+    <div class="pred-out" id="pOut"></div>
+  </div>
+
+  <!-- ③ 负载-产率分布 -->
+  <div class="card">
+    <h2>负载-产率分布</h2>
+    <canvas id="chart"></canvas>
+    <div class="legend">
+      <span><i style="background:#0f766e"></i>中位产率</span>
+      <span><i style="background:#94a3b8"></i>单条实测</span>
+      <span><i style="background:#f59e0b"></i>样本不足（n &lt; 5）</span>
+    </div>
+    <div class="note" id="chartNote"></div>
+  </div>
+
+  <!-- ④ 三维数据空间 -->
+  <div class="card">
+    <h2>三维数据空间 · 负载 × 光强 × 甲烷比例</h2>
+    <div class="space-grid">
+      <div class="space-view">
+        <div id="space3d"><div class="hint">拖拽旋转 · 滚轮缩放 · 右键平移</div></div>
+        <div class="legend" style="margin-top:9px;">
+          <span><i style="background:#0f766e"></i>低产率</span>
+          <span><i style="background:#22d3ee"></i>中</span>
+          <span><i style="background:#f59e0b"></i>高产率</span>
+          <span style="margin-left:auto;">球越大 = 选择性越高</span>
+        </div>
+      </div>
+      <div class="space-side">
+        <div class="side-title">筛选</div>
+        <label>负载<select id="fLoad"></select></label>
+        <label>光源<select id="fLamp"></select></label>
+        <div class="stat" id="spaceStat">—</div>
+      </div>
+    </div>
+    <div class="note">
+      <b>怎么看：</b>三个轴是实验中真正变过的量，每个球一条实测。球密的地方数据充分，空白的地方模型不能外推。
+    </div>
+  </div>
+
+  <!-- ④b 旧灯流量响应曲面 -->
+  <div class="card" style="border-color:#a7e8dd; background:#f7fefd;">
+    <h2 style="color:#0f766e;">旧灯流量响应曲面<small>0.05 wt% · 434 mW/cm²</small></h2>
+    <div class="surf-grid">
+      <div class="surf-view">
+        <div id="surf"><div class="hint">拖拽旋转 · 滚轮缩放 · 右键平移</div></div>
+        <div class="legend" style="margin-top:9px;">
+          <span>X = CH₄ 体积分数 %</span>
+          <span>Z = 总流量 mL/min</span>
+          <span>高度 + 颜色 = 产率</span>
+          <span style="margin-left:auto;">缺口 = 无实测支撑</span>
+        </div>
+      </div>
+      <div class="surf-side">
+        <div class="best-box" id="bestBox">
+          <div class="lb">当前最优点</div>
+          <div class="v">—</div>
+        </div>
+        <div style="font-size:10.5px;color:var(--sub);margin-bottom:4px;">产率色阶</div>
+        <div class="scale-bar"></div>
+        <div class="scale-txt"><span id="scMin">—</span><span id="scMax">—</span></div>
+        <div class="stat" id="surfStat" style="margin-top:11px;">—</div>
+      </div>
+    </div>
+    <div class="note" id="surfNote"></div>
+  </div>
+
+  <!-- ⑤ 各负载档数据量 -->
+  <div class="card">
+    <h2>各负载档数据量</h2>
+    <table>
+      <thead><tr>
+        <th>负载 wt%</th><th style="text-align:right">n</th>
+        <th style="text-align:right">产率中位</th><th style="text-align:right">最高</th>
+        <th style="text-align:right">选择性中位</th><th>判断</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="note">
+      <b>判据：</b>单档少于 5 条时，中位数会被单次实验波动主导。「可作结论」只表示样本量够，不代表该档条件已优化。
+    </div>
+  </div>
+
+  <!-- ⑥ 模型自检 -->
+  <div class="card" style="border-color:#99f6e4;">
+    <h2 style="color:#0f766e;">模型自检 · 它在哪里能用，哪里不能用</h2>
+    <div id="checkIntro" class="rule" style="margin-bottom:12px;"></div>
+    <table>
+      <thead><tr>
+        <th>负载</th><th style="text-align:right">实测中位</th><th style="text-align:right">n</th>
+        <th style="text-align:right">模型预测</th><th style="text-align:right">偏差</th>
+        <th>域内</th><th>判定</th>
+      </tr></thead>
+      <tbody id="checkBody"></tbody>
+    </table>
+    <div class="note">
+      <b>用途：</b>证明系统知道自己什么时候不该给数。偏差超 ±30% 或判为域外时，输出只能当趋势参考。
+      <br><b>探测条件：</b>Pd–P25，CH₄/O₂/Ar = 90/10/0，光强 257.3 mW/cm²。
+    </div>
+  </div>
+
+  <!-- ⑦ 数据缺口 -->
+  <div class="card">
+    <h2>数据缺口 → 建议补的点</h2>
+    <div id="gaps"></div>
+    <div class="rule" id="rule" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- ⑧ 机理模型 -->
+  <div class="card" style="border-color:#99f6e4; background:#f7fefd;">
+    <h2 style="color:#0f766e;">机理模型 · 流量响应</h2>
+    <div id="flowIntro" class="rule" style="margin-bottom:12px;"></div>
+    <table>
+      <thead><tr>
+        <th>流量 CH₄/O₂/Ar</th><th style="text-align:right">实测 y</th><th style="text-align:right">模型 y</th>
+        <th style="text-align:right">偏差</th><th style="text-align:right">实测 sel</th><th style="text-align:right">模型 sel</th>
+      </tr></thead>
+      <tbody id="flowBody"></tbody>
+    </table>
+    <div class="note" id="flowNote"></div>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+(function(){
+  var DATA=null;
+
+  function fmt(v,d){
+    if(v===null||v===undefined||isNaN(v)) return '—';
+    return Number(v).toLocaleString('zh-CN',
+      {maximumFractionDigits:d===undefined?0:d, minimumFractionDigits:0});
+  }
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
+  }
+  function loadLabel(v){ return (v===null||v===undefined)?'—':(v+'%'); }
+
+  /* ================= ① 结论 ================= */
+  function renderVerdict(){
+    var p=DATA.peak, b=DATA.best;
+    if(!p){ document.getElementById('verdictBig').textContent='数据不足'; return; }
+    document.getElementById('verdictBig').innerHTML =
+      '最优负载 <em>'+p.load+' wt%</em> · 中位产率 '+fmt(p.median)+
+      ' · 选择性中位 '+fmt(p.sel_median,1)+'%';
+
+    var t=['该档 <b>'+p.n+'</b> 条实测，是全表唯一数据充分的负载点。'];
+    if(b && b.y>p.median){
+      t.push('全表最高产率 <b>'+fmt(b.y)+'</b> 也在这里'+
+        (b.top_sel?'，最高选择性 <b>'+fmt(b.top_sel,1)+'%</b>':'')+'。');
+    }
+    document.getElementById('verdictWhy').innerHTML=t.join(' ');
+
+    document.getElementById('kpis').innerHTML=[
+      {k:'可用实测',v:fmt(DATA.n_total),s:'有产率+选择性'},
+      {k:'最优档样本',v:fmt(p.n),s:p.load+' wt%'},
+      {k:'单档不足5条',v:fmt(DATA.n_thin),s:'不能单独下结论'},
+      {k:'光照集中度',v:DATA.light.share_pct!==null?fmt(DATA.light.share_pct,1)+'%':'—',
+       s:DATA.light.top_lpd?DATA.light.top_lpd+' mW/cm²':'—'}
+    ].map(function(x){
+      return '<div class="kpi"><div class="k">'+x.k+'</div><div class="v">'+x.v+
+             '</div><div class="s">'+x.s+'</div></div>';
+    }).join('');
+  }
+
+  /* ================= ② 在线预测 ================= */
+  function runPredict(){
+    var btn=document.getElementById('pRun');
+    var out=document.getElementById('pOut');
+    var body={
+      loading: parseFloat(document.getElementById('pLoad').value)||0.05,
+      ch4: parseFloat(document.getElementById('pCh4').value)||0,
+      o2: parseFloat(document.getElementById('pO2').value)||0,
+      ar: parseFloat(document.getElementById('pAr').value)||0,
+      light: parseFloat(document.getElementById('pLight').value)||257.3,
+      light_unit: 'lpd'
+    };
+    btn.disabled=true; btn.textContent='计算中…';
+    out.classList.remove('on');
+    out.innerHTML='';
+
+    Promise.resolve({"ok": true, "y": 20047.1, "sel": 74.88, "unc": 6348.4, "y_lo": 13698.8, "y_hi": 26395.5, "in_domain": true, "domain": {"d_min": 0.4849}, "prior": {"y": 21140.4}, "residual_blend": 0.298})
+      .then(function(j){
+        btn.disabled=false; btn.textContent='预测';
+        if(!j || !j.ok){
+          out.classList.add('on');
+          out.innerHTML='<div class="pmsg bad">预测失败：'+esc((j&&j.error)||'未知错误')+'</div>';
+          return;
+        }
+        renderPredict(j, body);
+      })
+      .catch(function(e){
+        btn.disabled=false; btn.textContent='预测';
+        out.classList.add('on');
+        out.innerHTML='<div class="pmsg bad">请求失败：'+esc(e.message)+'</div>';
+      });
+  }
+
+  function renderPredict(j, body){
+    var out=document.getElementById('pOut');
+    var dom=j.domain||{};
+    var inDomain=j.in_domain!==false;
+    var dmin=dom.d_min!==undefined?dom.d_min:null;
+
+    var tone = !inDomain ? 'bad' : (dmin!==null && dmin>1.2 ? 'warn' : '');
+    var selTone = j.sel>=60 ? '' : 'warn';
+
+    var html='<div class="pred-row">'+
+      '<div class="pbox '+tone+'"><div class="k">产率</div>'+
+        '<div class="v">'+fmt(j.y)+'<small> ±'+fmt(j.unc)+'</small></div>'+
+        '<div class="s">区间 '+fmt(j.y_lo)+' – '+fmt(j.y_hi)+'</div></div>'+
+      '<div class="pbox '+selTone+'"><div class="k">C₂⁺ 选择性</div>'+
+        '<div class="v">'+fmt(j.sel,1)+'%</div>'+
+        '<div class="s">'+(j.sel>=60?'过 60% 门槛':'低于 60% 门槛')+'</div></div>'+
+      '<div class="pbox '+tone+'"><div class="k">可信度</div>'+
+        '<div class="v" style="font-size:16px">'+(inDomain?'域内':'域外')+'</div>'+
+        '<div class="s">'+(dmin!==null?('最近实测距离 '+fmt(dmin,2)):'')+'</div></div>'+
+      '<div class="pbox"><div class="k">机理先验</div>'+
+        '<div class="v" style="font-size:16px">'+(j.prior?fmt(j.prior.y):'—')+'</div>'+
+        '<div class="s">残差权重 '+fmt(j.residual_blend,2)+'</div></div>'+
+      '</div>';
+
+    var msg, cls='pmsg';
+    if(!inDomain){
+      cls='pmsg bad';
+      msg='<b>这个条件超出训练范围。</b>最近实测距离 '+(dmin!==null?fmt(dmin,2):'—')+
+        '，'+(dmin!==null&&dmin>1.2?'离得很远':'已出凸包')+
+        '。上面的数字只能当趋势参考，要做它请先补邻近实验。';
+    } else if(dmin!==null && dmin>0.6){
+      cls='pmsg warn';
+      msg='<b>在域内但离实测偏远。</b>距离 '+fmt(dmin,2)+
+        '，区间宽度 ±'+fmt(j.unc)+'，建议先做一次验证再放大。';
+    } else {
+      msg='<b>这个条件有邻近实测支撑。</b>距离 '+(dmin!==null?fmt(dmin,2):'—')+
+        '，预测区间 ±'+fmt(j.unc)+'，可以直接排实验。';
+    }
+    if(j.sel!==undefined && j.sel<60){
+      msg+=' <b>注意：</b>选择性只有 '+fmt(j.sel,1)+'%，低于 60% 硬门槛，产物会大量走向 COₓ。';
+    }
+    html+='<div class="'+cls+'">'+msg+'</div>';
+
+    out.innerHTML=html;
+    out.classList.add('on');
+  }
+
+  function bindPredict(){
+    document.getElementById('pRun').addEventListener('click',runPredict);
+    Array.prototype.forEach.call(document.querySelectorAll('.preset'),function(b){
+      b.addEventListener('click',function(){
+        var v=b.getAttribute('data-p').split(',');
+        document.getElementById('pLoad').value=v[0];
+        document.getElementById('pCh4').value=v[1];
+        document.getElementById('pO2').value=v[2];
+        document.getElementById('pAr').value=v[3];
+        document.getElementById('pLight').value=v[4];
+        runPredict();
+      });
+    });
+  }
+
+  /* ================= ③ 二维散点 ================= */
+  function drawChart(){
+    var cv=document.getElementById('chart');
+    var dpr=window.devicePixelRatio||1;
+    var W=cv.clientWidth, H=cv.clientHeight||290;
+    cv.width=W*dpr; cv.height=H*dpr;
+    var g=cv.getContext('2d');
+    g.setTransform(dpr,0,0,dpr,0,0);
+    g.clearRect(0,0,W,H);
+
+    var pad={l:56,r:16,t:12,b:38};
+    var iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+    var loads=DATA.curve.map(function(c){return c.load;});
+    var minL=Math.log10(Math.min.apply(null,loads));
+    var maxL=Math.log10(Math.max.apply(null,loads));
+    if(maxL-minL<0.5) maxL=minL+0.5;
+
+    var allY=[];
+    DATA.curve.forEach(function(c){ allY.push(c.q25,c.q75,c.max,c.median); });
+    var maxY=Math.max.apply(null,allY)*1.08;
+
+    var X=function(l){ return pad.l+((Math.log10(l)-minL)/(maxL-minL))*iw; };
+    var Y=function(v){ return pad.t+ih-(v/maxY)*ih; };
+
+    g.strokeStyle='#eef2f7'; g.lineWidth=1;
+    for(var i=0;i<=5;i++){
+      var yv=maxY*i/5, yy=Y(yv);
+      g.beginPath(); g.moveTo(pad.l,yy); g.lineTo(W-pad.r,yy); g.stroke();
+      g.fillStyle='#94a3b8'; g.font='10.5px ui-sans-serif,system-ui'; g.textAlign='right';
+      g.fillText(fmt(yv/1000)+'k', pad.l-7, yy+4);
+    }
+    g.textAlign='center';
+    DATA.curve.forEach(function(c){
+      g.fillStyle='#94a3b8'; g.font='10.5px ui-sans-serif,system-ui';
+      g.fillText(c.load+'%', X(c.load), H-pad.b+16);
+    });
+    g.strokeStyle='#cbd5e1'; g.beginPath();
+    g.moveTo(pad.l,pad.t+ih); g.lineTo(W-pad.r,pad.t+ih); g.stroke();
+
+    DATA.curve.forEach(function(c){
+      if(c.n<2) return;
+      var x=X(c.load);
+      g.strokeStyle=c.thin?'rgba(245,158,11,.45)':'rgba(15,118,110,.26)';
+      g.lineWidth=7; g.lineCap='round';
+      g.beginPath(); g.moveTo(x,Y(c.q25)); g.lineTo(x,Y(c.q75)); g.stroke();
+    });
+
+    g.strokeStyle='#0f766e'; g.lineWidth=2; g.lineJoin='round';
+    g.beginPath();
+    DATA.curve.forEach(function(c,i){
+      var x=X(c.load), y=Y(c.median);
+      if(i===0) g.moveTo(x,y); else g.lineTo(x,y);
+    });
+    g.stroke();
+
+    DATA.curve.forEach(function(c){
+      var x=X(c.load), y=Y(c.median);
+      g.beginPath(); g.arc(x,y,3.8,0,Math.PI*2);
+      g.fillStyle=c.thin?'#f59e0b':'#0f766e'; g.fill();
+      g.strokeStyle='#fff'; g.lineWidth=1.5; g.stroke();
+    });
+
+    var pk=DATA.peak;
+    if(pk){
+      var px=X(pk.load), py=Y(pk.median);
+      g.fillStyle='#0f766e'; g.font='700 11.5px ui-sans-serif,system-ui'; g.textAlign='center';
+      var lb='最优 '+pk.load+'%';
+      var tw=g.measureText(lb).width;
+      var bx=Math.min(Math.max(px,pad.l+tw/2+6),W-pad.r-tw/2-6);
+      g.fillText(lb,bx,py-12);
+    }
+  }
+
+  /* ================= ④ 三维 ================= */
+  var S={scene:null,cam:null,rd:null,ctrl:null,group:null};
+
+  function colorOf(t){
+    var c1=new THREE.Color(0x0f766e), c2=new THREE.Color(0x22d3ee), c3=new THREE.Color(0xf59e0b);
+    var c=new THREE.Color();
+    if(t<0.6) c.copy(c1).lerp(c2,t/0.6);
+    else c.copy(c2).lerp(c3,(t-0.6)/0.4);
+    return c;
+  }
+  function webglOK(){
+    try{ var c=document.createElement('canvas');
+      return !!(window.WebGLRenderingContext&&(c.getContext('webgl')||c.getContext('experimental-webgl')));
+    }catch(e){ return false; }
+  }
+  function fallback(msg){
+    var h=document.getElementById('space3d');
+    if(!h) return;
+    h.innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;'+
+      'justify-content:center;text-align:center;padding:30px;color:#7b93a0;font-size:12px;line-height:1.9">'+
+      '<div><div style="color:#0f766e;font-weight:700;font-size:13px;margin-bottom:6px">三维视图需要 WebGL</div>'+
+      esc(msg||'请用 Chrome / Edge 打开，或开启显卡加速。')+'</div></div>';
+  }
+
+  function initSpace(){
+    if(S.rd) return true;
+    var host=document.getElementById('space3d');
+    if(!host) return false;
+    if(typeof THREE==='undefined'){ fallback('Three.js 未加载。'); return false; }
+    if(!webglOK()){ fallback(); return false; }
+    var W=host.clientWidth, H=host.clientHeight;
+    if(!W||!H) return false;
+
+    var scene=new THREE.Scene();
+    scene.background=null;
+    var cam=new THREE.PerspectiveCamera(40,W/H,0.1,500);
+    cam.position.set(12,10,14);
+    var rd;
+    try{ rd=new THREE.WebGLRenderer({antialias:true,alpha:true}); }
+    catch(e){ fallback('WebGL 初始化失败：'+e.message); return false; }
+    rd.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    rd.setSize(W,H);
+    rd.setClearColor(0x000000,0);
+    host.appendChild(rd.domElement);
+    rd.domElement.style.display='block';
+
+    scene.add(new THREE.HemisphereLight(0xffffff,0xdfeaf0,1.05));
+    var d1=new THREE.DirectionalLight(0xffffff,0.75); d1.position.set(7,12,9); scene.add(d1);
+    var d2=new THREE.DirectionalLight(0x8fd8e8,0.35); d2.position.set(-8,-3,-7); scene.add(d2);
+
+    var ctrl=null;
+    if(THREE.OrbitControls){
+      ctrl=new THREE.OrbitControls(cam,rd.domElement);
+      ctrl.enableDamping=true; ctrl.dampingFactor=.08;
+      ctrl.rotateSpeed=.6; ctrl.zoomSpeed=.8;
+      ctrl.minDistance=8; ctrl.maxDistance=42;
+    }
+    scene.add(makeAxes());
+    S.scene=scene; S.cam=cam; S.rd=rd; S.ctrl=ctrl;
+    S.group=new THREE.Group(); scene.add(S.group);
+    (function loop(){ requestAnimationFrame(loop);
+      if(ctrl) ctrl.update(); rd.render(scene,cam); })();
+    return true;
+  }
+
+  function makeAxes(){
+    var g=new THREE.Group(), L=10, h=L/2;
+    var lm=new THREE.LineBasicMaterial({color:0x9fb6c2});
+    [[[h,0,0],[-h,0,0]],[[-h,0,0],[-h,L,0]],[[-h,0,0],[-h,0,L]]].forEach(function(s){
+      var geo=new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(s[0][0],s[0][1],s[0][2]),
+        new THREE.Vector3(s[1][0],s[1][1],s[1][2])]);
+      g.add(new THREE.Line(geo,lm));
+    });
+    var grid=new THREE.GridHelper(L,10,0xc3d5de,0xdfe9ef);
+    g.add(grid);
+    g.add(label('负载',new THREE.Vector3(h+0.9,0,0)));
+    g.add(label('光强',new THREE.Vector3(-h-0.9,L+0.5,0)));
+    g.add(label('CH₄%',new THREE.Vector3(-h,0,L+0.9)));
+    return g;
+  }
+
+  function label(text,pos){
+    var cv=document.createElement('canvas');
+    cv.width=256; cv.height=64;
+    var c=cv.getContext('2d');
+    c.font='bold 32px ui-sans-serif,system-ui';
+    c.fillStyle='#4a6572'; c.textAlign='center'; c.textBaseline='middle';
+    c.fillText(text,128,32);
+    var sp=new THREE.Sprite(new THREE.SpriteMaterial(
+      {map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));
+    sp.position.copy(pos); sp.scale.set(2.2,.55,1);
+    return sp;
+  }
+
+  function toXYZ(p,ax){
+    var lx=Math.log10(Math.max(p.load,1e-4));
+    var lo=Math.log10(Math.max(ax.x.min,1e-4)), hi=Math.log10(Math.max(ax.x.max,1e-4));
+    var tx=(lx-lo)/Math.max(hi-lo,1e-6);
+    var ty=(p.lpd-ax.y.min)/Math.max(ax.y.max-ax.y.min,1e-6);
+    var tz=(p.x_ch4-ax.z.min)/Math.max(ax.z.max-ax.z.min,1e-6);
+    return new THREE.Vector3(-5+tx*10, ty*9+0.35, tz*10);
+  }
+
+  function renderSpace(){
+    var D=window.__SPACE;
+    if(!D||!D.ok) return;
+    if(!initSpace()) return;
+    var ax=D.axes;
+    var fL=document.getElementById('fLoad').value;
+    var fP=document.getElementById('fLamp').value;
+
+    var kept=D.points.filter(function(p){
+      if(fL!=='all'&&String(p.load)!==fL) return false;
+      if(fP!=='all'&&String(p.lamp||'')!==fP) return false;
+      return true;
+    });
+
+    var g=S.group;
+    while(g.children.length){
+      var c=g.children.pop();
+      if(c.geometry) c.geometry.dispose();
+      if(c.material) c.material.dispose();
+    }
+    var lo=Math.log10(Math.max(ax.color.min,1)), hi=Math.log10(Math.max(ax.color.max,1));
+    kept.forEach(function(p){
+      var v=toXYZ(p,ax);
+      var t=(Math.log10(Math.max(p.y,1))-lo)/Math.max(hi-lo,1e-6);
+      var size=.07+((p.sel===null?60:p.sel)/100)*.13;
+      var col=colorOf(t);
+      var m=new THREE.Mesh(
+        new THREE.SphereGeometry(size,12,10),
+        new THREE.MeshStandardMaterial({
+          color:col, emissive:col, emissiveIntensity:.14,
+          metalness:.05, roughness:.55, transparent:true, opacity:.88}));
+      m.position.copy(v);
+      g.add(m);
+    });
+
+    var peak=kept.reduce(function(a,b){ return (b.y>(a?a.y:0))?b:a; },null);
+    document.getElementById('spaceStat').innerHTML=
+      '显示 '+kept.length+' / '+D.n+' 点'+
+      (peak?('<br>最高 '+fmt(peak.y)+'<br>负载 '+peak.load+'% · 光强 '+fmt(peak.lpd)+
+             ' · CH₄ '+fmt(peak.x_ch4,0)+'%'):'');
+  }
+
+  function bootSpace(){
+    var D=window.__SPACE;
+    if(!D||!D.ok){ fallback('数据空间未加载。'); return; }
+    var loads=['all'].concat(Array.from(new Set(D.points.map(function(p){return String(p.load);})))
+      .sort(function(a,b){return +a-+b;}));
+    document.getElementById('fLoad').innerHTML=loads.map(function(v){
+      return '<option value="'+v+'">'+(v==='all'?'全部':v+' wt%')+'</option>';}).join('');
+    var lamps=['all'].concat(Array.from(new Set(D.points.map(function(p){return p.lamp||'';})))
+      .filter(Boolean));
+    document.getElementById('fLamp').innerHTML=lamps.map(function(v){
+      return '<option value="'+esc(v)+'">'+(v==='all'?'全部':esc(v))+'</option>';}).join('');
+    ['fLoad','fLamp'].forEach(function(id){
+      document.getElementById(id).addEventListener('change',renderSpace);});
+    renderSpace();
+  }
+
+  /* ================= ④b 旧灯曲面（三维） ================= */
+  var SF={scene:null,cam:null,rd:null,ctrl:null,group:null};
+
+  function surfColor(t){
+    var c1=new THREE.Color(0x0f766e), c2=new THREE.Color(0x22d3ee), c3=new THREE.Color(0xf59e0b);
+    var c=new THREE.Color();
+    if(t<0.55) c.copy(c1).lerp(c2,t/0.55);
+    else c.copy(c2).lerp(c3,(t-0.55)/0.45);
+    return c;
+  }
+
+  function surfFallback(msg){
+    var h=document.getElementById('surf');
+    if(!h) return;
+    h.innerHTML='<div class="surf-fallback"><div><div style="color:#0f766e;'+
+      'font-weight:700;font-size:13px;margin-bottom:6px">三维曲面需要 WebGL</div>'+
+      esc(msg||'请用 Chrome / Edge 打开，或开启显卡加速。')+'</div></div>';
+  }
+
+  function initSurf(){
+    if(SF.rd) return true;
+    var host=document.getElementById('surf');
+    if(!host) return false;
+    if(typeof THREE==='undefined'){ surfFallback('Three.js 未加载。'); return false; }
+    if(!webglOK()){ surfFallback(); return false; }
+    var W=host.clientWidth, H=host.clientHeight;
+    if(!W||!H) return false;
+
+    var scene=new THREE.Scene();
+    var cam=new THREE.PerspectiveCamera(38,W/H,0.1,800);
+    cam.position.set(11,9.5,13);
+    var rd;
+    try{ rd=new THREE.WebGLRenderer({antialias:true,alpha:true}); }
+    catch(e){ surfFallback('WebGL 初始化失败：'+e.message); return false; }
+    rd.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    rd.setSize(W,H);
+    rd.setClearColor(0x000000,0);
+    host.appendChild(rd.domElement);
+    rd.domElement.style.display='block';
+
+    scene.add(new THREE.HemisphereLight(0xffffff,0xe2edf2,1.15));
+    var d1=new THREE.DirectionalLight(0xffffff,0.8); d1.position.set(8,14,9); scene.add(d1);
+    var d2=new THREE.DirectionalLight(0x9fe3ef,0.32); d2.position.set(-9,-5,-8); scene.add(d2);
+
+    var ctrl=null;
+    if(THREE.OrbitControls){
+      ctrl=new THREE.OrbitControls(cam,rd.domElement);
+      ctrl.enableDamping=true; ctrl.dampingFactor=.08;
+      ctrl.rotateSpeed=.6; ctrl.zoomSpeed=.85;
+      ctrl.minDistance=10; ctrl.maxDistance=46;
+    }
+    SF.scene=scene; SF.cam=cam; SF.rd=rd; SF.ctrl=ctrl;
+    SF.group=new THREE.Group(); scene.add(SF.group);
+    (function loop(){ requestAnimationFrame(loop);
+      if(ctrl) ctrl.update(); rd.render(scene,cam); })();
+    return true;
+  }
+
+  function surfAxes(){
+    var g=new THREE.Group(), L=10, h=L/2;
+    // 底面框架
+    var frame=[[[-h,0,-h],[h,0,-h]],[[h,0,-h],[h,0,h]],[[h,0,h],[-h,0,h]],[[-h,0,h],[-h,0,-h]]];
+    var fm=new THREE.LineBasicMaterial({color:0xb9cdd6});
+    frame.forEach(function(s){
+      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(s[0][0],s[0][1],s[0][2]),
+        new THREE.Vector3(s[1][0],s[1][1],s[1][2])]), fm));
+    });
+    var grid=new THREE.GridHelper(L,10,0xc3d5de,0xe2ecf1);
+    g.add(grid);
+    // 侧框
+    var vf=new THREE.LineBasicMaterial({color:0xd3e2e9});
+    [[[-h,0,-h],[-h,L*0.62,-h]],[[-h,0,h],[-h,L*0.62,h]],
+     [[h,0,-h],[h,L*0.62,-h]],[[h,0,h],[h,L*0.62,h]]].forEach(function(s){
+      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(s[0][0],s[0][1],s[0][2]),
+        new THREE.Vector3(s[1][0],s[1][1],s[1][2])]), vf));
+    });
+    g.add(sLabel('CH₄ %',new THREE.Vector3(h+1.1,0,0)));
+    g.add(sLabel('流量',new THREE.Vector3(0,0,h+1.1)));
+    g.add(sLabel('产率',new THREE.Vector3(-h-1.1,L*0.62,0)));
+    return g;
+  }
+
+  function sLabel(text,pos){
+    var cv=document.createElement('canvas');
+    cv.width=256; cv.height=64;
+    var c=cv.getContext('2d');
+    c.font='bold 30px ui-sans-serif,system-ui';
+    c.fillStyle='#4a6572'; c.textAlign='center'; c.textBaseline='middle';
+    c.fillText(text,128,32);
+    var sp=new THREE.Sprite(new THREE.SpriteMaterial(
+      {map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));
+    sp.position.copy(pos); sp.scale.set(2.4,.6,1);
+    return sp;
+  }
+
+  function drawSurface(){
+    var D=window.__SURF;
+    if(!D||!D.ok){ surfFallback('曲面数据不可用。'); return; }
+    if(!initSurf()) return;
+
+    var d=D.domain, n=D.grid;
+    var xlo=d.x[0], xhi=d.x[1], qlo=d.q[0], qhi=d.q[1];
+    var ys=D.cells.map(function(c){return c.y;});
+    var ymin=Math.min.apply(null,ys), ymax=Math.max.apply(null,ys);
+    var lmin=Math.log10(Math.max(ymin,1)), lmax=Math.log10(Math.max(ymax,1));
+
+    var g=SF.group;
+    while(g.children.length){
+      var c=g.children.pop();
+      if(c.geometry) c.geometry.dispose();
+      if(c.material){ if(c.material.map) c.material.map.dispose(); c.material.dispose(); }
+    }
+    g.add(surfAxes());
+
+    var HMAX=7.2;
+    var step=10.0/(n-1);
+    var map={};
+    D.cells.forEach(function(c){
+      var i=Math.round((c.x-xlo)/Math.max(xhi-xlo,1e-6)*(n-1));
+      var j=Math.round((c.q-qlo)/Math.max(qhi-qlo,1e-6)*(n-1));
+      map[i+'_'+j]=c;
+    });
+    var pos=function(i,j){
+      return new THREE.Vector3(-5+i*step, 0, -5+j*step);
+    };
+
+    // 三角面片
+    var geoms=[];
+    for(var i=0;i<n-1;i++){
+      for(var j=0;j<n-1;j++){
+        var cs=[map[i+'_'+j],map[(i+1)+'_'+j],map[(i+1)+'_'+(j+1)],map[i+'_'+(j+1)]];
+        if(cs.some(function(x){return !x;})) continue;
+        var dmax=Math.max.apply(null,cs.map(function(x){return x.d;}));
+        if(dmax>0.72) continue;   // 太稀疏不画
+        var op = dmax<=0.22 ? 1.0 : (dmax<=0.45 ? 0.72 : 0.38);
+        var avgY=cs.reduce(function(a,x){return a+x.y;},0)/4;
+        var t=(Math.log10(Math.max(avgY,1))-lmin)/Math.max(lmax-lmin,1e-6);
+        var col=surfColor(Math.max(0,Math.min(1,t)));
+        var mat=new THREE.MeshStandardMaterial({
+          color:col, side:THREE.DoubleSide, metalness:.06, roughness:.62,
+          transparent:op<1, opacity:op, flatShading:false });
+        var verts=[];
+        [[0,1,2],[0,2,3]].forEach(function(tri){
+          tri.forEach(function(k){
+            var x=cs[k];
+            var p=pos(k===0||k===3?i:i+1, k<2?j:j+1);
+            var hh=(Math.log10(Math.max(x.y,1))-lmin)/Math.max(lmax-lmin,1e-6);
+            verts.push(p.x, 0.15+hh*HMAX, p.z);
+          });
+        });
+        var geo=new THREE.BufferGeometry();
+        geo.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
+        geo.computeVertexNormals();
+        g.add(new THREE.Mesh(geo,mat));
+      }
+    }
+
+    // 实测点
+    var pm=new THREE.MeshBasicMaterial({color:0x0f172a, transparent:true, opacity:.42});
+    D.points.forEach(function(p){
+      var tx=(p.x-xlo)/Math.max(xhi-xlo,1e-6);
+      var tq=(p.q-qlo)/Math.max(qhi-qlo,1e-6);
+      if(tx<0||tx>1||tq<0||tq>1) return;
+      var hh=(Math.log10(Math.max(p.y,1))-lmin)/Math.max(lmax-lmin,1e-6);
+      var m=new THREE.Mesh(new THREE.SphereGeometry(0.055,8,6), pm);
+      m.position.set(-5+tx*10, 0.17+hh*HMAX, -5+tq*10);
+      g.add(m);
+    });
+
+    // 最优点：立柱 + 顶球
+    if(D.best){
+      var bx=(D.best.x-xlo)/Math.max(xhi-xlo,1e-6);
+      var bq=(D.best.q-qlo)/Math.max(qhi-qlo,1e-6);
+      var by=(Math.log10(Math.max(D.best.y,1))-lmin)/Math.max(lmax-lmin,1e-6);
+      var X=-5+bx*10, Z=-5+bq*10, Y=0.15+by*HMAX;
+      var lm=new THREE.LineBasicMaterial({color:0x0f172a,transparent:true,opacity:.5});
+      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(X,0,Z), new THREE.Vector3(X,Y,Z)]), lm));
+      var bm=new THREE.Mesh(new THREE.SphereGeometry(0.16,16,12),
+        new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xffffff,
+          emissiveIntensity:.35,roughness:.3}));
+      bm.position.set(X,Y,Z); g.add(bm);
+    }
+
+    // 侧栏
+    document.getElementById('scMin').textContent=fmt(ymin);
+    document.getElementById('scMax').textContent=fmt(ymax);
+    var b=D.best;
+    document.getElementById('bestBox').innerHTML = b
+      ? '<div class="lb">当前最优点</div>'+
+        '<div class="v">'+fmt(b.y)+'</div>'+
+        '<div class="s">CH₄ '+fmt(b.x,0)+'% · 总流量 '+fmt(b.q)+
+        '<br>选择性 '+fmt(b.sel,1)+'% · 距最近实测 '+fmt(b.d,2)+'</div>'
+      : '<div class="lb">当前最优点</div><div class="v">—</div>';
+
+    var dense=D.cells.filter(function(c){return c.d<=0.22;}).length;
+    document.getElementById('surfStat').innerHTML=
+      '实测 '+D.n_points+' 条<br>网格 '+D.grid+'×'+D.grid+
+      '（'+dense+' 格有支撑）<br>范围 CH₄ '+d.x[0]+'–'+d.x[1]+
+      '% · 流量 '+d.q[0]+'–'+d.q[1];
+
+    document.getElementById('surfNote').innerHTML=
+      '<b>怎么读：</b>高度和颜色都是产率，深色小点是实测，白色圆球是当前最优点。'+
+      '曲面上颜色淡的区块离实测远、可信度低；<b>缺口</b>是数据太稀疏，直接不画，避免外推。'+
+      '<br><b>更新方式：</b>新的旧灯 0.05% 数据进主表后刷新页面，曲面自动重算。';
+  }
+
+  /* ================= ⑤ 数据表 ================= */
+  function renderTable(){
+    var rows=DATA.curve.map(function(c){
+      var cls=c.n===0?'empty':(c.thin?'thin':'');
+      var tag=c.n===0?'<span class="tag empty">空白</span>'
+             :(c.thin?'<span class="tag thin">样本不足</span>'
+                     :'<span class="tag ok">可作结论</span>');
+      return '<tr class="'+cls+'">'+
+        '<td><b>'+loadLabel(c.load)+'</b></td>'+
+        '<td class="num">'+c.n+'</td>'+
+        '<td class="num">'+fmt(c.median)+'</td>'+
+        '<td class="num">'+fmt(c.max)+'</td>'+
+        '<td class="num">'+(c.sel_median!==null?fmt(c.sel_median,1)+'%':'—')+'</td>'+
+        '<td>'+tag+'</td></tr>';
+    });
+    var have={};
+    DATA.curve.forEach(function(c){ have[String(c.load)]=1; });
+    (DATA.planned||[]).forEach(function(l){
+      if(!have[String(l)]){
+        rows.push('<tr class="empty"><td><b>'+loadLabel(l)+'</b></td>'+
+          '<td class="num">0</td><td class="num">—</td><td class="num">—</td>'+
+          '<td class="num">—</td><td><span class="tag empty">空白</span></td></tr>');
+      }
+    });
+    document.getElementById('tbody').innerHTML=rows.join('');
+  }
+
+  /* ================= ⑥ 模型自检 ================= */
+  function renderSelfCheck(){
+    var SC=window.__SC;
+    if(!SC||!SC.ok){
+      document.getElementById('checkIntro').textContent='模型自检不可用。'; return;
+    }
+    document.getElementById('checkIntro').innerHTML='<b>'+SC.summary+'</b><br>'+
+      '只有 0.05% 那一档模型能给可信数值，其余档位给的是趋势。';
+
+    var V={reliable:['ok','可用'],biased:['mid','偏差偏大'],off:['bad','不可用'],
+           extrapolate:['out','仅外推'],'no-data':['empty','无实测']};
+    document.getElementById('checkBody').innerHTML=(SC.rows||[]).map(function(r){
+      var v=V[r.verdict]||['empty',r.verdict];
+      var cls=(r.verdict==='off'||r.verdict==='extrapolate')?'thin':'';
+      var e=(r.err_pct===null||r.err_pct===undefined)?'—':((r.err_pct>0?'+':'')+fmt(r.err_pct)+'%');
+      var d=r.in_domain===null?'—':(r.in_domain?'<span class="tag ok">域内</span>'
+                                                   :'<span class="tag out">域外</span>');
+      return '<tr class="'+cls+'">'+
+        '<td><b>'+loadLabel(r.load)+'</b></td>'+
+        '<td class="num">'+(r.measured!==null?fmt(r.measured):'—')+'</td>'+
+        '<td class="num">'+r.n+'</td>'+
+        '<td class="num">'+(r.predicted!==null?fmt(r.predicted):'—')+'</td>'+
+        '<td class="num">'+e+'</td><td>'+d+'</td>'+
+        '<td><span class="tag '+v[0]+'">'+v[1]+'</span></td></tr>';
+    }).join('');
+  }
+
+  /* ================= ⑦ 缺口 ================= */
+  function renderGaps(){
+    var box=document.getElementById('gaps');
+    var gs=DATA.gaps||[];
+    if(!gs.length){
+      box.innerHTML='<div class="gap"><div class="idx">✓</div><div class="body">'+
+        '<div class="t">计划内的负载点都已达标</div>'+
+        '<div class="d">每档至少 '+DATA.min_n+' 条实测。</div></div></div>';
+      document.getElementById('rule').style.display='none';
+      return;
+    }
+    box.innerHTML=gs.map(function(g,i){
+      var empty=g.n===0;
+      var badge=empty?'<span class="badge now">完全空白</span>'
+                     :'<span class="badge">缺 '+g.need+' 条</span>';
+      var detail=empty?'这一档没有任何实测。'
+        :('现有 '+g.n+' 条'+(g.median!==null?'，中位 '+fmt(g.median):'')+
+          '；补满 '+DATA.min_n+' 条才能判断。');
+      return '<div class="gap"><div class="idx">'+(i+1)+'</div>'+
+        '<div class="body"><div class="t">补 '+loadLabel(g.load)+' — '+
+        (empty?'完全没有数据':'样本不足')+'</div>'+
+        '<div class="d">'+detail+'</div></div>'+badge+'</div>';
+    }).join('');
+
+    var sp=DATA.plan_span;
+    var txt='<b>为什么先补这几个点：</b>最优负载 '+
+      (DATA.peak?DATA.peak.load:'—')+' wt% 已确定';
+    if(DATA.cliff){
+      txt+='，往上到 '+DATA.cliff.to_load+'% 跌幅 '+fmt(DATA.cliff.drop_pct,0)+
+        '%，而那一档只有 '+DATA.cliff.n_next+' 条数据';
+    }
+    if(sp&&sp.ratio<1.3){
+      txt+='。高负载区现有产率全在 '+fmt(sp.min)+' ~ '+fmt(sp.max)+
+        '（差 '+fmt((sp.ratio-1)*100,0)+'%），做出来是几条分不开的平线。';
+    }
+    document.getElementById('rule').innerHTML=txt;
+  }
+
+  /* ================= ⑧ 机理模型 ================= */
+  function renderFlow(){
+    var F=window.__FLOW;
+    if(!F||!F.ok){
+      document.getElementById('flowIntro').textContent='流量模型不可用。'; return;
+    }
+    document.getElementById('flowIntro').innerHTML='<b>'+F.summary+'</b><br>'+
+      'θ_O 与 θ_C 是竞争吸附覆盖度，产率正比于两者乘积。参数全部来自最小二乘拟合。'+
+      '<br><b>适用范围：</b>0.05 wt% · 430 mW/cm² · O₂ 5–30% · CH₄ 30–90% · 总流量 100 mL/min';
+    document.getElementById('flowBody').innerHTML=(F.rows||[]).map(function(r){
+      var bad=Math.abs(r.err_pct)>15;
+      return '<tr class="'+(bad?'thin':'')+'">'+
+        '<td>'+esc(r.flows)+'</td>'+
+        '<td class="num">'+fmt(r.measured_y)+'</td>'+
+        '<td class="num">'+fmt(r.pred_y)+'</td>'+
+        '<td class="num">'+(r.err_pct>0?'+':'')+fmt(r.err_pct,1)+'%</td>'+
+        '<td class="num">'+fmt(r.measured_sel,1)+'%</td>'+
+        '<td class="num">'+fmt(r.pred_sel,1)+'%</td></tr>';
+    }).join('');
+    document.getElementById('flowNote').innerHTML=
+      '<b>能做什么：</b>在适用范围内替代一次实验做插值（平均偏差 '+F.mape_y+
+      '%，选择性偏差 '+F.mae_sel+' 点）。'+
+      '<br><b>不能做什么：</b>外推到没测过的组合区域误差 33–56%；换负载（如 3%）完全不适用。';
+  }
+
+  /* ================= 启动 ================= */
+  function boot(){
+    Promise.all([Promise.resolve({"ok": true, "n_total": 366, "n_thin": 12, "n_solid": 354, "curve": [{"load": 0.01, "n": 11, "median": 4187.0, "max": 16746.0, "q25": 4084.0, "q75": 7394.0, "sel_median": 40.9, "sel_max": 79.4, "lpd_min": 212.0, "lpd_max": 434.0, "thin": false}, {"load": 0.02, "n": 6, "median": 15976.0, "max": 17784.0, "q25": 15564.0, "q75": 16389.0, "sel_median": 37.9, "sel_max": 78.4, "lpd_min": 257.0, "lpd_max": 434.0, "thin": false}, {"load": 0.025, "n": 6, "median": 13971.0, "max": 18564.0, "q25": 13331.0, "q75": 14612.0, "sel_median": 38.5, "sel_max": 81.5, "lpd_min": 257.0, "lpd_max": 434.0, "thin": false}, {"load": 0.03, "n": 18, "median": 13501.0, "max": 32513.0, "q25": 11550.0, "q75": 18868.0, "sel_median": 69.4, "sel_max": 83.7, "lpd_min": 212.0, "lpd_max": 434.0, "thin": false}, {"load": 0.04, "n": 4, "median": 20828.0, "max": 24514.0, "q25": 18549.0, "q75": 21485.0, "sel_median": 63.0, "sel_max": 80.2, "lpd_min": 212.0, "lpd_max": 434.0, "thin": true}, {"load": 0.05, "n": 256, "median": 24583.0, "max": 56381.0, "q25": 15909.0, "q75": 31258.0, "sel_median": 80.0, "sel_max": 96.3, "lpd_min": 22.0, "lpd_max": 434.0, "thin": false}, {"load": 0.06, "n": 6, "median": 10542.0, "max": 11665.0, "q25": 10228.0, "q75": 10542.0, "sel_median": 66.2, "sel_max": 67.9, "lpd_min": 257.0, "lpd_max": 257.0, "thin": false}, {"load": 0.1, "n": 5, "median": 15057.0, "max": 17764.0, "q25": 14127.0, "q75": 15057.0, "sel_median": 40.0, "sel_max": 78.7, "lpd_min": 257.0, "lpd_max": 434.0, "thin": false}, {"load": 0.5, "n": 5, "median": 4215.0, "max": 10323.0, "q25": 3348.0, "q75": 7322.0, "sel_median": 41.1, "sel_max": 70.3, "lpd_min": 257.0, "lpd_max": 434.0, "thin": false}, {"load": 1.0, "n": 2, "median": 8515.0, "max": 8515.0, "q25": 8515.0, "q75": 8515.0, "sel_median": 59.8, "sel_max": 59.8, "lpd_min": 434.0, "lpd_max": 434.0, "thin": true}, {"load": 1.73, "n": 3, "median": 2192.0, "max": 2893.0, "q25": 1878.0, "q75": 2192.0, "sel_median": 26.5, "sel_max": 30.0, "lpd_min": 234.0, "lpd_max": 234.0, "thin": true}, {"load": 2.0, "n": 3, "median": 1778.0, "max": 3782.0, "q25": 1762.0, "q75": 1778.0, "sel_median": 21.9, "sel_max": 35.6, "lpd_min": 257.0, "lpd_max": 257.0, "thin": true}, {"load": 3.0, "n": 41, "median": 9341.0, "max": 17288.0, "q25": 5959.0, "q75": 14469.0, "sel_median": 59.8, "sel_max": 69.7, "lpd_min": 257.0, "lpd_max": 434.0, "thin": false}], "peak": {"load": 0.05, "n": 256, "median": 24583.0, "max": 56381.0, "q25": 15909.0, "q75": 31258.0, "sel_median": 80.0, "sel_max": 96.3, "lpd_min": 22.0, "lpd_max": 434.0, "thin": false}, "best": {"load": 0.05, "y": 56381.0, "sel": 79.3, "top_sel": 96.3}, "cliff": {"from_load": 0.05, "to_load": 0.1, "from_median": 24583.0, "to_median": 15057.0, "drop_pct": 38.8, "n_next": 5, "reliable": true}, "gaps": [{"load": 1.0, "n": 2, "need": 3, "median": 8515.0, "reason": "只有 2 条，低于可信下限 5 条"}, {"load": 2.0, "n": 3, "need": 2, "median": 1778.0, "reason": "只有 3 条，低于可信下限 5 条"}], "plan_check": [{"load": 0.5, "n": 5, "median": 4215.0, "reliable": true}, {"load": 1.0, "n": 2, "median": 8515.0, "reliable": false}, {"load": 2.0, "n": 3, "median": 1778.0, "reliable": false}, {"load": 3.0, "n": 41, "median": 9341.0, "reliable": true}], "plan_span": {"min": 1778.0, "max": 9341.0, "ratio": 5.25}, "min_n": 5, "planned": [0.05, 0.1, 0.5, 1.0, 2.0, 3.0], "light": {"top_lpd": 434, "share_pct": 69.4}}),Promise.resolve({"ok": true, "points": [{"load": 0.025, "lpd": 433.9, "x_ch4": 50.0, "y": 9681.4, "sel": 79.8, "date": "2024-05-17", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 8976.2, "sel": 77.8, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.025, "lpd": 433.9, "x_ch4": 50.0, "y": 18563.8, "sel": 81.5, "date": "2024-05-17", "lamp": "旧灯 100W (433.9)"}, {"load": 0.1, "lpd": 433.9, "x_ch4": 50.0, "y": 17764.0, "sel": 78.7, "date": "2024-05-17", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 3688.4, "sel": 61.5, "date": null, "lamp": null}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 17083.0, "sel": 80.1, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 16757.6, "sel": 79.8, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 1.0, "lpd": 433.9, "x_ch4": 50.0, "y": 3475.1, "sel": 63.2, "date": null, "lamp": null}, {"load": 0.01, "lpd": 433.9, "x_ch4": 50.0, "y": 4213.9, "sel": 58.2, "date": "2024-05-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.02, "lpd": 433.9, "x_ch4": 50.0, "y": 14028.3, "sel": 78.4, "date": "2024-05-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.03, "lpd": 433.9, "x_ch4": 50.0, "y": 18891.2, "sel": 80.2, "date": "2024-05-20", "lamp": "旧灯 100W (433.9)"}, {"load": 0.04, "lpd": 433.9, "x_ch4": 50.0, "y": 18548.8, "sel": 80.2, "date": "2024-05-20", "lamp": "旧灯 100W (433.9)"}, {"load": 1.0, "lpd": 433.9, "x_ch4": 50.0, "y": 8514.5, "sel": 59.8, "date": "2024-05-20", "lamp": "旧灯 100W (433.9)"}, {"load": 0.01, "lpd": 433.9, "x_ch4": 50.0, "y": 16745.9, "sel": 79.4, "date": "2024-05-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 19078.6, "sel": 80.7, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.02, "lpd": 433.9, "x_ch4": 50.0, "y": 16388.5, "sel": 77.7, "date": "2024-05-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.5, "lpd": 433.9, "x_ch4": 50.0, "y": 10323.2, "sel": 70.3, "date": "2024-05-27", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 4933.8, "sel": 78.1, "date": "2024-05-27", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 17843.7, "sel": 81.0, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.5, "lpd": 433.9, "x_ch4": 50.0, "y": 7322.5, "sel": 63.8, "date": "2024-05-27", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 19960.0, "sel": 78.2, "date": "2024-05-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 22303.1, "sel": 75.8, "date": "2024-05-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 24680.8, "sel": 74.1, "date": "2024-05-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 14378.5, "sel": 73.0, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 20005.8, "sel": 78.8, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 347.1, "x_ch4": 50.0, "y": 19606.6, "sel": 79.3, "date": "2024-06-26", "lamp": "低功率档"}, {"load": 0.05, "lpd": 260.3, "x_ch4": 50.0, "y": 16473.8, "sel": 78.2, "date": "2024-06-27", "lamp": "新灯 100W (257.3)"}, {"load": 0.05, "lpd": 173.5, "x_ch4": 50.0, "y": 13987.1, "sel": 78.6, "date": "2024-06-27", "lamp": "新灯 60W (163.1)"}, {"load": 0.05, "lpd": 86.8, "x_ch4": 50.0, "y": 8910.1, "sel": 77.4, "date": "2024-06-27", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 16598.7, "sel": 77.9, "date": "std", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 60.0, "y": 25311.1, "sel": 82.6, "date": "2024-07-16", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 70.0, "y": 26406.9, "sel": 83.9, "date": "2024-07-16", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 24522.3, "sel": 82.5, "date": "2024-07-10", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 16598.7, "sel": 78.3, "date": "std", "lamp": "旧灯 100W (433.9)"}, {"load": 1.0, "lpd": 433.9, "x_ch4": 50.0, "y": 8514.5, "sel": 59.8, "date": "2024-05-20", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 8976.2, "sel": 77.8, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 9539.3, "sel": 80.7, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 2466.9, "sel": 78.1, "date": "2024-05-27", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 86.8, "x_ch4": 50.0, "y": 8921.8, "sel": 81.0, "date": "2024-06-27", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 9980.0, "sel": 78.2, "date": "2024-05-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 11151.6, "sel": 75.8, "date": "2024-05-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 12340.4, "sel": 74.1, "date": "2024-05-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 7189.3, "sel": 73.0, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 10002.9, "sel": 78.8, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 347.1, "x_ch4": 50.0, "y": 9803.3, "sel": 79.3, "date": "2024-06-26", "lamp": "低功率档"}, {"load": 0.05, "lpd": 260.3, "x_ch4": 50.0, "y": 8236.9, "sel": 78.2, "date": "2024-06-27", "lamp": "新灯 100W (257.3)"}, {"load": 0.05, "lpd": 173.5, "x_ch4": 50.0, "y": 6993.6, "sel": 78.6, "date": "2024-06-27", "lamp": "新灯 60W (163.1)"}, {"load": 0.05, "lpd": 86.8, "x_ch4": 50.0, "y": 4455.1, "sel": 77.4, "date": "2024-06-27", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 15836.5, "sel": 77.9, "date": "std", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 16598.7, "sel": 78.3, "date": "std", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 60.0, "y": 25176.4, "sel": 82.9, "date": "2024-07-16", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 70.0, "y": 26311.7, "sel": 84.3, "date": "2024-07-16", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 24361.8, "sel": 82.7, "date": "2024-07-10", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 23406.8, "sel": 84.1, "date": "2024-07-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 60.0, "y": 24451.1, "sel": 82.2, "date": "2024-07-16", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 70.0, "y": 25944.7, "sel": 83.5, "date": "2024-07-16", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 11660.5, "sel": 71.7, "date": "std", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 3506.4, "sel": 55.5, "date": "std", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 29989.1, "sel": 81.6, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 34858.4, "sel": 83.2, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 24301.6, "sel": 79.5, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 85.0, "y": 32964.1, "sel": 82.5, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 75.0, "y": 31093.2, "sel": 81.5, "date": "2024-07-19", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 70.0, "y": 29769.7, "sel": 80.9, "date": "2024-07-19", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 65.0, "y": 28145.9, "sel": 80.0, "date": "2024-07-19", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 29452.8, "sel": 81.4, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 25380.3, "sel": 81.6, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 33728.6, "sel": 82.7, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 85.0, "y": 34462.6, "sel": 83.4, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 36971.6, "sel": 83.0, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 31298.9, "sel": 84.9, "date": "2024-07-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 21751.9, "sel": 87.0, "date": "2024-07-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 15909.2, "sel": 90.2, "date": "2024-07-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 100.0, "y": 9769.8, "sel": 96.3, "date": "2024-07-25", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 9825.3, "sel": 96.1, "date": "2024-07-25", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 16243.4, "sel": 77.2, "date": "2024-07-25", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 30268.4, "sel": 83.0, "date": "2024-07-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 31804.9, "sel": 83.1, "date": "2024-07-27", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 21086.4, "sel": 80.6, "date": "2024-07-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 44945.6, "sel": 85.4, "date": "2024-09-05", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 7399.6, "sel": 57.6, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 41755.1, "sel": 84.6, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 52406.6, "sel": 82.5, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 36216.2, "sel": 78.0, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 35591.7, "sel": 82.3, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 46314.1, "sel": 84.9, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 20394.4, "sel": 75.9, "date": "2024-09-11", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 30.0, "y": 15015.9, "sel": 69.7, "date": "2024-09-11", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 40.0, "y": 17491.9, "sel": 74.0, "date": "2024-09-11", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 60.0, "y": 20739.2, "sel": 78.3, "date": "2024-09-14", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 17288.5, "sel": 69.7, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 30.0, "y": 9558.4, "sel": 51.0, "date": "2025-03-01", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 50.0, "y": 12939.3, "sel": 59.8, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 63.64, "y": 14484.3, "sel": 63.9, "date": "2024-09-13", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 70.0, "y": 14921.4, "sel": 64.6, "date": "2025-03-28", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 10.0, "y": 2739.8, "sel": 25.1, "date": "2024-09-14", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 14469.1, "sel": 67.1, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 60.0, "y": 27873.8, "sel": 78.5, "date": "2024-09-14", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 60.0, "y": 26336.1, "sel": 78.4, "date": "2024-09-14", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 54307.0, "sel": 75.4, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 56380.5, "sel": 79.3, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 42569.1, "sel": 62.1, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 28423.8, "sel": 52.7, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 98.75, "y": 21486.7, "sel": 53.6, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 94.74, "y": 22781.7, "sel": 87.4, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 303.7, "x_ch4": 90.0, "y": 33254.2, "sel": 82.3, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 86.8, "x_ch4": 90.0, "y": 16886.5, "sel": 79.4, "date": "2024-10-02", "lamp": "低功率档"}, {"load": 0.05, "lpd": 173.5, "x_ch4": 90.0, "y": 27226.6, "sel": 82.1, "date": "2024-10-03", "lamp": "新灯 60W (163.1)"}, {"load": 0.05, "lpd": 260.3, "x_ch4": 90.0, "y": 31021.7, "sel": 82.5, "date": "2024-10-07", "lamp": "新灯 100W (257.3)"}, {"load": 0.05, "lpd": 347.1, "x_ch4": 90.0, "y": 30167.8, "sel": 81.8, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 21.7, "x_ch4": 90.0, "y": 5828.5, "sel": 70.7, "date": "2024-10-04", "lamp": "低功率档"}, {"load": 0.05, "lpd": 43.4, "x_ch4": 90.0, "y": 9308.4, "sel": 76.1, "date": "2024-10-04", "lamp": "低功率档"}, {"load": 0.05, "lpd": 65.1, "x_ch4": 90.0, "y": 11649.3, "sel": 77.9, "date": null, "lamp": "低功率档"}, {"load": 0.05, "lpd": 86.8, "x_ch4": 90.0, "y": 13872.3, "sel": 78.3, "date": "2024-10-02", "lamp": "低功率档"}, {"load": 0.05, "lpd": 108.5, "x_ch4": 90.0, "y": 16054.0, "sel": 79.2, "date": null, "lamp": "低功率档"}, {"load": 0.05, "lpd": 130.2, "x_ch4": 90.0, "y": 17707.7, "sel": 79.8, "date": "2024-10-07", "lamp": "低功率档"}, {"load": 0.05, "lpd": 151.8, "x_ch4": 90.0, "y": 18832.2, "sel": 79.5, "date": null, "lamp": "过渡档"}, {"load": 0.05, "lpd": 195.2, "x_ch4": 90.0, "y": 29373.7, "sel": 82.7, "date": null, "lamp": "新灯 60W (163.1)"}, {"load": 0.05, "lpd": 216.9, "x_ch4": 90.0, "y": 31257.6, "sel": 82.9, "date": "2024-11-23", "lamp": "新灯 80W (211.5)"}, {"load": 0.05, "lpd": 238.6, "x_ch4": 90.0, "y": 30108.9, "sel": 82.3, "date": null, "lamp": "新灯 90W (234.4)"}, {"load": 0.05, "lpd": 216.9, "x_ch4": 90.0, "y": 31281.8, "sel": 82.4, "date": "2024-11-23", "lamp": "新灯 80W (211.5)"}, {"load": 0.05, "lpd": 130.2, "x_ch4": 90.0, "y": 21513.5, "sel": 80.4, "date": "2024-10-07", "lamp": "低功率档"}, {"load": 0.05, "lpd": 303.7, "x_ch4": 90.0, "y": 28212.6, "sel": 81.6, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 390.5, "x_ch4": 90.0, "y": 39356.5, "sel": 84.0, "date": "2024-10-08", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 37794.5, "sel": 83.5, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 108.5, "x_ch4": 90.0, "y": 21849.1, "sel": 81.5, "date": null, "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 23271.3, "sel": 79.0, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 347.1, "x_ch4": 90.0, "y": 34086.9, "sel": 82.8, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 303.7, "x_ch4": 90.0, "y": 33054.1, "sel": 83.0, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 216.9, "x_ch4": 90.0, "y": 25960.9, "sel": 80.9, "date": "2024-11-23", "lamp": "新灯 80W (211.5)"}, {"load": 0.05, "lpd": 347.1, "x_ch4": 90.0, "y": 34137.2, "sel": 82.5, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 36897.7, "sel": 81.5, "date": "2024-09-05", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 4247.4, "sel": 60.5, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 8811.0, "sel": 50.4, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 16305.8, "sel": 76.5, "date": "2024-07-25", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 23575.8, "sel": 80.6, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 34770.7, "sel": 82.4, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 30437.1, "sel": 78.5, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 22391.7, "sel": 73.8, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 347.1, "x_ch4": 90.0, "y": 30625.7, "sel": 80.9, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 23639.3, "sel": 77.5, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 24643.4, "sel": 79.3, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 35195.2, "sel": 84.7, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 31025.2, "sel": 78.4, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 29896.9, "sel": 77.5, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 26779.8, "sel": 76.7, "date": "2024-09-05", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 28576.6, "sel": 76.9, "date": "2024-09-05", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 34488.4, "sel": 82.4, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 22268.6, "sel": 75.8, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 25215.8, "sel": 82.5, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 38116.8, "sel": 81.2, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 33942.8, "sel": 78.3, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 26571.4, "sel": 75.4, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 30351.9, "sel": 80.8, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 18013.5, "sel": 67.6, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 36900.0, "sel": 76.4, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 29958.9, "sel": 78.6, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 28855.6, "sel": 75.6, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 27406.0, "sel": 75.6, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 35111.5, "sel": 77.5, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 31319.1, "sel": 75.5, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 22208.6, "sel": 79.8, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 32021.1, "sel": 81.2, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 31788.6, "sel": 79.9, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 31831.5, "sel": 81.8, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 130.2, "x_ch4": 90.0, "y": 21750.6, "sel": 75.3, "date": "2024-10-07", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 25010.4, "sel": 77.8, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 26349.5, "sel": 78.1, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 151.8, "x_ch4": 90.0, "y": 18609.6, "sel": 73.0, "date": null, "lamp": "过渡档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 39907.3, "sel": 84.3, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 33586.5, "sel": 83.4, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 23496.0, "sel": 77.5, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 347.1, "x_ch4": 90.0, "y": 30488.6, "sel": 80.0, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 40071.1, "sel": 84.2, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 303.7, "x_ch4": 90.0, "y": 33171.0, "sel": 83.4, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 14351.5, "sel": 68.9, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 27427.0, "sel": 79.5, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 14351.5, "sel": 68.9, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 27427.0, "sel": 79.5, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 303.7, "x_ch4": 90.0, "y": 28300.0, "sel": 78.8, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 10328.1, "sel": 77.8, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 4203.6, "sel": 82.2, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 2720.7, "sel": 69.4, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 534.4, "sel": 21.5, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 2195.2, "sel": 28.6, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 17288.5, "sel": 69.7, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 30.0, "y": 9558.4, "sel": 51.0, "date": "2025-03-01", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 50.0, "y": 12939.3, "sel": 59.8, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 63.64, "y": 14484.3, "sel": 63.9, "date": "2024-09-13", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 70.0, "y": 14921.4, "sel": 64.6, "date": "2025-03-28", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 10.0, "y": 2739.8, "sel": 25.1, "date": "2024-09-14", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 14469.1, "sel": 67.1, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 15134.3, "sel": 67.0, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 5978.7, "sel": 59.5, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 6891.5, "sel": 58.7, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 80.0, "y": 5773.8, "sel": 55.7, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 70.0, "y": 5937.9, "sel": 56.4, "date": "2025-03-28", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 60.0, "y": 7018.3, "sel": 57.2, "date": "2024-12-21", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 50.0, "y": 5959.4, "sel": 64.2, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 50.0, "y": 6175.5, "sel": 52.3, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 40.0, "y": 4950.6, "sel": 61.4, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 30.0, "y": 5561.4, "sel": 50.5, "date": "2025-03-01", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 70.0, "y": 8073.2, "sel": 60.9, "date": "2025-03-28", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 80.0, "y": 9383.1, "sel": 59.7, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 4259.1, "sel": 52.7, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 9341.2, "sel": 62.2, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 9742.6, "sel": 62.3, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 7424.9, "sel": 58.4, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 80.0, "y": 8468.2, "sel": 59.9, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 80.0, "y": 7242.2, "sel": 57.7, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 70.0, "y": 5971.2, "sel": 54.1, "date": "2025-03-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 86.8, "x_ch4": 90.0, "y": 16886.5, "sel": 79.4, "date": "2024-10-02", "lamp": "低功率档"}, {"load": 0.05, "lpd": 173.5, "x_ch4": 90.0, "y": 27226.6, "sel": 82.1, "date": "2024-10-03", "lamp": "新灯 60W (163.1)"}, {"load": 0.05, "lpd": 21.7, "x_ch4": 90.0, "y": 5828.5, "sel": 70.7, "date": "2024-10-04", "lamp": "低功率档"}, {"load": 0.05, "lpd": 43.4, "x_ch4": 90.0, "y": 9308.4, "sel": 76.1, "date": "2024-10-04", "lamp": "低功率档"}, {"load": 0.05, "lpd": 260.3, "x_ch4": 90.0, "y": 31021.7, "sel": 82.5, "date": "2024-10-07", "lamp": "新灯 100W (257.3)"}, {"load": 0.05, "lpd": 216.9, "x_ch4": 90.0, "y": 31281.8, "sel": 82.4, "date": "2024-11-23", "lamp": "新灯 80W (211.5)"}, {"load": 0.05, "lpd": 130.2, "x_ch4": 90.0, "y": 21513.5, "sel": 80.4, "date": "2024-10-07", "lamp": "低功率档"}, {"load": 0.05, "lpd": 390.5, "x_ch4": 90.0, "y": 39356.5, "sel": 84.0, "date": "2024-10-08", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 37794.5, "sel": 83.5, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 347.1, "x_ch4": 90.0, "y": 34086.9, "sel": 82.8, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 303.7, "x_ch4": 90.0, "y": 33054.1, "sel": 83.0, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 216.9, "x_ch4": 90.0, "y": 31257.6, "sel": 82.9, "date": "2024-11-23", "lamp": "新灯 80W (211.5)"}, {"load": 0.05, "lpd": 216.9, "x_ch4": 90.0, "y": 25960.9, "sel": 80.9, "date": "2024-11-23", "lamp": "新灯 80W (211.5)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 27427.0, "sel": 79.5, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 8976.2, "sel": 77.8, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 9539.3, "sel": 80.7, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 2466.9, "sel": 78.1, "date": "2024-05-27", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 86.8, "x_ch4": 50.0, "y": 8921.8, "sel": 81.0, "date": "2024-06-27", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 9980.0, "sel": 78.2, "date": "2024-05-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 11151.6, "sel": 75.8, "date": "2024-05-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 12340.4, "sel": 74.1, "date": "2024-05-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 7189.3, "sel": 73.0, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 10002.9, "sel": 78.8, "date": "2024-06-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 347.1, "x_ch4": 50.0, "y": 9803.3, "sel": 79.3, "date": "2024-06-26", "lamp": "低功率档"}, {"load": 0.05, "lpd": 260.3, "x_ch4": 50.0, "y": 8236.9, "sel": 78.2, "date": "2024-06-27", "lamp": "新灯 100W (257.3)"}, {"load": 0.05, "lpd": 173.5, "x_ch4": 50.0, "y": 6993.6, "sel": 78.6, "date": "2024-06-27", "lamp": "新灯 60W (163.1)"}, {"load": 0.05, "lpd": 86.8, "x_ch4": 50.0, "y": 4455.1, "sel": 77.4, "date": "2024-06-27", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 15836.5, "sel": 77.9, "date": "std", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 16598.7, "sel": 78.3, "date": "std", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 60.0, "y": 25176.4, "sel": 82.9, "date": "2024-07-16", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 70.0, "y": 26311.7, "sel": 84.3, "date": "2024-07-16", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 24361.8, "sel": 82.7, "date": "2024-07-10", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 23406.8, "sel": 84.1, "date": "2024-07-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 60.0, "y": 24451.1, "sel": 82.2, "date": "2024-07-16", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 70.0, "y": 25944.7, "sel": 83.5, "date": "2024-07-16", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 11660.5, "sel": 71.7, "date": "std", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 3506.4, "sel": 55.5, "date": "std", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 29989.1, "sel": 81.6, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 34858.4, "sel": 83.2, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 24301.6, "sel": 79.5, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 85.0, "y": 32964.1, "sel": 82.5, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 75.0, "y": 31093.2, "sel": 81.5, "date": "2024-07-19", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 70.0, "y": 29769.7, "sel": 80.9, "date": "2024-07-19", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 65.0, "y": 28145.9, "sel": 80.0, "date": "2024-07-19", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 29452.8, "sel": 81.4, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 25380.3, "sel": 81.6, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 33728.6, "sel": 82.7, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 85.0, "y": 34462.6, "sel": 83.4, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 36971.6, "sel": 83.0, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 31298.9, "sel": 84.9, "date": "2024-07-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 21751.9, "sel": 87.0, "date": "2024-07-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 16243.4, "sel": 77.2, "date": "2024-07-25", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 30268.4, "sel": 83.0, "date": "2024-07-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 31804.9, "sel": 83.1, "date": "2024-07-27", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 21086.4, "sel": 80.6, "date": "2024-07-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 20394.4, "sel": 75.9, "date": "2024-09-11", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 30.0, "y": 15015.9, "sel": 69.7, "date": "2024-09-11", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 40.0, "y": 17491.9, "sel": 74.0, "date": "2024-09-11", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 60.0, "y": 20739.2, "sel": 78.3, "date": "2024-09-14", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 90.0, "y": 17288.5, "sel": 69.7, "date": "2025-03-15", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 30.0, "y": 9558.4, "sel": 51.0, "date": "2025-03-01", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 50.0, "y": 12939.3, "sel": 59.8, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 63.64, "y": 14484.3, "sel": 63.9, "date": "2024-09-13", "lamp": "旧灯 100W (433.9)"}, {"load": 3.0, "lpd": 433.9, "x_ch4": 70.0, "y": 14921.4, "sel": 64.6, "date": "2025-03-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 75.0, "y": 31093.2, "sel": 81.5, "date": "2024-07-19", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 70.0, "y": 29769.7, "sel": 80.9, "date": "2024-07-19", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 65.0, "y": 28145.9, "sel": 80.0, "date": "2024-07-19", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 80.0, "y": 33728.6, "sel": 82.7, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 85.0, "y": 34462.6, "sel": 83.4, "date": "2024-07-22", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 36971.6, "sel": 83.0, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 50.0, "y": 20394.4, "sel": 75.9, "date": "2024-09-11", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 30.0, "y": 15015.9, "sel": 69.7, "date": "2024-09-11", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 40.0, "y": 17491.9, "sel": 74.0, "date": "2024-09-11", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 60.0, "y": 20739.2, "sel": 78.3, "date": "2024-09-14", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 60.0, "y": 27873.8, "sel": 78.5, "date": "2024-09-14", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 16243.4, "sel": 77.2, "date": "2024-07-25", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 30268.4, "sel": 83.0, "date": "2024-07-26", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 31804.9, "sel": 83.1, "date": "2024-07-27", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 21086.4, "sel": 80.6, "date": "2024-07-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 36971.6, "sel": 83.0, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 46314.1, "sel": 84.9, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 44945.6, "sel": 85.4, "date": "2024-09-05", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 7399.6, "sel": 57.6, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 41755.1, "sel": 84.6, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 52406.6, "sel": 82.5, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 36216.2, "sel": 78.0, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 35591.7, "sel": 82.3, "date": "2024-09-06", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 36971.6, "sel": 83.0, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 31298.9, "sel": 84.9, "date": "2024-07-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 21751.9, "sel": 87.0, "date": "2024-07-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 15909.2, "sel": 90.2, "date": "2024-07-23", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 9825.3, "sel": 96.1, "date": "2024-07-25", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 303.7, "x_ch4": 90.0, "y": 28300.0, "sel": 78.8, "date": "2024-10-09", "lamp": "低功率档"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 90.0, "y": 4203.6, "sel": 82.2, "date": "2025-02-28", "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 45.45, "y": 17135.8, "sel": 39.3, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.05, "lpd": 433.9, "x_ch4": 46.51, "y": 10559.7, "sel": 36.1, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.1, "lpd": 433.9, "x_ch4": 46.51, "y": 15057.2, "sel": 40.0, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.1, "lpd": 433.9, "x_ch4": 45.45, "y": 14127.3, "sel": 38.0, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.025, "lpd": 433.9, "x_ch4": 45.45, "y": 13331.2, "sel": 37.9, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.025, "lpd": 433.9, "x_ch4": 46.51, "y": 14611.6, "sel": 38.5, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.02, "lpd": 433.9, "x_ch4": 46.51, "y": 15564.0, "sel": 37.9, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.02, "lpd": 433.9, "x_ch4": 45.45, "y": 17784.2, "sel": 30.0, "date": null, "lamp": "旧灯 100W (433.9)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 69.23, "y": 32513.0, "sel": 65.3, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 97.3, "y": 11550.0, "sel": 78.4, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 85.71, "y": 13500.9, "sel": 68.5, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.01, "lpd": 257.3, "x_ch4": 90.0, "y": 4084.4, "sel": 40.9, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.06, "lpd": 257.3, "x_ch4": 68.97, "y": 10542.3, "sel": 66.2, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 97.3, "y": 11550.0, "sel": 78.4, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 97.3, "y": 11550.0, "sel": 78.4, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 85.71, "y": 13500.9, "sel": 68.5, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 85.71, "y": 13500.9, "sel": 68.5, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.01, "lpd": 257.3, "x_ch4": 90.0, "y": 4084.4, "sel": 40.9, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.01, "lpd": 257.3, "x_ch4": 90.0, "y": 4084.4, "sel": 40.9, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.06, "lpd": 257.3, "x_ch4": 68.97, "y": 10542.3, "sel": 66.2, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 0.06, "lpd": 257.3, "x_ch4": 68.97, "y": 10542.3, "sel": 66.2, "date": null, "lamp": "新灯 100W (257.3)"}, {"load": 3.0, "lpd": 257.3, "x_ch4": 90.0, "y": 2373.7, "sel": 23.4, "date": "2026-11-19", "lamp": "新灯 100W (257.3)"}, {"load": 3.0, "lpd": 257.3, "x_ch4": 90.0, "y": 1441.9, "sel": 19.2, "date": "2026-11-19", "lamp": "新灯 100W (257.3)"}, {"load": 3.0, "lpd": 257.3, "x_ch4": 90.0, "y": 1233.4, "sel": 16.6, "date": "2026-11-19", "lamp": "新灯 100W (257.3)"}, {"load": 2.0, "lpd": 257.3, "x_ch4": 90.0, "y": 1778.4, "sel": 21.9, "date": "2026-11-19", "lamp": "新灯 100W (257.3)"}, {"load": 2.0, "lpd": 257.3, "x_ch4": 90.0, "y": 3782.4, "sel": 35.6, "date": "2026-11-19", "lamp": "新灯 100W (257.3)"}, {"load": 2.0, "lpd": 257.3, "x_ch4": 90.0, "y": 1762.2, "sel": 19.8, "date": "2026-11-19", "lamp": "新灯 100W (257.3)"}, {"load": 0.5, "lpd": 257.3, "x_ch4": 90.0, "y": 4214.6, "sel": 41.1, "date": "2026-11-19", "lamp": "新灯 100W (257.3)"}, {"load": 0.5, "lpd": 257.3, "x_ch4": 90.0, "y": 3347.9, "sel": 38.5, "date": "2026-11-19", "lamp": "新灯 100W (257.3)"}, {"load": 0.5, "lpd": 257.3, "x_ch4": 90.0, "y": 3100.8, "sel": 37.5, "date": "2026-11-19", "lamp": "新灯 100W (257.3)"}, {"load": 1.73, "lpd": 234.4, "x_ch4": 90.0, "y": 2892.5, "sel": 30.0, "date": "2026-11-19", "lamp": "新灯 90W"}, {"load": 1.73, "lpd": 234.4, "x_ch4": 90.0, "y": 2191.6, "sel": 26.5, "date": "2026-11-19", "lamp": "新灯 90W"}, {"load": 1.73, "lpd": 234.4, "x_ch4": 90.0, "y": 1877.9, "sel": 25.0, "date": "2026-11-19", "lamp": "新灯 90W"}, {"load": 0.02, "lpd": 257.3, "x_ch4": 46.51, "y": 15564.0, "sel": 37.9, "date": "2026-10-29", "lamp": "新灯 100W (257.3)"}, {"load": 0.02, "lpd": 257.3, "x_ch4": 45.45, "y": 17784.2, "sel": 30.0, "date": "2026-10-29", "lamp": "新灯 100W (257.3)"}, {"load": 0.025, "lpd": 257.3, "x_ch4": 45.45, "y": 13331.2, "sel": 37.9, "date": "2026-10-29", "lamp": "新灯 100W (257.3)"}, {"load": 0.025, "lpd": 257.3, "x_ch4": 46.51, "y": 14611.6, "sel": 38.5, "date": "2026-10-29", "lamp": "新灯 100W (257.3)"}, {"load": 0.05, "lpd": 257.3, "x_ch4": 45.45, "y": 17135.8, "sel": 39.3, "date": "2026-10-29", "lamp": "新灯 100W (257.3)"}, {"load": 0.05, "lpd": 257.3, "x_ch4": 46.51, "y": 10559.7, "sel": 36.1, "date": "2026-10-29", "lamp": "新灯 100W (257.3)"}, {"load": 0.1, "lpd": 257.3, "x_ch4": 46.51, "y": 15057.2, "sel": 40.0, "date": "2026-10-29", "lamp": "新灯 100W (257.3)"}, {"load": 0.1, "lpd": 257.3, "x_ch4": 45.45, "y": 14127.3, "sel": 38.0, "date": "2026-10-29", "lamp": "新灯 100W (257.3)"}, {"load": 0.01, "lpd": 257.3, "x_ch4": 90.0, "y": 4186.7, "sel": 41.4, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.01, "lpd": 211.5, "x_ch4": 51.85, "y": 7916.4, "sel": 38.0, "date": "2026-11-04", "lamp": "新灯 80W (211.5)"}, {"load": 0.01, "lpd": 257.3, "x_ch4": 90.0, "y": 4050.0, "sel": 40.5, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.01, "lpd": 211.5, "x_ch4": 51.85, "y": 7557.8, "sel": 36.8, "date": "2026-11-04", "lamp": "新灯 80W (211.5)"}, {"load": 0.01, "lpd": 257.3, "x_ch4": 90.0, "y": 4016.5, "sel": 40.8, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.01, "lpd": 211.5, "x_ch4": 51.85, "y": 7394.3, "sel": 36.9, "date": "2026-11-04", "lamp": "新灯 80W (211.5)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 69.23, "y": 32513.0, "sel": 65.3, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 97.3, "y": 18868.4, "sel": 68.4, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 85.71, "y": 14837.6, "sel": 70.3, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 211.5, "x_ch4": 83.33, "y": 24169.5, "sel": 73.3, "date": "2026-11-04", "lamp": "新灯 80W (211.5)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 97.3, "y": 8115.3, "sel": 83.2, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 85.71, "y": 13351.7, "sel": 68.0, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 211.5, "x_ch4": 83.33, "y": 19243.3, "sel": 70.3, "date": "2026-11-04", "lamp": "新灯 80W (211.5)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 97.3, "y": 7666.1, "sel": 83.7, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 257.3, "x_ch4": 85.71, "y": 12313.5, "sel": 67.0, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.03, "lpd": 211.5, "x_ch4": 83.33, "y": 16830.0, "sel": 67.7, "date": "2026-11-04", "lamp": "新灯 80W (211.5)"}, {"load": 0.04, "lpd": 211.5, "x_ch4": 51.85, "y": 24514.1, "sel": 63.9, "date": "2026-11-04", "lamp": "新灯 80W (211.5)"}, {"load": 0.04, "lpd": 211.5, "x_ch4": 51.85, "y": 21484.9, "sel": 62.2, "date": "2026-11-04", "lamp": "新灯 80W (211.5)"}, {"load": 0.04, "lpd": 211.5, "x_ch4": 51.85, "y": 20171.0, "sel": 61.1, "date": "2026-11-04", "lamp": "新灯 80W (211.5)"}, {"load": 0.06, "lpd": 257.3, "x_ch4": 68.97, "y": 11665.2, "sel": 67.9, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.06, "lpd": 257.3, "x_ch4": 68.97, "y": 10227.7, "sel": 65.8, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}, {"load": 0.06, "lpd": 257.3, "x_ch4": 68.97, "y": 9734.1, "sel": 65.0, "date": "2026-11-04", "lamp": "新灯 100W (257.3)"}], "n": 368, "axes": {"x": {"label": "负载 wt%", "min": 0.01, "max": 3.0, "scale": "log"}, "y": {"label": "光强 mW/cm²", "min": 21.7, "max": 433.9, "scale": "linear"}, "z": {"label": "CH₄ 体积分数 %", "min": 10.0, "max": 100.0, "scale": "linear"}, "color": {"label": "产率", "min": 534.4, "max": 56380.5}}}),
+                 Promise.resolve({"ok": true, "probe": {"ch4": 90.0, "o2": 10.0, "ar": 0.0, "o2_in": 10.0, "light": 257.3}, "rows": [{"load": 0.01, "n": 11, "measured": 4187.0, "predicted": 5030.0, "err_pct": 20.0, "in_domain": true, "d_min": 0.0, "verdict": "reliable", "unc": 604.0}, {"load": 0.02, "n": 6, "measured": 15976.0, "predicted": 23402.0, "err_pct": 46.0, "in_domain": true, "d_min": 0.3, "verdict": "biased", "unc": 6273.0}, {"load": 0.03, "n": 18, "measured": 13501.0, "predicted": 22211.0, "err_pct": 65.0, "in_domain": true, "d_min": 0.48, "verdict": "off", "unc": 6998.0}, {"load": 0.05, "n": 256, "measured": 24583.0, "predicted": 20047.0, "err_pct": -18.0, "in_domain": true, "d_min": 0.48, "verdict": "reliable", "unc": 6348.0}, {"load": 0.06, "n": 6, "measured": 10542.0, "predicted": 19109.0, "err_pct": 81.0, "in_domain": true, "d_min": 0.48, "verdict": "off", "unc": 6026.0}, {"load": 0.1, "n": 5, "measured": 15057.0, "predicted": 17357.0, "err_pct": 15.0, "in_domain": true, "d_min": 0.53, "verdict": "reliable", "unc": 5642.0}, {"load": 0.5, "n": 5, "measured": 4215.0, "predicted": 12745.0, "err_pct": 202.0, "in_domain": false, "d_min": 0.9, "verdict": "off", "unc": 4966.0}, {"load": 1.0, "n": 2, "measured": 8515.0, "predicted": 11109.0, "err_pct": 30.0, "in_domain": false, "d_min": 0.93, "verdict": "biased", "unc": 4338.0}, {"load": 2.0, "n": 3, "measured": 1778.0, "predicted": 9624.0, "err_pct": 441.0, "in_domain": false, "d_min": 0.9, "verdict": "off", "unc": 3750.0}, {"load": 3.0, "n": 41, "measured": 9341.0, "predicted": 8864.0, "err_pct": -5.0, "in_domain": false, "d_min": 0.9, "verdict": "biased", "unc": 3454.0}], "n_reliable": 3, "n_biased": 7, "n_out_domain": 4, "thresholds": {"ok": 30.0, "warn": 60.0}, "summary": "在 10 个探测档位中，模型只在 3 档与实测吻合（误差 ≤30%），7 档偏差超出可用范围，4 档被判为域外。"}),Promise.resolve({"ok": true, "fit": {"Y0": 671254.0, "K_O": 6.33, "K_C": 0.26, "Q0": 739.0, "n": 4.16, "p": 0.94, "q": 0.96, "r2_log_y": 0.899, "r2_sel": 0.998, "n_points": 12}, "range": {"load_wt": 0.05, "lpd": 430.0, "x_o2": [0.05, 0.3], "x_ch4": [0.3, 0.9], "total_flow": 100.0}, "rows": [{"series": "氧扫描(CH4=90)", "flows": "90/2.5/8", "measured_y": 15909, "pred_y": 15565.1, "err_pct": -2.2, "measured_sel": 90.2, "pred_sel": 90.22, "err_sel": 0.02, "theta_o": 0.1137, "theta_c": 0.1681}, {"series": "氧扫描(CH4=90)", "flows": "90/5.0/5", "measured_y": 21752, "pred_y": 24677.8, "err_pct": 13.5, "measured_sel": 87.0, "pred_sel": 87.18, "err_sel": 0.18, "theta_o": 0.2041, "theta_c": 0.1509}, {"series": "氧扫描(CH4=90)", "flows": "90/7.5/2", "measured_y": 31299, "pred_y": 30280.4, "err_pct": -3.3, "measured_sel": 84.9, "pred_sel": 85.05, "err_sel": 0.15, "theta_o": 0.2778, "theta_c": 0.1369}, {"series": "甲烷扫描(低)", "flows": "30/10.0/60", "measured_y": 15016, "pred_y": 14175.0, "err_pct": -5.6, "measured_sel": 69.7, "pred_sel": 69.67, "err_sel": -0.03, "theta_o": 0.37, "theta_c": 0.0456}, {"series": "甲烷扫描(低)", "flows": "40/10.0/50", "measured_y": 17492, "pred_y": 18051.8, "err_pct": 3.2, "measured_sel": 74.0, "pred_sel": 73.81, "err_sel": -0.19, "theta_o": 0.3644, "theta_c": 0.0599}, {"series": "甲烷扫描(低)", "flows": "50/10.0/40", "measured_y": 20394, "pred_y": 21644.9, "err_pct": 6.1, "measured_sel": 75.9, "pred_sel": 76.75, "err_sel": 0.85, "theta_o": 0.359, "theta_c": 0.0737}, {"series": "甲烷扫描(高)", "flows": "65/10.0/25", "measured_y": 28146, "pred_y": 26571.0, "err_pct": -5.6, "measured_sel": 80.0, "pred_sel": 79.91, "err_sel": -0.09, "theta_o": 0.3513, "theta_c": 0.0938}, {"series": "甲烷扫描(高)", "flows": "70/10.0/20", "measured_y": 29770, "pred_y": 28101.5, "err_pct": -5.6, "measured_sel": 80.9, "pred_sel": 80.74, "err_sel": -0.16, "theta_o": 0.3488, "theta_c": 0.1003}, {"series": "甲烷扫描(高)", "flows": "75/10.0/15", "measured_y": 31093, "pred_y": 29580.6, "err_pct": -4.9, "measured_sel": 81.5, "pred_sel": 81.49, "err_sel": -0.01, "theta_o": 0.3463, "theta_c": 0.1067}, {"series": "氧扫描(CH4=50)", "flows": "50/20.0/30", "measured_y": 19960, "pred_y": 23507.1, "err_pct": 17.8, "measured_sel": 78.2, "pred_sel": 70.88, "err_sel": -7.32, "theta_o": 0.5284, "theta_c": 0.0543}, {"series": "氧扫描(CH4=50)", "flows": "50/25.0/25", "measured_y": 22303, "pred_y": 23006.8, "err_pct": 3.2, "measured_sel": 75.8, "pred_sel": 68.81, "err_sel": -6.99, "theta_o": 0.5834, "theta_c": 0.0479}, {"series": "氧扫描(CH4=50)", "flows": "50/30.0/20", "measured_y": 24681, "pred_y": 22223.0, "err_pct": -10.0, "measured_sel": 74.1, "pred_sel": 67.06, "err_sel": -7.04, "theta_o": 0.6269, "theta_c": 0.0429}], "demo": [{"flows": "90/10/0", "y": 33730.1, "sel": 83.36, "theta_o": 0.339, "theta_c": 0.1253, "in_range": true}, {"flows": "85/10/5", "y": 32392.8, "sel": 82.79, "theta_o": 0.3414, "theta_c": 0.1192, "in_range": true}, {"flows": "82/10/8", "y": 31568.9, "sel": 82.43, "theta_o": 0.3429, "theta_c": 0.1155, "in_range": true}, {"flows": "70/10/20", "y": 28101.5, "sel": 80.74, "theta_o": 0.3488, "theta_c": 0.1003, "in_range": true}, {"flows": "50/10/40", "y": 21644.9, "sel": 76.75, "theta_o": 0.359, "theta_c": 0.0737, "in_range": true}], "mape_y": 6.7, "mae_sel": 1.92, "summary": "竞争吸附模型用 12 个条件点拟合，R2(log y)=0.899，平均偏差 6.7%；选择性 R2=0.998，平均偏差 1.9 点。"}),
+                 Promise.resolve({"ok": true, "n_points": 198, "points": [{"x": 50.0, "q": 100, "y": 8976.2, "sel": 77.8, "date": "2024-06-26"}, {"x": 50.0, "q": 100, "y": 3688.4, "sel": 61.5, "date": null}, {"x": 50.0, "q": 100, "y": 17083.0, "sel": 80.1, "date": "2024-06-26"}, {"x": 50.0, "q": 100, "y": 16757.6, "sel": 79.8, "date": "2024-06-26"}, {"x": 50.0, "q": 100, "y": 19078.6, "sel": 80.7, "date": "2024-06-26"}, {"x": 50.0, "q": 20, "y": 4933.8, "sel": 78.1, "date": "2024-05-27"}, {"x": 50.0, "q": 100, "y": 17843.7, "sel": 81.0, "date": "2024-06-26"}, {"x": 50.0, "q": 100, "y": 19960.0, "sel": 78.2, "date": "2024-05-28"}, {"x": 50.0, "q": 100, "y": 22303.1, "sel": 75.8, "date": "2024-05-28"}, {"x": 50.0, "q": 100, "y": 24680.8, "sel": 74.1, "date": "2024-05-28"}, {"x": 50.0, "q": 100, "y": 14378.5, "sel": 73.0, "date": "2024-06-26"}, {"x": 50.0, "q": 100, "y": 20005.8, "sel": 78.8, "date": "2024-06-26"}, {"x": 50.0, "q": 100.0, "y": 16598.7, "sel": 77.9, "date": "std"}, {"x": 60.0, "q": 100.0, "y": 25311.1, "sel": 82.6, "date": "2024-07-16"}, {"x": 70.0, "q": 100.0, "y": 26406.9, "sel": 83.9, "date": "2024-07-16"}, {"x": 80.0, "q": 100.0, "y": 24522.3, "sel": 82.5, "date": "2024-07-10"}, {"x": 50.0, "q": 100.0, "y": 16598.7, "sel": 78.3, "date": "std"}, {"x": 50.0, "q": 100, "y": 8976.2, "sel": 77.8, "date": "2024-06-26"}, {"x": 50.0, "q": 100, "y": 9539.3, "sel": 80.7, "date": "2024-06-26"}, {"x": 50.0, "q": 20, "y": 2466.9, "sel": 78.1, "date": "2024-05-27"}, {"x": 50.0, "q": 100, "y": 9980.0, "sel": 78.2, "date": "2024-05-28"}, {"x": 50.0, "q": 100, "y": 11151.6, "sel": 75.8, "date": "2024-05-28"}, {"x": 50.0, "q": 100, "y": 12340.4, "sel": 74.1, "date": "2024-05-28"}, {"x": 50.0, "q": 100, "y": 7189.3, "sel": 73.0, "date": "2024-06-26"}, {"x": 50.0, "q": 100, "y": 10002.9, "sel": 78.8, "date": "2024-06-26"}, {"x": 50.0, "q": 100.0, "y": 15836.5, "sel": 77.9, "date": "std"}, {"x": 50.0, "q": 100.0, "y": 16598.7, "sel": 78.3, "date": "std"}, {"x": 60.0, "q": 100.0, "y": 25176.4, "sel": 82.9, "date": "2024-07-16"}, {"x": 70.0, "q": 100.0, "y": 26311.7, "sel": 84.3, "date": "2024-07-16"}, {"x": 80.0, "q": 100.0, "y": 24361.8, "sel": 82.7, "date": "2024-07-10"}, {"x": 90.0, "q": 100.0, "y": 23406.8, "sel": 84.1, "date": "2024-07-23"}, {"x": 60.0, "q": 100.0, "y": 24451.1, "sel": 82.2, "date": "2024-07-16"}, {"x": 70.0, "q": 100.0, "y": 25944.7, "sel": 83.5, "date": "2024-07-16"}, {"x": 50.0, "q": 100.0, "y": 11660.5, "sel": 71.7, "date": "std"}, {"x": 50.0, "q": 100.0, "y": 3506.4, "sel": 55.5, "date": "std"}, {"x": 80.0, "q": 100, "y": 29989.1, "sel": 81.6, "date": "2024-07-22"}, {"x": 90.0, "q": 100, "y": 34858.4, "sel": 83.2, "date": "2025-02-28"}, {"x": 80.0, "q": 100, "y": 24301.6, "sel": 79.5, "date": "2024-07-22"}, {"x": 85.0, "q": 100, "y": 32964.1, "sel": 82.5, "date": "2024-07-22"}, {"x": 75.0, "q": 100, "y": 31093.2, "sel": 81.5, "date": "2024-07-19"}, {"x": 70.0, "q": 100, "y": 29769.7, "sel": 80.9, "date": "2024-07-19"}, {"x": 65.0, "q": 100, "y": 28145.9, "sel": 80.0, "date": "2024-07-19"}, {"x": 80.0, "q": 100, "y": 29452.8, "sel": 81.4, "date": "2024-07-22"}, {"x": 80.0, "q": 100, "y": 25380.3, "sel": 81.6, "date": "2024-07-22"}, {"x": 80.0, "q": 100, "y": 33728.6, "sel": 82.7, "date": "2024-07-22"}, {"x": 85.0, "q": 100, "y": 34462.6, "sel": 83.4, "date": "2024-07-22"}, {"x": 90.0, "q": 100, "y": 36971.6, "sel": 83.0, "date": "2025-02-28"}, {"x": 90.0, "q": 100.0, "y": 31298.9, "sel": 84.9, "date": "2024-07-23"}, {"x": 90.0, "q": 100, "y": 21751.9, "sel": 87.0, "date": "2024-07-23"}, {"x": 90.0, "q": 100.0, "y": 15909.2, "sel": 90.2, "date": "2024-07-23"}, {"x": 100.0, "q": 100, "y": 9769.8, "sel": 96.3, "date": "2024-07-25"}, {"x": 90.0, "q": 100, "y": 9825.3, "sel": 96.1, "date": "2024-07-25"}, {"x": 90.0, "q": 50, "y": 16243.4, "sel": 77.2, "date": "2024-07-25"}, {"x": 90.0, "q": 80, "y": 30268.4, "sel": 83.0, "date": "2024-07-26"}, {"x": 90.0, "q": 90, "y": 31804.9, "sel": 83.1, "date": "2024-07-27"}, {"x": 90.0, "q": 60, "y": 21086.4, "sel": 80.6, "date": "2024-07-28"}, {"x": 90.0, "q": 150, "y": 44945.6, "sel": 85.4, "date": "2024-09-05"}, {"x": 90.0, "q": 200, "y": 7399.6, "sel": 57.6, "date": "2024-09-06"}, {"x": 90.0, "q": 200, "y": 41755.1, "sel": 84.6, "date": "2024-09-06"}, {"x": 90.0, "q": 300, "y": 52406.6, "sel": 82.5, "date": "2024-09-06"}, {"x": 90.0, "q": 400, "y": 36216.2, "sel": 78.0, "date": "2024-09-06"}, {"x": 90.0, "q": 250, "y": 35591.7, "sel": 82.3, "date": "2024-09-06"}, {"x": 90.0, "q": 200, "y": 46314.1, "sel": 84.9, "date": "2024-09-06"}, {"x": 50.0, "q": 100, "y": 20394.4, "sel": 75.9, "date": "2024-09-11"}, {"x": 30.0, "q": 100, "y": 15015.9, "sel": 69.7, "date": "2024-09-11"}, {"x": 40.0, "q": 100, "y": 17491.9, "sel": 74.0, "date": "2024-09-11"}, {"x": 60.0, "q": 100, "y": 20739.2, "sel": 78.3, "date": "2024-09-14"}, {"x": 60.0, "q": 100, "y": 27873.8, "sel": 78.5, "date": "2024-09-14"}, {"x": 60.0, "q": 100, "y": 26336.1, "sel": 78.4, "date": "2024-09-14"}, {"x": 90.0, "q": 400, "y": 54307.0, "sel": 75.4, "date": null}, {"x": 90.0, "q": 200.0, "y": 56380.5, "sel": 79.3, "date": null}, {"x": 90.0, "q": 200, "y": 42569.1, "sel": 62.1, "date": null}, {"x": 90.0, "q": 400, "y": 28423.8, "sel": 52.7, "date": null}, {"x": 98.75, "q": 400, "y": 21486.7, "sel": 53.6, "date": null}, {"x": 94.74, "q": 95, "y": 22781.7, "sel": 87.4, "date": null}, {"x": 90.0, "q": 100, "y": 37794.5, "sel": 83.5, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 23271.3, "sel": 79.0, "date": "2025-02-28"}, {"x": 90.0, "q": 150, "y": 36897.7, "sel": 81.5, "date": "2024-09-05"}, {"x": 90.0, "q": 25.0, "y": 4247.4, "sel": 60.5, "date": null}, {"x": 90.0, "q": 500, "y": 8811.0, "sel": 50.4, "date": null}, {"x": 90.0, "q": 50, "y": 16305.8, "sel": 76.5, "date": "2024-07-25"}, {"x": 90.0, "q": 75.0, "y": 23575.8, "sel": 80.6, "date": null}, {"x": 90.0, "q": 125.0, "y": 34770.7, "sel": 82.4, "date": null}, {"x": 90.0, "q": 175.0, "y": 30437.1, "sel": 78.5, "date": null}, {"x": 90.0, "q": 175.0, "y": 22391.7, "sel": 73.8, "date": null}, {"x": 90.0, "q": 100, "y": 23639.3, "sel": 77.5, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 24643.4, "sel": 79.3, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 35195.2, "sel": 84.7, "date": "2025-02-28"}, {"x": 90.0, "q": 175.0, "y": 31025.2, "sel": 78.4, "date": null}, {"x": 90.0, "q": 175.0, "y": 29896.9, "sel": 77.5, "date": null}, {"x": 90.0, "q": 150, "y": 26779.8, "sel": 76.7, "date": "2024-09-05"}, {"x": 90.0, "q": 150, "y": 28576.6, "sel": 76.9, "date": "2024-09-05"}, {"x": 90.0, "q": 125.0, "y": 34488.4, "sel": 82.4, "date": null}, {"x": 90.0, "q": 125.0, "y": 22268.6, "sel": 75.8, "date": null}, {"x": 90.0, "q": 75.0, "y": 25215.8, "sel": 82.5, "date": null}, {"x": 90.0, "q": 200, "y": 38116.8, "sel": 81.2, "date": "2024-09-06"}, {"x": 90.0, "q": 225.0, "y": 33942.8, "sel": 78.3, "date": null}, {"x": 90.0, "q": 225.0, "y": 26571.4, "sel": 75.4, "date": null}, {"x": 90.0, "q": 175.0, "y": 30351.9, "sel": 80.8, "date": null}, {"x": 90.0, "q": 175.0, "y": 18013.5, "sel": 67.6, "date": null}, {"x": 90.0, "q": 225.0, "y": 36900.0, "sel": 76.4, "date": null}, {"x": 90.0, "q": 175.0, "y": 29958.9, "sel": 78.6, "date": null}, {"x": 90.0, "q": 250, "y": 28855.6, "sel": 75.6, "date": "2024-09-06"}, {"x": 90.0, "q": 250, "y": 27406.0, "sel": 75.6, "date": "2024-09-06"}, {"x": 90.0, "q": 250, "y": 35111.5, "sel": 77.5, "date": "2024-09-06"}, {"x": 90.0, "q": 250, "y": 31319.1, "sel": 75.5, "date": "2024-09-06"}, {"x": 90.0, "q": 75.0, "y": 22208.6, "sel": 79.8, "date": null}, {"x": 90.0, "q": 100, "y": 32021.1, "sel": 81.2, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 31788.6, "sel": 79.9, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 31831.5, "sel": 81.8, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 25010.4, "sel": 77.8, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 26349.5, "sel": 78.1, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 39907.3, "sel": 84.3, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 33586.5, "sel": 83.4, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 23496.0, "sel": 77.5, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 40071.1, "sel": 84.2, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 14351.5, "sel": 68.9, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 27427.0, "sel": 79.5, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 14351.5, "sel": 68.9, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 27427.0, "sel": 79.5, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 10328.1, "sel": 77.8, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 4203.6, "sel": 82.2, "date": "2025-02-28"}, {"x": 80.0, "q": 50, "y": 2720.7, "sel": 69.4, "date": null}, {"x": 50.0, "q": 20, "y": 534.4, "sel": 21.5, "date": null}, {"x": 50.0, "q": 100, "y": 2195.2, "sel": 28.6, "date": null}, {"x": 90.0, "q": 100, "y": 37794.5, "sel": 83.5, "date": "2025-02-28"}, {"x": 90.0, "q": 100, "y": 27427.0, "sel": 79.5, "date": "2025-02-28"}, {"x": 50.0, "q": 100, "y": 8976.2, "sel": 77.8, "date": "2024-06-26"}, {"x": 50.0, "q": 100, "y": 9539.3, "sel": 80.7, "date": "2024-06-26"}, {"x": 50.0, "q": 20, "y": 2466.9, "sel": 78.1, "date": "2024-05-27"}, {"x": 50.0, "q": 100, "y": 9980.0, "sel": 78.2, "date": "2024-05-28"}, {"x": 50.0, "q": 100, "y": 11151.6, "sel": 75.8, "date": "2024-05-28"}, {"x": 50.0, "q": 100, "y": 12340.4, "sel": 74.1, "date": "2024-05-28"}, {"x": 50.0, "q": 100, "y": 7189.3, "sel": 73.0, "date": "2024-06-26"}, {"x": 50.0, "q": 100, "y": 10002.9, "sel": 78.8, "date": "2024-06-26"}, {"x": 50.0, "q": 100.0, "y": 15836.5, "sel": 77.9, "date": "std"}, {"x": 50.0, "q": 100.0, "y": 16598.7, "sel": 78.3, "date": "std"}, {"x": 60.0, "q": 100.0, "y": 25176.4, "sel": 82.9, "date": "2024-07-16"}, {"x": 70.0, "q": 100.0, "y": 26311.7, "sel": 84.3, "date": "2024-07-16"}, {"x": 80.0, "q": 100.0, "y": 24361.8, "sel": 82.7, "date": "2024-07-10"}, {"x": 90.0, "q": 100.0, "y": 23406.8, "sel": 84.1, "date": "2024-07-23"}, {"x": 60.0, "q": 100.0, "y": 24451.1, "sel": 82.2, "date": "2024-07-16"}, {"x": 70.0, "q": 100.0, "y": 25944.7, "sel": 83.5, "date": "2024-07-16"}, {"x": 50.0, "q": 100.0, "y": 11660.5, "sel": 71.7, "date": "std"}, {"x": 50.0, "q": 100.0, "y": 3506.4, "sel": 55.5, "date": "std"}, {"x": 80.0, "q": 100, "y": 29989.1, "sel": 81.6, "date": "2024-07-22"}, {"x": 90.0, "q": 100, "y": 34858.4, "sel": 83.2, "date": "2025-02-28"}, {"x": 80.0, "q": 100, "y": 24301.6, "sel": 79.5, "date": "2024-07-22"}, {"x": 85.0, "q": 100, "y": 32964.1, "sel": 82.5, "date": "2024-07-22"}, {"x": 75.0, "q": 100, "y": 31093.2, "sel": 81.5, "date": "2024-07-19"}, {"x": 70.0, "q": 100, "y": 29769.7, "sel": 80.9, "date": "2024-07-19"}, {"x": 65.0, "q": 100, "y": 28145.9, "sel": 80.0, "date": "2024-07-19"}, {"x": 80.0, "q": 100, "y": 29452.8, "sel": 81.4, "date": "2024-07-22"}, {"x": 80.0, "q": 100, "y": 25380.3, "sel": 81.6, "date": "2024-07-22"}, {"x": 80.0, "q": 100, "y": 33728.6, "sel": 82.7, "date": "2024-07-22"}, {"x": 85.0, "q": 100, "y": 34462.6, "sel": 83.4, "date": "2024-07-22"}, {"x": 90.0, "q": 100, "y": 36971.6, "sel": 83.0, "date": "2025-02-28"}, {"x": 90.0, "q": 100.0, "y": 31298.9, "sel": 84.9, "date": "2024-07-23"}, {"x": 90.0, "q": 100, "y": 21751.9, "sel": 87.0, "date": "2024-07-23"}, {"x": 90.0, "q": 50, "y": 16243.4, "sel": 77.2, "date": "2024-07-25"}, {"x": 90.0, "q": 80, "y": 30268.4, "sel": 83.0, "date": "2024-07-26"}, {"x": 90.0, "q": 90, "y": 31804.9, "sel": 83.1, "date": "2024-07-27"}, {"x": 90.0, "q": 60, "y": 21086.4, "sel": 80.6, "date": "2024-07-28"}, {"x": 50.0, "q": 100, "y": 20394.4, "sel": 75.9, "date": "2024-09-11"}, {"x": 30.0, "q": 100, "y": 15015.9, "sel": 69.7, "date": "2024-09-11"}, {"x": 40.0, "q": 100, "y": 17491.9, "sel": 74.0, "date": "2024-09-11"}, {"x": 60.0, "q": 100, "y": 20739.2, "sel": 78.3, "date": "2024-09-14"}, {"x": 75.0, "q": 100, "y": 31093.2, "sel": 81.5, "date": "2024-07-19"}, {"x": 70.0, "q": 100, "y": 29769.7, "sel": 80.9, "date": "2024-07-19"}, {"x": 65.0, "q": 100, "y": 28145.9, "sel": 80.0, "date": "2024-07-19"}, {"x": 80.0, "q": 100, "y": 33728.6, "sel": 82.7, "date": "2024-07-22"}, {"x": 85.0, "q": 100, "y": 34462.6, "sel": 83.4, "date": "2024-07-22"}, {"x": 90.0, "q": 100, "y": 36971.6, "sel": 83.0, "date": "2025-02-28"}, {"x": 50.0, "q": 100, "y": 20394.4, "sel": 75.9, "date": "2024-09-11"}, {"x": 30.0, "q": 100, "y": 15015.9, "sel": 69.7, "date": "2024-09-11"}, {"x": 40.0, "q": 100, "y": 17491.9, "sel": 74.0, "date": "2024-09-11"}, {"x": 60.0, "q": 100, "y": 20739.2, "sel": 78.3, "date": "2024-09-14"}, {"x": 60.0, "q": 100, "y": 27873.8, "sel": 78.5, "date": "2024-09-14"}, {"x": 90.0, "q": 50, "y": 16243.4, "sel": 77.2, "date": "2024-07-25"}, {"x": 90.0, "q": 80, "y": 30268.4, "sel": 83.0, "date": "2024-07-26"}, {"x": 90.0, "q": 90, "y": 31804.9, "sel": 83.1, "date": "2024-07-27"}, {"x": 90.0, "q": 60, "y": 21086.4, "sel": 80.6, "date": "2024-07-28"}, {"x": 90.0, "q": 100, "y": 36971.6, "sel": 83.0, "date": "2025-02-28"}, {"x": 90.0, "q": 200, "y": 46314.1, "sel": 84.9, "date": "2024-09-06"}, {"x": 90.0, "q": 150, "y": 44945.6, "sel": 85.4, "date": "2024-09-05"}, {"x": 90.0, "q": 200, "y": 7399.6, "sel": 57.6, "date": "2024-09-06"}, {"x": 90.0, "q": 200, "y": 41755.1, "sel": 84.6, "date": "2024-09-06"}, {"x": 90.0, "q": 300, "y": 52406.6, "sel": 82.5, "date": "2024-09-06"}, {"x": 90.0, "q": 400, "y": 36216.2, "sel": 78.0, "date": "2024-09-06"}, {"x": 90.0, "q": 250, "y": 35591.7, "sel": 82.3, "date": "2024-09-06"}, {"x": 90.0, "q": 100, "y": 36971.6, "sel": 83.0, "date": "2025-02-28"}, {"x": 90.0, "q": 100.0, "y": 31298.9, "sel": 84.9, "date": "2024-07-23"}, {"x": 90.0, "q": 100, "y": 21751.9, "sel": 87.0, "date": "2024-07-23"}, {"x": 90.0, "q": 100.0, "y": 15909.2, "sel": 90.2, "date": "2024-07-23"}, {"x": 90.0, "q": 100, "y": 9825.3, "sel": 96.1, "date": "2024-07-25"}, {"x": 90.0, "q": 100, "y": 4203.6, "sel": 82.2, "date": "2025-02-28"}, {"x": 45.45, "q": 220, "y": 17135.8, "sel": 39.3, "date": null}, {"x": 46.51, "q": 215, "y": 10559.7, "sel": 36.1, "date": null}], "cells": [{"x": 30.0, "q": 20.0, "y": 16424.0, "sel": 73.9, "d": 0.167}, {"x": 30.0, "q": 36.6, "y": 16234.0, "sel": 73.5, "d": 0.132}, {"x": 30.0, "q": 53.1, "y": 15996.0, "sel": 72.8, "d": 0.098}, {"x": 30.0, "q": 69.7, "y": 15626.0, "sel": 71.6, "d": 0.063}, {"x": 30.0, "q": 86.2, "y": 15163.0, "sel": 70.1, "d": 0.029}, {"x": 30.0, "q": 102.8, "y": 15019.0, "sel": 69.7, "d": 0.006}, {"x": 30.0, "q": 119.3, "y": 15337.0, "sel": 70.5, "d": 0.04}, {"x": 30.0, "q": 135.9, "y": 15922.0, "sel": 71.9, "d": 0.075}, {"x": 30.0, "q": 152.4, "y": 16414.0, "sel": 72.6, "d": 0.109}, {"x": 30.0, "q": 169.0, "y": 16809.0, "sel": 72.9, "d": 0.144}, {"x": 30.0, "q": 185.5, "y": 17164.0, "sel": 72.9, "d": 0.178}, {"x": 30.0, "q": 202.1, "y": 17506.0, "sel": 72.8, "d": 0.213}, {"x": 30.0, "q": 218.6, "y": 17848.0, "sel": 72.7, "d": 0.221}, {"x": 30.0, "q": 235.2, "y": 18197.0, "sel": 72.6, "d": 0.223}, {"x": 30.0, "q": 251.7, "y": 18556.0, "sel": 72.7, "d": 0.23}, {"x": 30.0, "q": 268.3, "y": 18923.0, "sel": 72.9, "d": 0.243}, {"x": 30.0, "q": 284.8, "y": 19295.0, "sel": 73.2, "d": 0.259}, {"x": 30.0, "q": 301.4, "y": 19664.0, "sel": 73.5, "d": 0.278}, {"x": 30.0, "q": 317.9, "y": 20024.0, "sel": 73.9, "d": 0.301}, {"x": 30.0, "q": 334.5, "y": 20371.0, "sel": 74.2, "d": 0.325}, {"x": 30.0, "q": 351.0, "y": 20701.0, "sel": 74.5, "d": 0.351}, {"x": 30.0, "q": 367.6, "y": 21011.0, "sel": 74.8, "d": 0.378}, {"x": 30.0, "q": 384.1, "y": 21301.0, "sel": 75.0, "d": 0.407}, {"x": 30.0, "q": 400.7, "y": 21571.0, "sel": 75.3, "d": 0.436}, {"x": 30.0, "q": 417.2, "y": 21821.0, "sel": 75.5, "d": 0.466}, {"x": 30.0, "q": 433.8, "y": 22052.0, "sel": 75.6, "d": 0.497}, {"x": 30.0, "q": 450.3, "y": 22263.0, "sel": 75.8, "d": 0.528}, {"x": 30.0, "q": 466.9, "y": 22458.0, "sel": 75.9, "d": 0.56}, {"x": 30.0, "q": 483.4, "y": 22635.0, "sel": 76.0, "d": 0.592}, {"x": 30.0, "q": 500.0, "y": 22797.0, "sel": 76.1, "d": 0.624}, {"x": 32.41, "q": 20.0, "y": 16144.0, "sel": 73.9, "d": 0.17}, {"x": 32.41, "q": 36.6, "y": 16019.0, "sel": 73.6, "d": 0.137}, {"x": 32.41, "q": 53.1, "y": 15898.0, "sel": 73.1, "d": 0.104}, {"x": 32.41, "q": 69.7, "y": 15712.0, "sel": 72.3, "d": 0.072}, {"x": 32.41, "q": 86.2, "y": 15417.0, "sel": 71.1, "d": 0.045}, {"x": 32.41, "q": 102.8, "y": 15290.0, "sel": 70.6, "d": 0.035}, {"x": 32.41, "q": 119.3, "y": 15584.0, "sel": 71.4, "d": 0.053}, {"x": 32.41, "q": 135.9, "y": 15998.0, "sel": 72.4, "d": 0.082}, {"x": 32.41, "q": 152.4, "y": 16351.0, "sel": 72.8, "d": 0.115}, {"x": 32.41, "q": 169.0, "y": 16678.0, "sel": 72.8, "d": 0.148}, {"x": 32.41, "q": 185.5, "y": 17004.0, "sel": 72.6, "d": 0.181}, {"x": 32.41, "q": 202.1, "y": 17337.0, "sel": 72.2, "d": 0.19}, {"x": 32.41, "q": 218.6, "y": 17681.0, "sel": 71.9, "d": 0.186}, {"x": 32.41, "q": 235.2, "y": 18042.0, "sel": 71.8, "d": 0.189}, {"x": 32.41, "q": 251.7, "y": 18425.0, "sel": 71.9, "d": 0.198}, {"x": 32.41, "q": 268.3, "y": 18825.0, "sel": 72.2, "d": 0.212}, {"x": 32.41, "q": 284.8, "y": 19233.0, "sel": 72.6, "d": 0.23}, {"x": 32.41, "q": 301.4, "y": 19638.0, "sel": 73.1, "d": 0.252}, {"x": 32.41, "q": 317.9, "y": 20031.0, "sel": 73.6, "d": 0.276}, {"x": 32.41, "q": 334.5, "y": 20406.0, "sel": 74.0, "d": 0.303}, {"x": 32.41, "q": 351.0, "y": 20759.0, "sel": 74.4, "d": 0.33}, {"x": 32.41, "q": 367.6, "y": 21088.0, "sel": 74.7, "d": 0.359}, {"x": 32.41, "q": 384.1, "y": 21394.0, "sel": 75.0, "d": 0.389}, {"x": 32.41, "q": 400.7, "y": 21675.0, "sel": 75.2, "d": 0.42}, {"x": 32.41, "q": 417.2, "y": 21933.0, "sel": 75.4, "d": 0.451}, {"x": 32.41, "q": 433.8, "y": 22170.0, "sel": 75.6, "d": 0.483}, {"x": 32.41, "q": 450.3, "y": 22385.0, "sel": 75.8, "d": 0.515}, {"x": 32.41, "q": 466.9, "y": 22582.0, "sel": 75.9, "d": 0.547}, {"x": 32.41, "q": 483.4, "y": 22760.0, "sel": 76.0, "d": 0.58}, {"x": 32.41, "q": 500.0, "y": 22922.0, "sel": 76.1, "d": 0.612}, {"x": 34.83, "q": 20.0, "y": 15793.0, "sel": 73.9, "d": 0.18}, {"x": 34.83, "q": 36.6, "y": 15741.0, "sel": 73.8, "d": 0.149}, {"x": 34.83, "q": 53.1, "y": 15758.0, "sel": 73.5, "d": 0.12}, {"x": 34.83, "q": 69.7, "y": 15823.0, "sel": 73.2, "d": 0.094}, {"x": 34.83, "q": 86.2, "y": 15898.0, "sel": 72.9, "d": 0.075}, {"x": 34.83, "q": 102.8, "y": 15949.0, "sel": 72.7, "d": 0.069}, {"x": 34.83, "q": 119.3, "y": 15995.0, "sel": 72.9, "d": 0.08}, {"x": 34.83, "q": 135.9, "y": 16091.0, "sel": 73.1, "d": 0.102}, {"x": 34.83, "q": 152.4, "y": 16273.0, "sel": 73.1, "d": 0.129}, {"x": 34.83, "q": 169.0, "y": 16529.0, "sel": 72.7, "d": 0.159}, {"x": 34.83, "q": 185.5, "y": 16828.0, "sel": 72.1, "d": 0.168}, {"x": 34.83, "q": 202.1, "y": 17147.0, "sel": 71.3, "d": 0.156}, {"x": 34.83, "q": 218.6, "y": 17486.0, "sel": 70.7, "d": 0.152}, {"x": 34.83, "q": 235.2, "y": 17858.0, "sel": 70.4, "d": 0.155}, {"x": 34.83, "q": 251.7, "y": 18271.0, "sel": 70.7, "d": 0.166}, {"x": 34.83, "q": 268.3, "y": 18716.0, "sel": 71.3, "d": 0.182}, {"x": 34.83, "q": 284.8, "y": 19174.0, "sel": 72.0, "d": 0.203}, {"x": 34.83, "q": 301.4, "y": 19625.0, "sel": 72.6, "d": 0.228}, {"x": 34.83, "q": 317.9, "y": 20058.0, "sel": 73.3, "d": 0.254}, {"x": 34.83, "q": 334.5, "y": 20465.0, "sel": 73.8, "d": 0.283}, {"x": 34.83, "q": 351.0, "y": 20843.0, "sel": 74.3, "d": 0.312}, {"x": 34.83, "q": 367.6, "y": 21191.0, "sel": 74.6, "d": 0.343}, {"x": 34.83, "q": 384.1, "y": 21511.0, "sel": 75.0, "d": 0.374}, {"x": 34.83, "q": 400.7, "y": 21802.0, "sel": 75.2, "d": 0.406}, {"x": 34.83, "q": 417.2, "y": 22067.0, "sel": 75.4, "d": 0.438}, {"x": 34.83, "q": 433.8, "y": 22308.0, "sel": 75.6, "d": 0.471}, {"x": 34.83, "q": 450.3, "y": 22526.0, "sel": 75.8, "d": 0.503}, {"x": 34.83, "q": 466.9, "y": 22724.0, "sel": 75.9, "d": 0.536}, {"x": 34.83, "q": 483.4, "y": 22901.0, "sel": 76.0, "d": 0.569}, {"x": 34.83, "q": 500.0, "y": 23062.0, "sel": 76.1, "d": 0.603}, {"x": 37.24, "q": 20.0, "y": 15315.0, "sel": 73.8, "d": 0.171}, {"x": 37.24, "q": 36.6, "y": 15345.0, "sel": 73.8, "d": 0.138}, {"x": 37.24, "q": 53.1, "y": 15496.0, "sel": 73.8, "d": 0.105}, {"x": 37.24, "q": 69.7, "y": 15820.0, "sel": 73.8, "d": 0.074}, {"x": 37.24, "q": 86.2, "y": 16374.0, "sel": 73.8, "d": 0.049}, {"x": 37.24, "q": 102.8, "y": 16667.0, "sel": 73.8, "d": 0.04}, {"x": 37.24, "q": 119.3, "y": 16305.0, "sel": 73.7, "d": 0.056}, {"x": 37.24, "q": 135.9, "y": 16050.0, "sel": 73.6, "d": 0.084}, {"x": 37.24, "q": 152.4, "y": 16108.0, "sel": 73.2, "d": 0.116}, {"x": 37.24, "q": 169.0, "y": 16334.0, "sel": 72.5, "d": 0.149}, {"x": 37.24, "q": 185.5, "y": 16619.0, "sel": 71.2, "d": 0.138}, {"x": 37.24, "q": 202.1, "y": 16911.0, "sel": 69.6, "d": 0.123}, {"x": 37.24, "q": 218.6, "y": 17224.0, "sel": 68.4, "d": 0.117}, {"x": 37.24, "q": 235.2, "y": 17605.0, "sel": 68.1, "d": 0.121}, {"x": 37.24, "q": 251.7, "y": 18070.0, "sel": 68.8, "d": 0.135}, {"x": 37.24, "q": 268.3, "y": 18589.0, "sel": 69.9, "d": 0.154}, {"x": 37.24, "q": 284.8, "y": 19120.0, "sel": 71.1, "d": 0.179}, {"x": 37.24, "q": 301.4, "y": 19633.0, "sel": 72.1, "d": 0.206}, {"x": 37.24, "q": 317.9, "y": 20112.0, "sel": 72.9, "d": 0.235}, {"x": 37.24, "q": 334.5, "y": 20554.0, "sel": 73.6, "d": 0.266}, {"x": 37.24, "q": 351.0, "y": 20958.0, "sel": 74.2, "d": 0.297}, {"x": 37.24, "q": 367.6, "y": 21324.0, "sel": 74.6, "d": 0.329}, {"x": 37.24, "q": 384.1, "y": 21656.0, "sel": 74.9, "d": 0.362}, {"x": 37.24, "q": 400.7, "y": 21956.0, "sel": 75.2, "d": 0.394}, {"x": 37.24, "q": 417.2, "y": 22227.0, "sel": 75.5, "d": 0.427}, {"x": 37.24, "q": 433.8, "y": 22470.0, "sel": 75.7, "d": 0.461}, {"x": 37.24, "q": 450.3, "y": 22688.0, "sel": 75.8, "d": 0.494}, {"x": 37.24, "q": 466.9, "y": 22884.0, "sel": 76.0, "d": 0.528}, {"x": 37.24, "q": 483.4, "y": 23060.0, "sel": 76.1, "d": 0.561}, {"x": 37.24, "q": 500.0, "y": 23217.0, "sel": 76.2, "d": 0.595}, {"x": 39.66, "q": 20.0, "y": 14625.0, "sel": 73.5, "d": 0.148}, {"x": 39.66, "q": 36.6, "y": 14772.0, "sel": 73.7, "d": 0.132}, {"x": 39.66, "q": 53.1, "y": 15057.0, "sel": 73.9, "d": 0.098}, {"x": 39.66, "q": 69.7, "y": 15581.0, "sel": 74.0, "d": 0.063}, {"x": 39.66, "q": 86.2, "y": 16773.0, "sel": 74.0, "d": 0.029}, {"x": 39.66, "q": 102.8, "y": 17455.0, "sel": 74.0, "d": 0.008}, {"x": 39.66, "q": 119.3, "y": 16409.0, "sel": 74.0, "d": 0.041}, {"x": 39.66, "q": 135.9, "y": 15798.0, "sel": 73.8, "d": 0.075}, {"x": 39.66, "q": 152.4, "y": 15835.0, "sel": 73.3, "d": 0.109}, {"x": 39.66, "q": 169.0, "y": 16091.0, "sel": 72.0, "d": 0.135}, {"x": 39.66, "q": 185.5, "y": 16366.0, "sel": 69.7, "d": 0.11}, {"x": 39.66, "q": 202.1, "y": 16578.0, "sel": 66.3, "d": 0.091}, {"x": 39.66, "q": 218.6, "y": 16816.0, "sel": 63.7, "d": 0.083}, {"x": 39.66, "q": 235.2, "y": 17215.0, "sel": 63.8, "d": 0.089}, {"x": 39.66, "q": 251.7, "y": 17789.0, "sel": 65.8, "d": 0.106}, {"x": 39.66, "q": 268.3, "y": 18441.0, "sel": 68.2, "d": 0.13}, {"x": 39.66, "q": 284.8, "y": 19081.0, "sel": 70.1, "d": 0.158}, {"x": 39.66, "q": 301.4, "y": 19673.0, "sel": 71.6, "d": 0.189}, {"x": 39.66, "q": 317.9, "y": 20206.0, "sel": 72.7, "d": 0.22}, {"x": 39.66, "q": 334.5, "y": 20684.0, "sel": 73.5, "d": 0.252}, {"x": 39.66, "q": 351.0, "y": 21111.0, "sel": 74.1, "d": 0.285}, {"x": 39.66, "q": 367.6, "y": 21493.0, "sel": 74.6, "d": 0.318}, {"x": 39.66, "q": 384.1, "y": 21835.0, "sel": 75.0, "d": 0.352}, {"x": 39.66, "q": 400.7, "y": 22140.0, "sel": 75.3, "d": 0.385}, {"x": 39.66, "q": 417.2, "y": 22413.0, "sel": 75.5, "d": 0.419}, {"x": 39.66, "q": 433.8, "y": 22656.0, "sel": 75.7, "d": 0.453}, {"x": 39.66, "q": 450.3, "y": 22873.0, "sel": 75.9, "d": 0.487}, {"x": 39.66, "q": 466.9, "y": 23065.0, "sel": 76.0, "d": 0.521}, {"x": 39.66, "q": 483.4, "y": 23237.0, "sel": 76.1, "d": 0.555}, {"x": 39.66, "q": 500.0, "y": 23388.0, "sel": 76.2, "d": 0.589}, {"x": 42.07, "q": 20.0, "y": 13526.0, "sel": 72.8, "d": 0.113}, {"x": 42.07, "q": 36.6, "y": 13934.0, "sel": 73.3, "d": 0.118}, {"x": 42.07, "q": 53.1, "y": 14415.0, "sel": 73.8, "d": 0.102}, {"x": 42.07, "q": 69.7, "y": 14855.0, "sel": 74.1, "d": 0.07}, {"x": 42.07, "q": 86.2, "y": 15633.0, "sel": 74.1, "d": 0.041}, {"x": 42.07, "q": 102.8, "y": 16229.0, "sel": 74.1, "d": 0.03}, {"x": 42.07, "q": 119.3, "y": 15485.0, "sel": 74.1, "d": 0.05}, {"x": 42.07, "q": 135.9, "y": 15247.0, "sel": 74.0, "d": 0.08}, {"x": 42.07, "q": 152.4, "y": 15476.0, "sel": 73.3, "d": 0.113}, {"x": 42.07, "q": 169.0, "y": 15833.0, "sel": 71.6, "d": 0.115}, {"x": 42.07, "q": 185.5, "y": 16061.0, "sel": 67.3, "d": 0.087}, {"x": 42.07, "q": 202.1, "y": 16034.0, "sel": 59.7, "d": 0.061}, {"x": 42.07, "q": 218.6, "y": 16173.0, "sel": 54.0, "d": 0.048}, {"x": 42.07, "q": 235.2, "y": 16635.0, "sel": 56.2, "d": 0.058}, {"x": 42.07, "q": 251.7, "y": 17422.0, "sel": 61.8, "d": 0.082}, {"x": 42.07, "q": 268.3, "y": 18298.0, "sel": 66.3, "d": 0.112}, {"x": 42.07, "q": 284.8, "y": 19088.0, "sel": 69.3, "d": 0.143}, {"x": 42.07, "q": 301.4, "y": 19769.0, "sel": 71.2, "d": 0.176}, {"x": 42.07, "q": 317.9, "y": 20355.0, "sel": 72.5, "d": 0.21}, {"x": 42.07, "q": 334.5, "y": 20864.0, "sel": 73.5, "d": 0.243}, {"x": 42.07, "q": 351.0, "y": 21310.0, "sel": 74.1, "d": 0.277}, {"x": 42.07, "q": 367.6, "y": 21703.0, "sel": 74.7, "d": 0.311}, {"x": 42.07, "q": 384.1, "y": 22050.0, "sel": 75.0, "d": 0.345}, {"x": 42.07, "q": 400.7, "y": 22357.0, "sel": 75.3, "d": 0.38}, {"x": 42.07, "q": 417.2, "y": 22629.0, "sel": 75.6, "d": 0.414}, {"x": 42.07, "q": 433.8, "y": 22869.0, "sel": 75.8, "d": 0.448}, {"x": 42.07, "q": 450.3, "y": 23081.0, "sel": 75.9, "d": 0.482}, {"x": 42.07, "q": 466.9, "y": 23268.0, "sel": 76.0, "d": 0.517}, {"x": 42.07, "q": 483.4, "y": 23432.0, "sel": 76.1, "d": 0.551}, {"x": 42.07, "q": 500.0, "y": 23576.0, "sel": 76.2, "d": 0.585}, {"x": 44.48, "q": 20.0, "y": 11485.0, "sel": 71.3, "d": 0.079}, {"x": 44.48, "q": 36.6, "y": 12605.0, "sel": 72.4, "d": 0.086}, {"x": 44.48, "q": 53.1, "y": 13692.0, "sel": 73.6, "d": 0.105}, {"x": 44.48, "q": 69.7, "y": 14071.0, "sel": 74.1, "d": 0.09}, {"x": 44.48, "q": 86.2, "y": 14118.0, "sel": 74.3, "d": 0.07}, {"x": 44.48, "q": 102.8, "y": 14156.0, "sel": 74.3, "d": 0.064}, {"x": 44.48, "q": 119.3, "y": 14292.0, "sel": 74.3, "d": 0.076}, {"x": 44.48, "q": 135.9, "y": 14628.0, "sel": 74.1, "d": 0.098}, {"x": 44.48, "q": 152.4, "y": 15130.0, "sel": 73.5, "d": 0.127}, {"x": 44.48, "q": 169.0, "y": 15632.0, "sel": 71.4, "d": 0.1}, {"x": 44.48, "q": 185.5, "y": 15729.0, "sel": 64.7, "d": 0.068}, {"x": 44.48, "q": 202.1, "y": 14957.0, "sel": 50.0, "d": 0.04}, {"x": 44.48, "q": 218.6, "y": 16300.0, "sel": 40.7, "d": 0.014}, {"x": 44.48, "q": 235.2, "y": 16105.0, "sel": 47.4, "d": 0.034}, {"x": 44.48, "q": 251.7, "y": 17096.0, "sel": 58.2, "d": 0.068}, {"x": 44.48, "q": 268.3, "y": 18259.0, "sel": 65.0, "d": 0.102}, {"x": 44.48, "q": 284.8, "y": 19199.0, "sel": 68.9, "d": 0.136}, {"x": 44.48, "q": 301.4, "y": 19954.0, "sel": 71.1, "d": 0.17}, {"x": 44.48, "q": 317.9, "y": 20578.0, "sel": 72.6, "d": 0.204}, {"x": 44.48, "q": 334.5, "y": 21107.0, "sel": 73.6, "d": 0.239}, {"x": 44.48, "q": 351.0, "y": 21563.0, "sel": 74.3, "d": 0.273}, {"x": 44.48, "q": 367.6, "y": 21959.0, "sel": 74.8, "d": 0.308}, {"x": 44.48, "q": 384.1, "y": 22306.0, "sel": 75.2, "d": 0.342}, {"x": 44.48, "q": 400.7, "y": 22610.0, "sel": 75.4, "d": 0.377}, {"x": 44.48, "q": 417.2, "y": 22876.0, "sel": 75.7, "d": 0.411}, {"x": 44.48, "q": 433.8, "y": 23110.0, "sel": 75.8, "d": 0.446}, {"x": 44.48, "q": 450.3, "y": 23314.0, "sel": 76.0, "d": 0.48}, {"x": 44.48, "q": 466.9, "y": 23492.0, "sel": 76.1, "d": 0.515}, {"x": 44.48, "q": 483.4, "y": 23646.0, "sel": 76.2, "d": 0.549}, {"x": 44.48, "q": 500.0, "y": 23781.0, "sel": 76.3, "d": 0.583}, {"x": 46.9, "q": 20.0, "y": 7343.0, "sel": 67.9, "d": 0.044}, {"x": 46.9, "q": 36.6, "y": 10201.0, "sel": 70.5, "d": 0.056}, {"x": 46.9, "q": 53.1, "y": 13048.0, "sel": 73.3, "d": 0.082}, {"x": 46.9, "q": 69.7, "y": 13656.0, "sel": 74.2, "d": 0.077}, {"x": 46.9, "q": 86.2, "y": 13512.0, "sel": 74.3, "d": 0.053}, {"x": 46.9, "q": 102.8, "y": 13447.0, "sel": 74.3, "d": 0.045}, {"x": 46.9, "q": 119.3, "y": 13681.0, "sel": 74.3, "d": 0.06}, {"x": 46.9, "q": 135.9, "y": 14219.0, "sel": 74.3, "d": 0.087}, {"x": 46.9, "q": 152.4, "y": 14933.0, "sel": 73.8, "d": 0.118}, {"x": 46.9, "q": 169.0, "y": 15599.0, "sel": 71.9, "d": 0.096}, {"x": 46.9, "q": 185.5, "y": 15669.0, "sel": 64.8, "d": 0.062}, {"x": 46.9, "q": 202.1, "y": 13545.0, "sel": 46.5, "d": 0.027}, {"x": 46.9, "q": 218.6, "y": 11545.0, "sel": 37.4, "d": 0.009}, {"x": 46.9, "q": 235.2, "y": 15465.0, "sel": 47.5, "d": 0.038}, {"x": 46.9, "q": 251.7, "y": 17141.0, "sel": 58.6, "d": 0.069}, {"x": 46.9, "q": 268.3, "y": 18481.0, "sel": 65.5, "d": 0.103}, {"x": 46.9, "q": 284.8, "y": 19481.0, "sel": 69.3, "d": 0.137}, {"x": 46.9, "q": 301.4, "y": 20259.0, "sel": 71.5, "d": 0.171}, {"x": 46.9, "q": 317.9, "y": 20892.0, "sel": 72.9, "d": 0.205}, {"x": 46.9, "q": 334.5, "y": 21422.0, "sel": 73.8, "d": 0.239}, {"x": 46.9, "q": 351.0, "y": 21875.0, "sel": 74.5, "d": 0.274}, {"x": 46.9, "q": 367.6, "y": 22266.0, "sel": 75.0, "d": 0.308}, {"x": 46.9, "q": 384.1, "y": 22605.0, "sel": 75.3, "d": 0.343}, {"x": 46.9, "q": 400.7, "y": 22900.0, "sel": 75.6, "d": 0.377}, {"x": 46.9, "q": 417.2, "y": 23156.0, "sel": 75.8, "d": 0.411}, {"x": 46.9, "q": 433.8, "y": 23379.0, "sel": 75.9, "d": 0.446}, {"x": 46.9, "q": 450.3, "y": 23572.0, "sel": 76.1, "d": 0.48}, {"x": 46.9, "q": 466.9, "y": 23738.0, "sel": 76.2, "d": 0.515}, {"x": 46.9, "q": 483.4, "y": 23880.0, "sel": 76.2, "d": 0.549}, {"x": 46.9, "q": 500.0, "y": 24002.0, "sel": 76.3, "d": 0.584}, {"x": 49.31, "q": 20.0, "y": 2815.0, "sel": 64.1, "d": 0.01}, {"x": 49.31, "q": 36.6, "y": 7221.0, "sel": 67.9, "d": 0.036}, {"x": 49.31, "q": 53.1, "y": 12744.0, "sel": 73.1, "d": 0.07}, {"x": 49.31, "q": 69.7, "y": 13578.0, "sel": 74.2, "d": 0.064}, {"x": 49.31, "q": 86.2, "y": 13311.0, "sel": 74.3, "d": 0.03}, {"x": 49.31, "q": 102.8, "y": 13214.0, "sel": 74.3, "d": 0.011}, {"x": 49.31, "q": 119.3, "y": 13459.0, "sel": 74.3, "d": 0.041}, {"x": 49.31, "q": 135.9, "y": 14128.0, "sel": 74.4, "d": 0.075}, {"x": 49.31, "q": 152.4, "y": 15015.0, "sel": 74.2, "d": 0.11}, {"x": 49.31, "q": 169.0, "y": 15842.0, "sel": 72.9, "d": 0.104}, {"x": 49.31, "q": 185.5, "y": 16220.0, "sel": 68.5, "d": 0.073}, {"x": 49.31, "q": 202.1, "y": 15519.0, "sel": 58.7, "d": 0.048}, {"x": 49.31, "q": 218.6, "y": 14984.0, "sel": 52.2, "d": 0.041}, {"x": 49.31, "q": 235.2, "y": 16372.0, "sel": 56.7, "d": 0.058}, {"x": 49.31, "q": 251.7, "y": 17866.0, "sel": 63.1, "d": 0.086}, {"x": 49.31, "q": 268.3, "y": 19045.0, "sel": 67.6, "d": 0.115}, {"x": 49.31, "q": 284.8, "y": 19962.0, "sel": 70.5, "d": 0.146}, {"x": 49.31, "q": 301.4, "y": 20696.0, "sel": 72.2, "d": 0.178}, {"x": 49.31, "q": 317.9, "y": 21301.0, "sel": 73.4, "d": 0.211}, {"x": 49.31, "q": 334.5, "y": 21812.0, "sel": 74.2, "d": 0.245}, {"x": 49.31, "q": 351.0, "y": 22248.0, "sel": 74.8, "d": 0.279}, {"x": 49.31, "q": 367.6, "y": 22623.0, "sel": 75.2, "d": 0.312}, {"x": 49.31, "q": 384.1, "y": 22948.0, "sel": 75.5, "d": 0.346}, {"x": 49.31, "q": 400.7, "y": 23228.0, "sel": 75.7, "d": 0.38}, {"x": 49.31, "q": 417.2, "y": 23470.0, "sel": 75.9, "d": 0.415}, {"x": 49.31, "q": 433.8, "y": 23678.0, "sel": 76.0, "d": 0.449}, {"x": 49.31, "q": 450.3, "y": 23856.0, "sel": 76.1, "d": 0.483}, {"x": 49.31, "q": 466.9, "y": 24007.0, "sel": 76.2, "d": 0.517}, {"x": 49.31, "q": 483.4, "y": 24134.0, "sel": 76.3, "d": 0.552}, {"x": 49.31, "q": 500.0, "y": 24240.0, "sel": 76.3, "d": 0.581}, {"x": 51.72, "q": 20.0, "y": 4433.0, "sel": 65.5, "d": 0.025}, {"x": 51.72, "q": 36.6, "y": 8773.0, "sel": 69.2, "d": 0.042}, {"x": 51.72, "q": 53.1, "y": 13339.0, "sel": 73.5, "d": 0.073}, {"x": 51.72, "q": 69.7, "y": 13926.0, "sel": 74.4, "d": 0.068}, {"x": 51.72, "q": 86.2, "y": 13487.0, "sel": 74.4, "d": 0.038}, {"x": 51.72, "q": 102.8, "y": 13326.0, "sel": 74.3, "d": 0.025}, {"x": 51.72, "q": 119.3, "y": 13706.0, "sel": 74.5, "d": 0.047}, {"x": 51.72, "q": 135.9, "y": 14557.0, "sel": 74.7, "d": 0.079}, {"x": 51.72, "q": 152.4, "y": 15551.0, "sel": 74.7, "d": 0.112}, {"x": 51.72, "q": 169.0, "y": 16444.0, "sel": 74.0, "d": 0.121}, {"x": 51.72, "q": 185.5, "y": 17065.0, "sel": 71.9, "d": 0.097}, {"x": 51.72, "q": 202.1, "y": 17297.0, "sel": 68.3, "d": 0.079}, {"x": 51.72, "q": 218.6, "y": 17474.0, "sel": 65.5, "d": 0.075}, {"x": 51.72, "q": 235.2, "y": 18096.0, "sel": 65.9, "d": 0.086}, {"x": 51.72, "q": 251.7, "y": 18981.0, "sel": 68.1, "d": 0.107}, {"x": 51.72, "q": 268.3, "y": 19847.0, "sel": 70.3, "d": 0.134}, {"x": 51.72, "q": 284.8, "y": 20604.0, "sel": 72.0, "d": 0.162}, {"x": 51.72, "q": 301.4, "y": 21250.0, "sel": 73.2, "d": 0.192}, {"x": 51.72, "q": 317.9, "y": 21801.0, "sel": 74.1, "d": 0.223}, {"x": 51.72, "q": 334.5, "y": 22273.0, "sel": 74.7, "d": 0.255}, {"x": 51.72, "q": 351.0, "y": 22681.0, "sel": 75.2, "d": 0.287}, {"x": 51.72, "q": 367.6, "y": 23032.0, "sel": 75.5, "d": 0.32}, {"x": 51.72, "q": 384.1, "y": 23335.0, "sel": 75.7, "d": 0.354}, {"x": 51.72, "q": 400.7, "y": 23595.0, "sel": 75.9, "d": 0.387}, {"x": 51.72, "q": 417.2, "y": 23818.0, "sel": 76.1, "d": 0.421}, {"x": 51.72, "q": 433.8, "y": 24007.0, "sel": 76.2, "d": 0.454}, {"x": 51.72, "q": 450.3, "y": 24165.0, "sel": 76.2, "d": 0.488}, {"x": 51.72, "q": 466.9, "y": 24297.0, "sel": 76.3, "d": 0.522}, {"x": 51.72, "q": 483.4, "y": 24406.0, "sel": 76.3, "d": 0.548}, {"x": 51.72, "q": 500.0, "y": 24494.0, "sel": 76.3, "d": 0.547}, {"x": 54.14, "q": 20.0, "y": 10879.0, "sel": 70.6, "d": 0.059}, {"x": 54.14, "q": 36.6, "y": 13039.0, "sel": 72.6, "d": 0.068}, {"x": 54.14, "q": 53.1, "y": 14969.0, "sel": 74.5, "d": 0.091}, {"x": 54.14, "q": 69.7, "y": 15295.0, "sel": 75.1, "d": 0.087}, {"x": 54.14, "q": 86.2, "y": 14946.0, "sel": 75.1, "d": 0.066}, {"x": 54.14, "q": 102.8, "y": 14798.0, "sel": 75.0, "d": 0.059}, {"x": 54.14, "q": 119.3, "y": 15224.0, "sel": 75.2, "d": 0.072}, {"x": 54.14, "q": 135.9, "y": 15955.0, "sel": 75.3, "d": 0.095}, {"x": 54.14, "q": 152.4, "y": 16736.0, "sel": 75.3, "d": 0.124}, {"x": 54.14, "q": 169.0, "y": 17469.0, "sel": 75.0, "d": 0.145}, {"x": 54.14, "q": 185.5, "y": 18086.0, "sel": 74.0, "d": 0.125}, {"x": 54.14, "q": 202.1, "y": 18555.0, "sel": 72.6, "d": 0.112}, {"x": 54.14, "q": 218.6, "y": 18969.0, "sel": 71.4, "d": 0.109}, {"x": 54.14, "q": 235.2, "y": 19475.0, "sel": 71.1, "d": 0.117}, {"x": 54.14, "q": 251.7, "y": 20089.0, "sel": 71.7, "d": 0.133}, {"x": 54.14, "q": 268.3, "y": 20732.0, "sel": 72.6, "d": 0.156}, {"x": 54.14, "q": 284.8, "y": 21340.0, "sel": 73.5, "d": 0.182}, {"x": 54.14, "q": 301.4, "y": 21889.0, "sel": 74.2, "d": 0.21}, {"x": 54.14, "q": 317.9, "y": 22374.0, "sel": 74.8, "d": 0.239}, {"x": 54.14, "q": 334.5, "y": 22799.0, "sel": 75.2, "d": 0.269}, {"x": 54.14, "q": 351.0, "y": 23169.0, "sel": 75.5, "d": 0.3}, {"x": 54.14, "q": 367.6, "y": 23489.0, "sel": 75.8, "d": 0.332}, {"x": 54.14, "q": 384.1, "y": 23765.0, "sel": 76.0, "d": 0.364}, {"x": 54.14, "q": 400.7, "y": 24000.0, "sel": 76.1, "d": 0.396}, {"x": 54.14, "q": 417.2, "y": 24199.0, "sel": 76.2, "d": 0.429}, {"x": 54.14, "q": 433.8, "y": 24365.0, "sel": 76.3, "d": 0.462}, {"x": 54.14, "q": 450.3, "y": 24500.0, "sel": 76.3, "d": 0.496}, {"x": 54.14, "q": 466.9, "y": 24610.0, "sel": 76.3, "d": 0.517}, {"x": 54.14, "q": 483.4, "y": 24696.0, "sel": 76.3, "d": 0.513}, {"x": 54.14, "q": 500.0, "y": 24763.0, "sel": 76.4, "d": 0.512}, {"x": 56.55, "q": 20.0, "y": 15374.0, "sel": 74.0, "d": 0.094}, {"x": 56.55, "q": 36.6, "y": 16317.0, "sel": 74.9, "d": 0.1}, {"x": 56.55, "q": 53.1, "y": 17347.0, "sel": 75.9, "d": 0.109}, {"x": 56.55, "q": 69.7, "y": 18235.0, "sel": 76.6, "d": 0.08}, {"x": 56.55, "q": 86.2, "y": 19352.0, "sel": 77.4, "d": 0.057}, {"x": 56.55, "q": 102.8, "y": 19941.0, "sel": 77.7, "d": 0.05}, {"x": 56.55, "q": 119.3, "y": 19133.0, "sel": 77.2, "d": 0.064}, {"x": 56.55, "q": 135.9, "y": 18523.0, "sel": 76.7, "d": 0.089}, {"x": 56.55, "q": 152.4, "y": 18530.0, "sel": 76.3, "d": 0.12}, {"x": 56.55, "q": 169.0, "y": 18857.0, "sel": 76.0, "d": 0.152}, {"x": 56.55, "q": 185.5, "y": 19290.0, "sel": 75.5, "d": 0.156}, {"x": 56.55, "q": 202.1, "y": 19729.0, "sel": 74.8, "d": 0.146}, {"x": 56.55, "q": 218.6, "y": 20163.0, "sel": 74.2, "d": 0.144}, {"x": 56.55, "q": 235.2, "y": 20622.0, "sel": 73.9, "d": 0.149}, {"x": 56.55, "q": 251.7, "y": 21118.0, "sel": 74.0, "d": 0.163}, {"x": 56.55, "q": 268.3, "y": 21628.0, "sel": 74.3, "d": 0.181}, {"x": 56.55, "q": 284.8, "y": 22125.0, "sel": 74.7, "d": 0.204}, {"x": 56.55, "q": 301.4, "y": 22587.0, "sel": 75.1, "d": 0.23}, {"x": 56.55, "q": 317.9, "y": 23006.0, "sel": 75.5, "d": 0.258}, {"x": 56.55, "q": 334.5, "y": 23379.0, "sel": 75.7, "d": 0.286}, {"x": 56.55, "q": 351.0, "y": 23707.0, "sel": 75.9, "d": 0.316}, {"x": 56.55, "q": 367.6, "y": 23992.0, "sel": 76.1, "d": 0.346}, {"x": 56.55, "q": 384.1, "y": 24236.0, "sel": 76.2, "d": 0.377}, {"x": 56.55, "q": 400.7, "y": 24442.0, "sel": 76.3, "d": 0.408}, {"x": 56.55, "q": 417.2, "y": 24613.0, "sel": 76.3, "d": 0.44}, {"x": 56.55, "q": 433.8, "y": 24752.0, "sel": 76.3, "d": 0.473}, {"x": 56.55, "q": 450.3, "y": 24860.0, "sel": 76.4, "d": 0.489}, {"x": 56.55, "q": 466.9, "y": 24943.0, "sel": 76.4, "d": 0.483}, {"x": 56.55, "q": 483.4, "y": 25003.0, "sel": 76.4, "d": 0.479}, {"x": 56.55, "q": 500.0, "y": 25044.0, "sel": 76.3, "d": 0.478}, {"x": 58.97, "q": 20.0, "y": 18171.0, "sel": 75.9, "d": 0.128}, {"x": 58.97, "q": 36.6, "y": 18807.0, "sel": 76.5, "d": 0.133}, {"x": 58.97, "q": 53.1, "y": 19764.0, "sel": 77.2, "d": 0.099}, {"x": 58.97, "q": 69.7, "y": 21238.0, "sel": 78.2, "d": 0.065}, {"x": 58.97, "q": 86.2, "y": 23358.0, "sel": 79.6, "d": 0.032}, {"x": 58.97, "q": 102.8, "y": 24211.0, "sel": 80.1, "d": 0.016}, {"x": 58.97, "q": 119.3, "y": 22739.0, "sel": 79.2, "d": 0.043}, {"x": 58.97, "q": 135.9, "y": 21104.0, "sel": 78.0, "d": 0.076}, {"x": 58.97, "q": 152.4, "y": 20448.0, "sel": 77.4, "d": 0.11}, {"x": 58.97, "q": 169.0, "y": 20388.0, "sel": 76.9, "d": 0.144}, {"x": 58.97, "q": 185.5, "y": 20599.0, "sel": 76.5, "d": 0.179}, {"x": 58.97, "q": 202.1, "y": 20922.0, "sel": 76.1, "d": 0.18}, {"x": 58.97, "q": 218.6, "y": 21291.0, "sel": 75.8, "d": 0.178}, {"x": 58.97, "q": 235.2, "y": 21688.0, "sel": 75.6, "d": 0.183}, {"x": 58.97, "q": 251.7, "y": 22103.0, "sel": 75.5, "d": 0.194}, {"x": 58.97, "q": 268.3, "y": 22525.0, "sel": 75.6, "d": 0.21}, {"x": 58.97, "q": 284.8, "y": 22936.0, "sel": 75.7, "d": 0.23}, {"x": 58.97, "q": 301.4, "y": 23325.0, "sel": 75.9, "d": 0.253}, {"x": 58.97, "q": 317.9, "y": 23683.0, "sel": 76.1, "d": 0.279}, {"x": 58.97, "q": 334.5, "y": 24004.0, "sel": 76.2, "d": 0.306}, {"x": 58.97, "q": 351.0, "y": 24289.0, "sel": 76.3, "d": 0.334}, {"x": 58.97, "q": 367.6, "y": 24536.0, "sel": 76.4, "d": 0.363}, {"x": 58.97, "q": 384.1, "y": 24746.0, "sel": 76.4, "d": 0.393}, {"x": 58.97, "q": 400.7, "y": 24920.0, "sel": 76.4, "d": 0.423}, {"x": 58.97, "q": 417.2, "y": 25060.0, "sel": 76.4, "d": 0.445}, {"x": 58.97, "q": 433.8, "y": 25167.0, "sel": 76.4, "d": 0.449}, {"x": 58.97, "q": 450.3, "y": 25245.0, "sel": 76.4, "d": 0.455}, {"x": 58.97, "q": 466.9, "y": 25296.0, "sel": 76.4, "d": 0.449}, {"x": 58.97, "q": 483.4, "y": 25324.0, "sel": 76.3, "d": 0.445}, {"x": 58.97, "q": 500.0, "y": 25335.0, "sel": 76.3, "d": 0.443}, {"x": 61.38, "q": 20.0, "y": 20172.0, "sel": 77.2, "d": 0.163}, {"x": 61.38, "q": 36.6, "y": 20741.0, "sel": 77.6, "d": 0.134}, {"x": 61.38, "q": 53.1, "y": 21604.0, "sel": 78.2, "d": 0.1}, {"x": 61.38, "q": 69.7, "y": 22800.0, "sel": 79.0, "d": 0.066}, {"x": 61.38, "q": 86.2, "y": 23994.0, "sel": 79.8, "d": 0.035}, {"x": 61.38, "q": 102.8, "y": 24324.0, "sel": 80.1, "d": 0.021}, {"x": 61.38, "q": 119.3, "y": 23733.0, "sel": 79.6, "d": 0.045}, {"x": 61.38, "q": 135.9, "y": 22714.0, "sel": 78.8, "d": 0.077}, {"x": 61.38, "q": 152.4, "y": 22066.0, "sel": 78.2, "d": 0.111}, {"x": 61.38, "q": 169.0, "y": 21850.0, "sel": 77.8, "d": 0.145}, {"x": 61.38, "q": 185.5, "y": 21908.0, "sel": 77.4, "d": 0.179}, {"x": 61.38, "q": 202.1, "y": 22116.0, "sel": 77.1, "d": 0.214}, {"x": 61.38, "q": 218.6, "y": 22401.0, "sel": 76.8, "d": 0.213}, {"x": 61.38, "q": 235.2, "y": 22727.0, "sel": 76.6, "d": 0.217}, {"x": 61.38, "q": 251.7, "y": 23072.0, "sel": 76.5, "d": 0.226}, {"x": 61.38, "q": 268.3, "y": 23423.0, "sel": 76.5, "d": 0.24}, {"x": 61.38, "q": 284.8, "y": 23766.0, "sel": 76.5, "d": 0.257}, {"x": 61.38, "q": 301.4, "y": 24093.0, "sel": 76.5, "d": 0.278}, {"x": 61.38, "q": 317.9, "y": 24395.0, "sel": 76.6, "d": 0.302}, {"x": 61.38, "q": 334.5, "y": 24669.0, "sel": 76.6, "d": 0.327}, {"x": 61.38, "q": 351.0, "y": 24911.0, "sel": 76.6, "d": 0.354}, {"x": 61.38, "q": 367.6, "y": 25121.0, "sel": 76.6, "d": 0.382}, {"x": 61.38, "q": 384.1, "y": 25295.0, "sel": 76.6, "d": 0.41}, {"x": 61.38, "q": 400.7, "y": 25435.0, "sel": 76.6, "d": 0.409}, {"x": 61.38, "q": 417.2, "y": 25540.0, "sel": 76.5, "d": 0.41}, {"x": 61.38, "q": 433.8, "y": 25612.0, "sel": 76.5, "d": 0.415}, {"x": 61.38, "q": 450.3, "y": 25653.0, "sel": 76.4, "d": 0.422}, {"x": 61.38, "q": 466.9, "y": 25666.0, "sel": 76.3, "d": 0.415}, {"x": 61.38, "q": 483.4, "y": 25658.0, "sel": 76.3, "d": 0.41}, {"x": 61.38, "q": 500.0, "y": 25633.0, "sel": 76.2, "d": 0.409}, {"x": 63.79, "q": 20.0, "y": 21715.0, "sel": 78.1, "d": 0.168}, {"x": 63.79, "q": 36.6, "y": 22266.0, "sel": 78.5, "d": 0.133}, {"x": 63.79, "q": 53.1, "y": 23034.0, "sel": 79.0, "d": 0.099}, {"x": 63.79, "q": 69.7, "y": 24037.0, "sel": 79.5, "d": 0.066}, {"x": 63.79, "q": 86.2, "y": 25529.0, "sel": 79.9, "d": 0.034}, {"x": 63.79, "q": 102.8, "y": 26924.0, "sel": 80.0, "d": 0.018}, {"x": 63.79, "q": 119.3, "y": 25018.0, "sel": 79.8, "d": 0.044}, {"x": 63.79, "q": 135.9, "y": 23993.0, "sel": 79.4, "d": 0.077}, {"x": 63.79, "q": 152.4, "y": 23430.0, "sel": 78.9, "d": 0.111}, {"x": 63.79, "q": 169.0, "y": 23177.0, "sel": 78.5, "d": 0.145}, {"x": 63.79, "q": 185.5, "y": 23151.0, "sel": 78.2, "d": 0.179}, {"x": 63.79, "q": 202.1, "y": 23275.0, "sel": 77.9, "d": 0.213}, {"x": 63.79, "q": 218.6, "y": 23486.0, "sel": 77.6, "d": 0.247}, {"x": 63.79, "q": 235.2, "y": 23747.0, "sel": 77.4, "d": 0.25}, {"x": 63.79, "q": 251.7, "y": 24031.0, "sel": 77.3, "d": 0.258}, {"x": 63.79, "q": 268.3, "y": 24323.0, "sel": 77.2, "d": 0.271}, {"x": 63.79, "q": 284.8, "y": 24610.0, "sel": 77.1, "d": 0.287}, {"x": 63.79, "q": 301.4, "y": 24884.0, "sel": 77.0, "d": 0.306}, {"x": 63.79, "q": 317.9, "y": 25139.0, "sel": 77.0, "d": 0.327}, {"x": 63.79, "q": 334.5, "y": 25369.0, "sel": 76.9, "d": 0.351}, {"x": 63.79, "q": 351.0, "y": 25572.0, "sel": 76.9, "d": 0.376}, {"x": 63.79, "q": 367.6, "y": 25745.0, "sel": 76.8, "d": 0.38}, {"x": 63.79, "q": 384.1, "y": 25884.0, "sel": 76.7, "d": 0.376}, {"x": 63.79, "q": 400.7, "y": 25989.0, "sel": 76.6, "d": 0.374}, {"x": 63.79, "q": 417.2, "y": 26056.0, "sel": 76.5, "d": 0.376}, {"x": 63.79, "q": 433.8, "y": 26087.0, "sel": 76.4, "d": 0.381}, {"x": 63.79, "q": 450.3, "y": 26085.0, "sel": 76.3, "d": 0.388}, {"x": 63.79, "q": 466.9, "y": 26053.0, "sel": 76.3, "d": 0.381}, {"x": 63.79, "q": 483.4, "y": 26000.0, "sel": 76.2, "d": 0.376}, {"x": 63.79, "q": 500.0, "y": 25932.0, "sel": 76.1, "d": 0.374}, {"x": 66.21, "q": 20.0, "y": 22924.0, "sel": 78.8, "d": 0.168}, {"x": 66.21, "q": 36.6, "y": 23487.0, "sel": 79.2, "d": 0.133}, {"x": 66.21, "q": 53.1, "y": 24241.0, "sel": 79.6, "d": 0.099}, {"x": 66.21, "q": 69.7, "y": 25220.0, "sel": 80.2, "d": 0.066}, {"x": 66.21, "q": 86.2, "y": 26545.0, "sel": 80.5, "d": 0.034}, {"x": 66.21, "q": 102.8, "y": 27482.0, "sel": 80.3, "d": 0.018}, {"x": 66.21, "q": 119.3, "y": 26145.0, "sel": 80.5, "d": 0.044}, {"x": 66.21, "q": 135.9, "y": 25189.0, "sel": 80.0, "d": 0.077}, {"x": 66.21, "q": 152.4, "y": 24634.0, "sel": 79.5, "d": 0.111}, {"x": 66.21, "q": 169.0, "y": 24362.0, "sel": 79.1, "d": 0.145}, {"x": 66.21, "q": 185.5, "y": 24296.0, "sel": 78.8, "d": 0.179}, {"x": 66.21, "q": 202.1, "y": 24369.0, "sel": 78.5, "d": 0.213}, {"x": 66.21, "q": 218.6, "y": 24530.0, "sel": 78.2, "d": 0.248}, {"x": 66.21, "q": 235.2, "y": 24742.0, "sel": 78.0, "d": 0.282}, {"x": 66.21, "q": 251.7, "y": 24979.0, "sel": 77.8, "d": 0.292}, {"x": 66.21, "q": 268.3, "y": 25225.0, "sel": 77.7, "d": 0.302}, {"x": 66.21, "q": 284.8, "y": 25467.0, "sel": 77.5, "d": 0.317}, {"x": 66.21, "q": 301.4, "y": 25698.0, "sel": 77.4, "d": 0.334}, {"x": 66.21, "q": 317.9, "y": 25912.0, "sel": 77.3, "d": 0.342}, {"x": 66.21, "q": 334.5, "y": 26105.0, "sel": 77.2, "d": 0.347}, {"x": 66.21, "q": 351.0, "y": 26273.0, "sel": 77.1, "d": 0.355}, {"x": 66.21, "q": 367.6, "y": 26412.0, "sel": 77.0, "d": 0.347}, {"x": 66.21, "q": 384.1, "y": 26517.0, "sel": 76.8, "d": 0.342}, {"x": 66.21, "q": 400.7, "y": 26585.0, "sel": 76.7, "d": 0.34}, {"x": 66.21, "q": 417.2, "y": 26611.0, "sel": 76.5, "d": 0.342}, {"x": 66.21, "q": 433.8, "y": 26595.0, "sel": 76.4, "d": 0.347}, {"x": 66.21, "q": 450.3, "y": 26541.0, "sel": 76.2, "d": 0.355}, {"x": 66.21, "q": 466.9, "y": 26453.0, "sel": 76.1, "d": 0.347}, {"x": 66.21, "q": 483.4, "y": 26344.0, "sel": 76.0, "d": 0.342}, {"x": 66.21, "q": 500.0, "y": 26223.0, "sel": 75.9, "d": 0.34}, {"x": 68.62, "q": 20.0, "y": 23824.0, "sel": 79.3, "d": 0.168}, {"x": 68.62, "q": 36.6, "y": 24400.0, "sel": 79.7, "d": 0.134}, {"x": 68.62, "q": 53.1, "y": 25163.0, "sel": 80.2, "d": 0.1}, {"x": 68.62, "q": 69.7, "y": 26111.0, "sel": 81.0, "d": 0.066}, {"x": 68.62, "q": 86.2, "y": 27061.0, "sel": 82.0, "d": 0.035}, {"x": 68.62, "q": 102.8, "y": 27383.0, "sel": 82.5, "d": 0.021}, {"x": 68.62, "q": 119.3, "y": 26866.0, "sel": 81.6, "d": 0.045}, {"x": 68.62, "q": 135.9, "y": 26139.0, "sel": 80.7, "d": 0.077}, {"x": 68.62, "q": 152.4, "y": 25642.0, "sel": 80.1, "d": 0.111}, {"x": 68.62, "q": 169.0, "y": 25392.0, "sel": 79.6, "d": 0.145}, {"x": 68.62, "q": 185.5, "y": 25325.0, "sel": 79.2, "d": 0.179}, {"x": 68.62, "q": 202.1, "y": 25384.0, "sel": 78.9, "d": 0.214}, {"x": 68.62, "q": 218.6, "y": 25522.0, "sel": 78.6, "d": 0.248}, {"x": 68.62, "q": 235.2, "y": 25707.0, "sel": 78.4, "d": 0.282}, {"x": 68.62, "q": 251.7, "y": 25914.0, "sel": 78.2, "d": 0.305}, {"x": 68.62, "q": 268.3, "y": 26128.0, "sel": 78.0, "d": 0.308}, {"x": 68.62, "q": 284.8, "y": 26338.0, "sel": 77.9, "d": 0.307}, {"x": 68.62, "q": 301.4, "y": 26537.0, "sel": 77.7, "d": 0.305}, {"x": 68.62, "q": 317.9, "y": 26719.0, "sel": 77.6, "d": 0.308}, {"x": 68.62, "q": 334.5, "y": 26881.0, "sel": 77.4, "d": 0.314}, {"x": 68.62, "q": 351.0, "y": 27019.0, "sel": 77.2, "d": 0.322}, {"x": 68.62, "q": 367.6, "y": 27128.0, "sel": 77.0, "d": 0.313}, {"x": 68.62, "q": 384.1, "y": 27203.0, "sel": 76.8, "d": 0.307}, {"x": 68.62, "q": 400.7, "y": 27234.0, "sel": 76.6, "d": 0.305}, {"x": 68.62, "q": 417.2, "y": 27214.0, "sel": 76.4, "d": 0.308}, {"x": 68.62, "q": 433.8, "y": 27142.0, "sel": 76.2, "d": 0.313}, {"x": 68.62, "q": 450.3, "y": 27021.0, "sel": 76.1, "d": 0.322}, {"x": 68.62, "q": 466.9, "y": 26862.0, "sel": 75.9, "d": 0.313}, {"x": 68.62, "q": 483.4, "y": 26680.0, "sel": 75.7, "d": 0.307}, {"x": 68.62, "q": 500.0, "y": 26491.0, "sel": 75.6, "d": 0.305}, {"x": 71.03, "q": 20.0, "y": 24392.0, "sel": 79.7, "d": 0.143}, {"x": 71.03, "q": 36.6, "y": 24951.0, "sel": 80.0, "d": 0.131}, {"x": 71.03, "q": 53.1, "y": 25717.0, "sel": 80.5, "d": 0.099}, {"x": 71.03, "q": 69.7, "y": 26629.0, "sel": 81.2, "d": 0.065}, {"x": 71.03, "q": 86.2, "y": 27366.0, "sel": 82.2, "d": 0.032}, {"x": 71.03, "q": 102.8, "y": 27513.0, "sel": 82.6, "d": 0.016}, {"x": 71.03, "q": 119.3, "y": 27300.0, "sel": 81.9, "d": 0.043}, {"x": 71.03, "q": 135.9, "y": 26818.0, "sel": 81.0, "d": 0.076}, {"x": 71.03, "q": 152.4, "y": 26448.0, "sel": 80.4, "d": 0.11}, {"x": 71.03, "q": 169.0, "y": 26267.0, "sel": 80.0, "d": 0.144}, {"x": 71.03, "q": 185.5, "y": 26239.0, "sel": 79.6, "d": 0.179}, {"x": 71.03, "q": 202.1, "y": 26318.0, "sel": 79.2, "d": 0.213}, {"x": 71.03, "q": 218.6, "y": 26463.0, "sel": 78.9, "d": 0.248}, {"x": 71.03, "q": 235.2, "y": 26644.0, "sel": 78.7, "d": 0.272}, {"x": 71.03, "q": 251.7, "y": 26840.0, "sel": 78.5, "d": 0.271}, {"x": 71.03, "q": 268.3, "y": 27039.0, "sel": 78.3, "d": 0.274}, {"x": 71.03, "q": 284.8, "y": 27230.0, "sel": 78.1, "d": 0.273}, {"x": 71.03, "q": 301.4, "y": 27407.0, "sel": 77.9, "d": 0.271}, {"x": 71.03, "q": 317.9, "y": 27567.0, "sel": 77.7, "d": 0.273}, {"x": 71.03, "q": 334.5, "y": 27705.0, "sel": 77.5, "d": 0.28}, {"x": 71.03, "q": 351.0, "y": 27820.0, "sel": 77.3, "d": 0.29}, {"x": 71.03, "q": 367.6, "y": 27907.0, "sel": 77.0, "d": 0.279}, {"x": 71.03, "q": 384.1, "y": 27955.0, "sel": 76.8, "d": 0.273}, {"x": 71.03, "q": 400.7, "y": 27951.0, "sel": 76.5, "d": 0.271}, {"x": 71.03, "q": 417.2, "y": 27880.0, "sel": 76.3, "d": 0.273}, {"x": 71.03, "q": 433.8, "y": 27737.0, "sel": 76.0, "d": 0.28}, {"x": 71.03, "q": 450.3, "y": 27528.0, "sel": 75.8, "d": 0.29}, {"x": 71.03, "q": 466.9, "y": 27270.0, "sel": 75.5, "d": 0.28}, {"x": 71.03, "q": 483.4, "y": 26988.0, "sel": 75.4, "d": 0.273}, {"x": 71.03, "q": 500.0, "y": 26712.0, "sel": 75.2, "d": 0.271}, {"x": 73.45, "q": 20.0, "y": 24554.0, "sel": 79.8, "d": 0.113}, {"x": 73.45, "q": 36.6, "y": 24994.0, "sel": 80.1, "d": 0.098}, {"x": 73.45, "q": 53.1, "y": 25806.0, "sel": 80.5, "d": 0.094}, {"x": 73.45, "q": 69.7, "y": 26936.0, "sel": 81.1, "d": 0.067}, {"x": 73.45, "q": 86.2, "y": 28316.0, "sel": 81.6, "d": 0.036}, {"x": 73.45, "q": 102.8, "y": 29367.0, "sel": 81.6, "d": 0.023}, {"x": 73.45, "q": 119.3, "y": 28069.0, "sel": 81.5, "d": 0.046}, {"x": 73.45, "q": 135.9, "y": 27402.0, "sel": 81.1, "d": 0.078}, {"x": 73.45, "q": 152.4, "y": 27106.0, "sel": 80.6, "d": 0.111}, {"x": 73.45, "q": 169.0, "y": 27011.0, "sel": 80.2, "d": 0.145}, {"x": 73.45, "q": 185.5, "y": 27054.0, "sel": 79.8, "d": 0.18}, {"x": 73.45, "q": 202.1, "y": 27185.0, "sel": 79.4, "d": 0.214}, {"x": 73.45, "q": 218.6, "y": 27364.0, "sel": 79.1, "d": 0.237}, {"x": 73.45, "q": 235.2, "y": 27563.0, "sel": 78.9, "d": 0.237}, {"x": 73.45, "q": 251.7, "y": 27767.0, "sel": 78.6, "d": 0.236}, {"x": 73.45, "q": 268.3, "y": 27967.0, "sel": 78.4, "d": 0.239}, {"x": 73.45, "q": 284.8, "y": 28155.0, "sel": 78.3, "d": 0.239}, {"x": 73.45, "q": 301.4, "y": 28326.0, "sel": 78.1, "d": 0.236}, {"x": 73.45, "q": 317.9, "y": 28473.0, "sel": 77.9, "d": 0.239}, {"x": 73.45, "q": 334.5, "y": 28594.0, "sel": 77.6, "d": 0.247}, {"x": 73.45, "q": 351.0, "y": 28692.0, "sel": 77.3, "d": 0.258}, {"x": 73.45, "q": 367.6, "y": 28766.0, "sel": 77.0, "d": 0.246}, {"x": 73.45, "q": 384.1, "y": 28798.0, "sel": 76.6, "d": 0.239}, {"x": 73.45, "q": 400.7, "y": 28763.0, "sel": 76.3, "d": 0.236}, {"x": 73.45, "q": 417.2, "y": 28633.0, "sel": 76.0, "d": 0.239}, {"x": 73.45, "q": 433.8, "y": 28396.0, "sel": 75.6, "d": 0.247}, {"x": 73.45, "q": 450.3, "y": 28061.0, "sel": 75.3, "d": 0.258}, {"x": 73.45, "q": 466.9, "y": 27660.0, "sel": 75.1, "d": 0.246}, {"x": 73.45, "q": 483.4, "y": 27236.0, "sel": 74.8, "d": 0.239}, {"x": 73.45, "q": 500.0, "y": 26838.0, "sel": 74.6, "d": 0.236}, {"x": 75.86, "q": 20.0, "y": 24167.0, "sel": 79.7, "d": 0.086}, {"x": 75.86, "q": 36.6, "y": 23955.0, "sel": 79.6, "d": 0.065}, {"x": 75.86, "q": 53.1, "y": 24762.0, "sel": 80.0, "d": 0.059}, {"x": 75.86, "q": 69.7, "y": 26758.0, "sel": 80.9, "d": 0.064}, {"x": 75.86, "q": 86.2, "y": 28723.0, "sel": 81.4, "d": 0.031}, {"x": 75.86, "q": 102.8, "y": 30412.0, "sel": 81.5, "d": 0.014}, {"x": 75.86, "q": 119.3, "y": 28453.0, "sel": 81.4, "d": 0.042}, {"x": 75.86, "q": 135.9, "y": 27818.0, "sel": 81.1, "d": 0.076}, {"x": 75.86, "q": 152.4, "y": 27635.0, "sel": 80.7, "d": 0.11}, {"x": 75.86, "q": 169.0, "y": 27655.0, "sel": 80.3, "d": 0.144}, {"x": 75.86, "q": 185.5, "y": 27800.0, "sel": 79.8, "d": 0.179}, {"x": 75.86, "q": 202.1, "y": 28013.0, "sel": 79.5, "d": 0.202}, {"x": 75.86, "q": 218.6, "y": 28249.0, "sel": 79.1, "d": 0.202}, {"x": 75.86, "q": 235.2, "y": 28483.0, "sel": 78.9, "d": 0.203}, {"x": 75.86, "q": 251.7, "y": 28709.0, "sel": 78.7, "d": 0.202}, {"x": 75.86, "q": 268.3, "y": 28929.0, "sel": 78.5, "d": 0.206}, {"x": 75.86, "q": 284.8, "y": 29139.0, "sel": 78.4, "d": 0.204}, {"x": 75.86, "q": 301.4, "y": 29324.0, "sel": 78.2, "d": 0.202}, {"x": 75.86, "q": 317.9, "y": 29469.0, "sel": 77.9, "d": 0.205}, {"x": 75.86, "q": 334.5, "y": 29575.0, "sel": 77.6, "d": 0.214}, {"x": 75.86, "q": 351.0, "y": 29661.0, "sel": 77.2, "d": 0.226}, {"x": 75.86, "q": 367.6, "y": 29734.0, "sel": 76.8, "d": 0.213}, {"x": 75.86, "q": 384.1, "y": 29770.0, "sel": 76.3, "d": 0.205}, {"x": 75.86, "q": 400.7, "y": 29716.0, "sel": 75.9, "d": 0.202}, {"x": 75.86, "q": 417.2, "y": 29516.0, "sel": 75.5, "d": 0.205}, {"x": 75.86, "q": 433.8, "y": 29145.0, "sel": 75.1, "d": 0.214}, {"x": 75.86, "q": 450.3, "y": 28622.0, "sel": 74.8, "d": 0.227}, {"x": 75.86, "q": 466.9, "y": 27998.0, "sel": 74.4, "d": 0.213}, {"x": 75.86, "q": 483.4, "y": 27356.0, "sel": 74.0, "d": 0.205}, {"x": 75.86, "q": 500.0, "y": 26784.0, "sel": 73.7, "d": 0.202}, {"x": 78.28, "q": 20.0, "y": 23287.0, "sel": 79.4, "d": 0.067}, {"x": 78.28, "q": 36.6, "y": 19809.0, "sel": 77.7, "d": 0.037}, {"x": 78.28, "q": 53.1, "y": 17341.0, "sel": 76.5, "d": 0.025}, {"x": 78.28, "q": 69.7, "y": 25794.0, "sel": 80.5, "d": 0.048}, {"x": 78.28, "q": 86.2, "y": 27886.0, "sel": 81.5, "d": 0.038}, {"x": 78.28, "q": 102.8, "y": 28097.0, "sel": 81.7, "d": 0.025}, {"x": 78.28, "q": 119.3, "y": 28115.0, "sel": 81.5, "d": 0.047}, {"x": 78.28, "q": 135.9, "y": 28037.0, "sel": 81.2, "d": 0.079}, {"x": 78.28, "q": 152.4, "y": 28062.0, "sel": 80.8, "d": 0.112}, {"x": 78.28, "q": 169.0, "y": 28241.0, "sel": 80.3, "d": 0.146}, {"x": 78.28, "q": 185.5, "y": 28526.0, "sel": 79.8, "d": 0.169}, {"x": 78.28, "q": 202.1, "y": 28849.0, "sel": 79.3, "d": 0.168}, {"x": 78.28, "q": 218.6, "y": 29153.0, "sel": 79.0, "d": 0.168}, {"x": 78.28, "q": 235.2, "y": 29424.0, "sel": 78.8, "d": 0.169}, {"x": 78.28, "q": 251.7, "y": 29680.0, "sel": 78.6, "d": 0.168}, {"x": 78.28, "q": 268.3, "y": 29947.0, "sel": 78.5, "d": 0.172}, {"x": 78.28, "q": 284.8, "y": 30224.0, "sel": 78.4, "d": 0.17}, {"x": 78.28, "q": 301.4, "y": 30464.0, "sel": 78.2, "d": 0.168}, {"x": 78.28, "q": 317.9, "y": 30618.0, "sel": 78.0, "d": 0.172}, {"x": 78.28, "q": 334.5, "y": 30694.0, "sel": 77.6, "d": 0.182}, {"x": 78.28, "q": 351.0, "y": 30755.0, "sel": 77.1, "d": 0.196}, {"x": 78.28, "q": 367.6, "y": 30847.0, "sel": 76.5, "d": 0.181}, {"x": 78.28, "q": 384.1, "y": 30928.0, "sel": 75.9, "d": 0.171}, {"x": 78.28, "q": 400.7, "y": 30884.0, "sel": 75.3, "d": 0.167}, {"x": 78.28, "q": 417.2, "y": 30599.0, "sel": 74.9, "d": 0.171}, {"x": 78.28, "q": 433.8, "y": 30028.0, "sel": 74.4, "d": 0.182}, {"x": 78.28, "q": 450.3, "y": 29204.0, "sel": 74.0, "d": 0.197}, {"x": 78.28, "q": 466.9, "y": 28217.0, "sel": 73.4, "d": 0.181}, {"x": 78.28, "q": 483.4, "y": 27216.0, "sel": 72.8, "d": 0.171}, {"x": 78.28, "q": 500.0, "y": 26378.0, "sel": 72.4, "d": 0.167}, {"x": 80.69, "q": 20.0, "y": 23046.0, "sel": 79.3, "d": 0.063}, {"x": 80.69, "q": 36.6, "y": 17631.0, "sel": 76.7, "d": 0.03}, {"x": 80.69, "q": 53.1, "y": 7997.0, "sel": 72.0, "d": 0.012}, {"x": 80.69, "q": 69.7, "y": 25542.0, "sel": 80.5, "d": 0.042}, {"x": 80.69, "q": 86.2, "y": 27948.0, "sel": 81.6, "d": 0.03}, {"x": 80.69, "q": 102.8, "y": 28061.0, "sel": 81.7, "d": 0.011}, {"x": 80.69, "q": 119.3, "y": 28198.0, "sel": 81.6, "d": 0.041}, {"x": 80.69, "q": 135.9, "y": 28280.0, "sel": 81.3, "d": 0.075}, {"x": 80.69, "q": 152.4, "y": 28476.0, "sel": 80.8, "d": 0.11}, {"x": 80.69, "q": 169.0, "y": 28835.0, "sel": 80.1, "d": 0.134}, {"x": 80.69, "q": 185.5, "y": 29294.0, "sel": 79.5, "d": 0.135}, {"x": 80.69, "q": 202.1, "y": 29753.0, "sel": 79.0, "d": 0.133}, {"x": 80.69, "q": 218.6, "y": 30118.0, "sel": 78.7, "d": 0.134}, {"x": 80.69, "q": 235.2, "y": 30397.0, "sel": 78.5, "d": 0.135}, {"x": 80.69, "q": 251.7, "y": 30676.0, "sel": 78.5, "d": 0.133}, {"x": 80.69, "q": 268.3, "y": 31036.0, "sel": 78.5, "d": 0.138}, {"x": 80.69, "q": 284.8, "y": 31489.0, "sel": 78.5, "d": 0.137}, {"x": 80.69, "q": 301.4, "y": 31891.0, "sel": 78.4, "d": 0.133}, {"x": 80.69, "q": 317.9, "y": 32058.0, "sel": 78.1, "d": 0.138}, {"x": 80.69, "q": 334.5, "y": 32022.0, "sel": 77.6, "d": 0.151}, {"x": 80.69, "q": 351.0, "y": 31999.0, "sel": 76.8, "d": 0.168}, {"x": 80.69, "q": 367.6, "y": 32135.0, "sel": 76.0, "d": 0.149}, {"x": 80.69, "q": 384.1, "y": 32348.0, "sel": 75.2, "d": 0.137}, {"x": 80.69, "q": 400.7, "y": 32376.0, "sel": 74.5, "d": 0.133}, {"x": 80.69, "q": 417.2, "y": 31985.0, "sel": 74.0, "d": 0.138}, {"x": 80.69, "q": 433.8, "y": 31104.0, "sel": 73.6, "d": 0.15}, {"x": 80.69, "q": 450.3, "y": 29791.0, "sel": 73.0, "d": 0.168}, {"x": 80.69, "q": 466.9, "y": 28180.0, "sel": 72.1, "d": 0.15}, {"x": 80.69, "q": 483.4, "y": 26541.0, "sel": 71.1, "d": 0.137}, {"x": 80.69, "q": 500.0, "y": 25270.0, "sel": 70.3, "d": 0.133}, {"x": 83.1, "q": 20.0, "y": 23527.0, "sel": 79.6, "d": 0.077}, {"x": 83.1, "q": 36.6, "y": 23077.0, "sel": 79.5, "d": 0.052}, {"x": 83.1, "q": 53.1, "y": 23901.0, "sel": 80.0, "d": 0.045}, {"x": 83.1, "q": 69.7, "y": 26682.0, "sel": 81.3, "d": 0.06}, {"x": 83.1, "q": 86.2, "y": 28798.0, "sel": 82.0, "d": 0.039}, {"x": 83.1, "q": 102.8, "y": 30005.0, "sel": 82.2, "d": 0.028}, {"x": 83.1, "q": 119.3, "y": 28884.0, "sel": 81.9, "d": 0.049}, {"x": 83.1, "q": 135.9, "y": 28629.0, "sel": 81.4, "d": 0.079}, {"x": 83.1, "q": 152.4, "y": 28973.0, "sel": 80.6, "d": 0.099}, {"x": 83.1, "q": 169.0, "y": 29497.0, "sel": 79.7, "d": 0.099}, {"x": 83.1, "q": 185.5, "y": 30164.0, "sel": 78.9, "d": 0.101}, {"x": 83.1, "q": 202.1, "y": 30817.0, "sel": 78.4, "d": 0.099}, {"x": 83.1, "q": 218.6, "y": 31183.0, "sel": 78.2, "d": 0.099}, {"x": 83.1, "q": 235.2, "y": 31369.0, "sel": 78.2, "d": 0.101}, {"x": 83.1, "q": 251.7, "y": 31628.0, "sel": 78.3, "d": 0.099}, {"x": 83.1, "q": 268.3, "y": 32169.0, "sel": 78.4, "d": 0.106}, {"x": 83.1, "q": 284.8, "y": 33116.0, "sel": 78.6, "d": 0.103}, {"x": 83.1, "q": 301.4, "y": 34005.0, "sel": 78.6, "d": 0.099}, {"x": 83.1, "q": 317.9, "y": 34122.0, "sel": 78.3, "d": 0.105}, {"x": 83.1, "q": 334.5, "y": 33675.0, "sel": 77.6, "d": 0.122}, {"x": 83.1, "q": 351.0, "y": 33376.0, "sel": 76.5, "d": 0.142}, {"x": 83.1, "q": 367.6, "y": 33587.0, "sel": 75.3, "d": 0.119}, {"x": 83.1, "q": 384.1, "y": 34093.0, "sel": 74.1, "d": 0.104}, {"x": 83.1, "q": 400.7, "y": 34299.0, "sel": 73.4, "d": 0.099}, {"x": 83.1, "q": 417.2, "y": 33765.0, "sel": 73.0, "d": 0.105}, {"x": 83.1, "q": 433.8, "y": 32420.0, "sel": 72.7, "d": 0.121}, {"x": 83.1, "q": 450.3, "y": 30344.0, "sel": 71.9, "d": 0.143}, {"x": 83.1, "q": 466.9, "y": 27642.0, "sel": 70.3, "d": 0.12}, {"x": 83.1, "q": 483.4, "y": 24765.0, "sel": 68.2, "d": 0.104}, {"x": 83.1, "q": 500.0, "y": 22742.0, "sel": 66.7, "d": 0.099}, {"x": 85.52, "q": 20.0, "y": 22724.0, "sel": 78.9, "d": 0.065}, {"x": 85.52, "q": 36.6, "y": 23276.0, "sel": 79.7, "d": 0.068}, {"x": 85.52, "q": 53.1, "y": 24607.0, "sel": 80.7, "d": 0.064}, {"x": 85.52, "q": 69.7, "y": 26558.0, "sel": 81.6, "d": 0.064}, {"x": 85.52, "q": 86.2, "y": 29194.0, "sel": 82.3, "d": 0.03}, {"x": 85.52, "q": 102.8, "y": 33088.0, "sel": 82.9, "d": 0.009}, {"x": 85.52, "q": 119.3, "y": 28949.0, "sel": 82.1, "d": 0.041}, {"x": 85.52, "q": 135.9, "y": 28972.0, "sel": 81.4, "d": 0.068}, {"x": 85.52, "q": 152.4, "y": 29766.0, "sel": 80.4, "d": 0.064}, {"x": 85.52, "q": 169.0, "y": 30132.0, "sel": 79.1, "d": 0.065}, {"x": 85.52, "q": 185.5, "y": 31082.0, "sel": 78.0, "d": 0.068}, {"x": 85.52, "q": 202.1, "y": 32243.0, "sel": 77.4, "d": 0.064}, {"x": 85.52, "q": 218.6, "y": 32362.0, "sel": 77.4, "d": 0.065}, {"x": 85.52, "q": 235.2, "y": 32191.0, "sel": 77.7, "d": 0.067}, {"x": 85.52, "q": 251.7, "y": 32326.0, "sel": 78.1, "d": 0.064}, {"x": 85.52, "q": 268.3, "y": 33166.0, "sel": 78.4, "d": 0.075}, {"x": 85.52, "q": 284.8, "y": 35596.0, "sel": 78.9, "d": 0.071}, {"x": 85.52, "q": 301.4, "y": 38076.0, "sel": 79.4, "d": 0.064}, {"x": 85.52, "q": 317.9, "y": 37573.0, "sel": 79.0, "d": 0.074}, {"x": 85.52, "q": 334.5, "y": 35752.0, "sel": 77.8, "d": 0.096}, {"x": 85.52, "q": 351.0, "y": 34744.0, "sel": 76.2, "d": 0.12}, {"x": 85.52, "q": 367.6, "y": 35059.0, "sel": 74.3, "d": 0.093}, {"x": 85.52, "q": 384.1, "y": 36062.0, "sel": 72.8, "d": 0.072}, {"x": 85.52, "q": 400.7, "y": 36538.0, "sel": 72.1, "d": 0.064}, {"x": 85.52, "q": 417.2, "y": 35824.0, "sel": 72.0, "d": 0.073}, {"x": 85.52, "q": 433.8, "y": 33899.0, "sel": 71.8, "d": 0.095}, {"x": 85.52, "q": 450.3, "y": 30793.0, "sel": 70.8, "d": 0.122}, {"x": 85.52, "q": 466.9, "y": 26280.0, "sel": 67.9, "d": 0.094}, {"x": 85.52, "q": 483.4, "y": 20952.0, "sel": 63.4, "d": 0.073}, {"x": 85.52, "q": 500.0, "y": 17696.0, "sel": 60.5, "d": 0.064}, {"x": 87.93, "q": 20.0, "y": 17966.0, "sel": 74.6, "d": 0.031}, {"x": 87.93, "q": 36.6, "y": 20188.0, "sel": 77.8, "d": 0.038}, {"x": 87.93, "q": 53.1, "y": 21678.0, "sel": 79.7, "d": 0.03}, {"x": 87.93, "q": 69.7, "y": 25495.0, "sel": 81.5, "d": 0.032}, {"x": 87.93, "q": 86.2, "y": 27263.0, "sel": 82.4, "d": 0.031}, {"x": 87.93, "q": 102.8, "y": 26988.0, "sel": 82.6, "d": 0.03}, {"x": 87.93, "q": 119.3, "y": 27859.0, "sel": 82.0, "d": 0.032}, {"x": 87.93, "q": 135.9, "y": 29919.0, "sel": 81.3, "d": 0.037}, {"x": 87.93, "q": 152.4, "y": 32251.0, "sel": 80.4, "d": 0.03}, {"x": 87.93, "q": 169.0, "y": 29743.0, "sel": 77.9, "d": 0.032}, {"x": 87.93, "q": 185.5, "y": 31484.0, "sel": 76.8, "d": 0.037}, {"x": 87.93, "q": 202.1, "y": 34672.0, "sel": 76.0, "d": 0.03}, {"x": 87.93, "q": 218.6, "y": 33350.0, "sel": 76.7, "d": 0.032}, {"x": 87.93, "q": 235.2, "y": 32548.0, "sel": 77.5, "d": 0.036}, {"x": 87.93, "q": 251.7, "y": 32442.0, "sel": 78.0, "d": 0.03}, {"x": 87.93, "q": 268.3, "y": 33526.0, "sel": 78.4, "d": 0.048}, {"x": 87.93, "q": 284.8, "y": 40129.0, "sel": 79.8, "d": 0.043}, {"x": 87.93, "q": 301.4, "y": 46984.0, "sel": 81.3, "d": 0.03}, {"x": 87.93, "q": 317.9, "y": 42998.0, "sel": 80.2, "d": 0.048}, {"x": 87.93, "q": 334.5, "y": 37933.0, "sel": 78.1, "d": 0.078}, {"x": 87.93, "q": 351.0, "y": 35766.0, "sel": 75.8, "d": 0.106}, {"x": 87.93, "q": 367.6, "y": 36174.0, "sel": 73.4, "d": 0.074}, {"x": 87.93, "q": 384.1, "y": 37688.0, "sel": 71.7, "d": 0.044}, {"x": 87.93, "q": 400.7, "y": 38334.0, "sel": 71.2, "d": 0.03}, {"x": 87.93, "q": 417.2, "y": 37517.0, "sel": 71.3, "d": 0.047}, {"x": 87.93, "q": 433.8, "y": 35128.0, "sel": 71.3, "d": 0.076}, {"x": 87.93, "q": 450.3, "y": 31051.0, "sel": 69.9, "d": 0.108}, {"x": 87.93, "q": 466.9, "y": 24265.0, "sel": 65.3, "d": 0.075}, {"x": 87.93, "q": 483.4, "y": 15277.0, "sel": 57.1, "d": 0.045}, {"x": 87.93, "q": 500.0, "y": 11007.0, "sel": 52.8, "d": 0.03}, {"x": 90.34, "q": 20.0, "y": 7853.0, "sel": 64.3, "d": 0.012}, {"x": 90.34, "q": 36.6, "y": 17386.0, "sel": 75.8, "d": 0.025}, {"x": 90.34, "q": 53.1, "y": 17397.0, "sel": 77.7, "d": 0.008}, {"x": 90.34, "q": 69.7, "y": 24506.0, "sel": 81.3, "d": 0.012}, {"x": 90.34, "q": 86.2, "y": 29064.0, "sel": 82.8, "d": 0.009}, {"x": 90.34, "q": 102.8, "y": 26411.0, "sel": 82.7, "d": 0.008}, {"x": 90.34, "q": 119.3, "y": 28712.0, "sel": 81.3, "d": 0.013}, {"x": 90.34, "q": 135.9, "y": 30904.0, "sel": 81.0, "d": 0.023}, {"x": 90.34, "q": 152.4, "y": 36124.0, "sel": 81.1, "d": 0.007}, {"x": 90.34, "q": 169.0, "y": 28111.0, "sel": 76.8, "d": 0.014}, {"x": 90.34, "q": 185.5, "y": 30845.0, "sel": 76.4, "d": 0.022}, {"x": 90.34, "q": 202.1, "y": 36370.0, "sel": 75.2, "d": 0.007}, {"x": 90.34, "q": 218.6, "y": 33029.0, "sel": 76.6, "d": 0.014}, {"x": 90.34, "q": 235.2, "y": 32528.0, "sel": 77.3, "d": 0.022}, {"x": 90.34, "q": 251.7, "y": 32318.0, "sel": 78.1, "d": 0.006}, {"x": 90.34, "q": 268.3, "y": 33404.0, "sel": 78.3, "d": 0.038}, {"x": 90.34, "q": 284.8, "y": 43465.0, "sel": 80.5, "d": 0.032}, {"x": 90.34, "q": 301.4, "y": 52266.0, "sel": 82.5, "d": 0.006}, {"x": 90.34, "q": 317.9, "y": 45777.0, "sel": 80.8, "d": 0.038}, {"x": 90.34, "q": 334.5, "y": 38778.0, "sel": 78.2, "d": 0.072}, {"x": 90.34, "q": 351.0, "y": 36017.0, "sel": 75.5, "d": 0.102}, {"x": 90.34, "q": 367.6, "y": 36415.0, "sel": 72.9, "d": 0.068}, {"x": 90.34, "q": 384.1, "y": 38137.0, "sel": 71.3, "d": 0.033}, {"x": 90.34, "q": 400.7, "y": 38783.0, "sel": 71.0, "d": 0.005}, {"x": 90.34, "q": 417.2, "y": 37976.0, "sel": 71.1, "d": 0.036}, {"x": 90.34, "q": 433.8, "y": 35398.0, "sel": 71.0, "d": 0.071}, {"x": 90.34, "q": 450.3, "y": 31032.0, "sel": 69.5, "d": 0.104}, {"x": 90.34, "q": 466.9, "y": 23375.0, "sel": 64.2, "d": 0.069}, {"x": 90.34, "q": 483.4, "y": 12827.0, "sel": 54.5, "d": 0.035}, {"x": 90.34, "q": 500.0, "y": 8844.0, "sel": 50.4, "d": 0.005}, {"x": 92.76, "q": 20.0, "y": 19917.0, "sel": 76.6, "d": 0.041}, {"x": 92.76, "q": 36.6, "y": 21112.0, "sel": 78.6, "d": 0.046}, {"x": 92.76, "q": 53.1, "y": 22608.0, "sel": 80.2, "d": 0.04}, {"x": 92.76, "q": 69.7, "y": 25394.0, "sel": 81.7, "d": 0.041}, {"x": 92.76, "q": 86.2, "y": 26642.0, "sel": 82.5, "d": 0.034}, {"x": 92.76, "q": 102.8, "y": 26659.0, "sel": 82.6, "d": 0.033}, {"x": 92.76, "q": 119.3, "y": 27427.0, "sel": 82.1, "d": 0.041}, {"x": 92.76, "q": 135.9, "y": 29347.0, "sel": 81.3, "d": 0.045}, {"x": 92.76, "q": 152.4, "y": 31176.0, "sel": 80.2, "d": 0.04}, {"x": 92.76, "q": 169.0, "y": 30127.0, "sel": 78.3, "d": 0.041}, {"x": 92.76, "q": 185.5, "y": 31549.0, "sel": 77.1, "d": 0.045}, {"x": 92.76, "q": 202.1, "y": 33890.0, "sel": 76.4, "d": 0.04}, {"x": 92.76, "q": 218.6, "y": 33224.0, "sel": 76.8, "d": 0.042}, {"x": 92.76, "q": 235.2, "y": 32568.0, "sel": 77.5, "d": 0.045}, {"x": 92.76, "q": 251.7, "y": 32524.0, "sel": 78.0, "d": 0.04}, {"x": 92.76, "q": 268.3, "y": 33601.0, "sel": 78.4, "d": 0.055}, {"x": 92.76, "q": 284.8, "y": 38706.0, "sel": 79.5, "d": 0.051}, {"x": 92.76, "q": 301.4, "y": 44031.0, "sel": 80.6, "d": 0.04}, {"x": 92.76, "q": 317.9, "y": 41475.0, "sel": 79.7, "d": 0.054}, {"x": 92.76, "q": 334.5, "y": 37377.0, "sel": 77.7, "d": 0.082}, {"x": 92.76, "q": 351.0, "y": 35310.0, "sel": 75.2, "d": 0.109}, {"x": 92.76, "q": 367.6, "y": 35415.0, "sel": 72.7, "d": 0.078}, {"x": 92.76, "q": 384.1, "y": 36773.0, "sel": 71.2, "d": 0.051}, {"x": 92.76, "q": 400.7, "y": 37518.0, "sel": 70.9, "d": 0.039}, {"x": 92.76, "q": 417.2, "y": 36535.0, "sel": 70.7, "d": 0.053}, {"x": 92.76, "q": 433.8, "y": 34219.0, "sel": 70.4, "d": 0.081}, {"x": 92.76, "q": 450.3, "y": 30663.0, "sel": 69.3, "d": 0.111}, {"x": 92.76, "q": 466.9, "y": 24792.0, "sel": 65.6, "d": 0.079}, {"x": 92.76, "q": 483.4, "y": 16931.0, "sel": 58.7, "d": 0.052}, {"x": 92.76, "q": 500.0, "y": 12783.0, "sel": 54.7, "d": 0.039}, {"x": 95.17, "q": 20.0, "y": 23180.0, "sel": 79.5, "d": 0.075}, {"x": 95.17, "q": 36.6, "y": 23604.0, "sel": 80.2, "d": 0.078}, {"x": 95.17, "q": 53.1, "y": 24511.0, "sel": 81.1, "d": 0.074}, {"x": 95.17, "q": 69.7, "y": 25530.0, "sel": 82.0, "d": 0.053}, {"x": 95.17, "q": 86.2, "y": 25244.0, "sel": 83.8, "d": 0.019}, {"x": 95.17, "q": 102.8, "y": 25311.0, "sel": 84.1, "d": 0.017}, {"x": 95.17, "q": 119.3, "y": 27071.0, "sel": 82.3, "d": 0.051}, {"x": 95.17, "q": 135.9, "y": 28268.0, "sel": 81.4, "d": 0.077}, {"x": 95.17, "q": 152.4, "y": 29402.0, "sel": 80.4, "d": 0.074}, {"x": 95.17, "q": 169.0, "y": 30082.0, "sel": 79.2, "d": 0.075}, {"x": 95.17, "q": 185.5, "y": 31018.0, "sel": 78.2, "d": 0.077}, {"x": 95.17, "q": 202.1, "y": 32001.0, "sel": 77.6, "d": 0.074}, {"x": 95.17, "q": 218.6, "y": 32250.0, "sel": 77.6, "d": 0.075}, {"x": 95.17, "q": 235.2, "y": 32216.0, "sel": 77.8, "d": 0.077}, {"x": 95.17, "q": 251.7, "y": 32404.0, "sel": 78.1, "d": 0.074}, {"x": 95.17, "q": 268.3, "y": 33195.0, "sel": 78.4, "d": 0.083}, {"x": 95.17, "q": 284.8, "y": 35091.0, "sel": 78.8, "d": 0.08}, {"x": 95.17, "q": 301.4, "y": 36932.0, "sel": 79.0, "d": 0.074}, {"x": 95.17, "q": 317.9, "y": 36671.0, "sel": 78.4, "d": 0.083}, {"x": 95.17, "q": 334.5, "y": 35162.0, "sel": 77.0, "d": 0.103}, {"x": 95.17, "q": 351.0, "y": 33882.0, "sel": 74.7, "d": 0.114}, {"x": 95.17, "q": 367.6, "y": 33160.0, "sel": 71.7, "d": 0.085}, {"x": 95.17, "q": 384.1, "y": 32438.0, "sel": 68.6, "d": 0.061}, {"x": 95.17, "q": 400.7, "y": 31753.0, "sel": 66.8, "d": 0.051}, {"x": 95.17, "q": 417.2, "y": 32081.0, "sel": 67.7, "d": 0.062}, {"x": 95.17, "q": 433.8, "y": 31730.0, "sel": 69.0, "d": 0.087}, {"x": 95.17, "q": 450.3, "y": 29927.0, "sel": 69.2, "d": 0.117}, {"x": 95.17, "q": 466.9, "y": 26586.0, "sel": 67.6, "d": 0.101}, {"x": 95.17, "q": 483.4, "y": 22335.0, "sel": 64.5, "d": 0.082}, {"x": 95.17, "q": 500.0, "y": 19494.0, "sel": 62.2, "d": 0.074}, {"x": 97.59, "q": 20.0, "y": 24371.0, "sel": 80.4, "d": 0.109}, {"x": 97.59, "q": 36.6, "y": 24642.0, "sel": 80.9, "d": 0.111}, {"x": 97.59, "q": 53.1, "y": 25055.0, "sel": 81.5, "d": 0.096}, {"x": 97.59, "q": 69.7, "y": 25266.0, "sel": 82.4, "d": 0.067}, {"x": 97.59, "q": 86.2, "y": 24562.0, "sel": 83.7, "d": 0.045}, {"x": 97.59, "q": 102.8, "y": 23829.0, "sel": 84.6, "d": 0.035}, {"x": 97.59, "q": 119.3, "y": 25986.0, "sel": 82.9, "d": 0.053}, {"x": 97.59, "q": 135.9, "y": 27540.0, "sel": 81.7, "d": 0.082}, {"x": 97.59, "q": 152.4, "y": 28622.0, "sel": 80.7, "d": 0.108}, {"x": 97.59, "q": 169.0, "y": 29479.0, "sel": 79.8, "d": 0.109}, {"x": 97.59, "q": 185.5, "y": 30263.0, "sel": 79.0, "d": 0.111}, {"x": 97.59, "q": 202.1, "y": 30934.0, "sel": 78.4, "d": 0.108}, {"x": 97.59, "q": 218.6, "y": 31345.0, "sel": 78.2, "d": 0.109}, {"x": 97.59, "q": 235.2, "y": 31591.0, "sel": 78.2, "d": 0.11}, {"x": 97.59, "q": 251.7, "y": 31884.0, "sel": 78.3, "d": 0.108}, {"x": 97.59, "q": 268.3, "y": 32403.0, "sel": 78.4, "d": 0.115}, {"x": 97.59, "q": 284.8, "y": 33200.0, "sel": 78.5, "d": 0.113}, {"x": 97.59, "q": 301.4, "y": 33890.0, "sel": 78.3, "d": 0.108}, {"x": 97.59, "q": 317.9, "y": 33919.0, "sel": 77.8, "d": 0.115}, {"x": 97.59, "q": 334.5, "y": 33301.0, "sel": 76.4, "d": 0.13}, {"x": 97.59, "q": 351.0, "y": 32294.0, "sel": 74.0, "d": 0.103}, {"x": 97.59, "q": 367.6, "y": 30476.0, "sel": 69.6, "d": 0.07}, {"x": 97.59, "q": 384.1, "y": 26135.0, "sel": 61.2, "d": 0.037}, {"x": 97.59, "q": 400.7, "y": 22469.0, "sel": 55.1, "d": 0.017}, {"x": 97.59, "q": 417.2, "y": 26042.0, "sel": 60.9, "d": 0.04}, {"x": 97.59, "q": 433.8, "y": 29014.0, "sel": 66.8, "d": 0.072}, {"x": 97.59, "q": 450.3, "y": 29050.0, "sel": 68.9, "d": 0.106}, {"x": 97.59, "q": 466.9, "y": 27538.0, "sel": 69.0, "d": 0.128}, {"x": 97.59, "q": 483.4, "y": 25429.0, "sel": 68.0, "d": 0.114}, {"x": 97.59, "q": 500.0, "y": 23761.0, "sel": 67.1, "d": 0.108}, {"x": 100.0, "q": 20.0, "y": 24948.0, "sel": 80.8, "d": 0.143}, {"x": 100.0, "q": 36.6, "y": 25092.0, "sel": 81.2, "d": 0.132}, {"x": 100.0, "q": 53.1, "y": 25174.0, "sel": 81.8, "d": 0.098}, {"x": 100.0, "q": 69.7, "y": 24666.0, "sel": 82.9, "d": 0.063}, {"x": 100.0, "q": 86.2, "y": 20172.0, "sel": 87.3, "d": 0.029}, {"x": 100.0, "q": 102.8, "y": 10356.0, "sel": 95.8, "d": 0.006}, {"x": 100.0, "q": 119.3, "y": 23575.0, "sel": 84.7, "d": 0.04}, {"x": 100.0, "q": 135.9, "y": 26836.0, "sel": 82.0, "d": 0.075}, {"x": 100.0, "q": 152.4, "y": 28080.0, "sel": 80.9, "d": 0.109}, {"x": 100.0, "q": 169.0, "y": 28925.0, "sel": 80.1, "d": 0.143}, {"x": 100.0, "q": 185.5, "y": 29617.0, "sel": 79.5, "d": 0.145}, {"x": 100.0, "q": 202.1, "y": 30185.0, "sel": 79.0, "d": 0.143}, {"x": 100.0, "q": 218.6, "y": 30613.0, "sel": 78.7, "d": 0.143}, {"x": 100.0, "q": 235.2, "y": 30939.0, "sel": 78.6, "d": 0.144}, {"x": 100.0, "q": 251.7, "y": 31248.0, "sel": 78.5, "d": 0.143}, {"x": 100.0, "q": 268.3, "y": 31609.0, "sel": 78.5, "d": 0.148}, {"x": 100.0, "q": 284.8, "y": 32016.0, "sel": 78.4, "d": 0.146}, {"x": 100.0, "q": 301.4, "y": 32324.0, "sel": 78.1, "d": 0.143}, {"x": 100.0, "q": 317.9, "y": 32341.0, "sel": 77.4, "d": 0.148}, {"x": 100.0, "q": 334.5, "y": 31975.0, "sel": 76.2, "d": 0.138}, {"x": 100.0, "q": 351.0, "y": 31107.0, "sel": 73.8, "d": 0.104}, {"x": 100.0, "q": 367.6, "y": 29126.0, "sel": 69.0, "d": 0.07}, {"x": 100.0, "q": 384.1, "y": 24964.0, "sel": 60.3, "d": 0.038}, {"x": 100.0, "q": 400.7, "y": 22222.0, "sel": 55.0, "d": 0.018}, {"x": 100.0, "q": 417.2, "y": 24805.0, "sel": 59.9, "d": 0.04}, {"x": 100.0, "q": 433.8, "y": 27727.0, "sel": 66.2, "d": 0.073}, {"x": 100.0, "q": 450.3, "y": 28448.0, "sel": 69.1, "d": 0.106}, {"x": 100.0, "q": 466.9, "y": 27891.0, "sel": 70.0, "d": 0.141}, {"x": 100.0, "q": 483.4, "y": 26839.0, "sel": 70.1, "d": 0.147}, {"x": 100.0, "q": 500.0, "y": 25862.0, "sel": 69.9, "d": 0.143}], "grid": 30, "domain": {"x": [30.0, 100.0], "q": [20, 500]}, "best": {"x": 90.34, "q": 301.4, "y": 52266.0, "sel": 82.5, "d": 0.006}, "scope": "Pd–P25 · 0.05 wt% · 旧灯 434 mW/cm² · 1% 氧瓶"})])
+      .then(function(res){
+        var j=res[0];
+        window.__SPACE=res[1]; window.__SC=res[2]; window.__FLOW=res[3];
+        window.__SURF=res[4];
+        if(!j||!j.ok){
+          document.body.innerHTML='<div class="err">数据读取失败：'+
+            ((j&&j.error)||'无法连接后端')+'</div>';
+          return;
+        }
+        DATA=j;
+        renderVerdict();
+        bindPredict();
+        renderTable();
+        renderSelfCheck();
+        renderGaps();
+        renderFlow();
+
+        document.getElementById('meta').textContent=
+          '有效实测 '+DATA.n_total+' 条 · 负载档 '+DATA.curve.length+' 个';
+        document.getElementById('chartNote').innerHTML=
+          '<b>怎么读：</b>灰点是单条实测，绿线连的是各档中位数。'+
+          '0.05% 那档有 '+(DATA.peak?DATA.peak.n:0)+' 条，上下四分位跨度很大（'+
+          (DATA.peak?fmt(DATA.peak.q25)+' ~ '+fmt(DATA.peak.q75):'—')+
+          '），说明同一负载下流量、光强的影响远大于负载本身。橙色档位样本不足 5 条。';
+        document.getElementById('foot').innerHTML=
+          '数据来源 data/OCM_master.xlsx · 统计口径为按负载分组的中位数与四分位。'+
+          '预测由分层世界模型（机理先验 + 条件残差）给出，域外时自动降置信。';
+
+        drawChart();
+        bootSpace();
+        drawSurface();
+        window.addEventListener('resize',function(){
+          clearTimeout(window.__rt);
+          window.__rt=setTimeout(function(){ drawChart(); drawSurface(); },160);
+        });
+      })
+      .catch(function(e){
+        document.body.innerHTML='<div class="err">请求失败：'+e.message+'</div>';
+      });
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>

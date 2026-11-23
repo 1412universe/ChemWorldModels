@@ -30,6 +30,11 @@ if str(_WM) not in sys.path:
 from .data import ALLCAT, POOL
 from . import services
 
+try:
+    import lamp_calib as CAL
+except ImportError:  # pragma: no cover
+    CAL = None
+
 METALS = {
     "Pt": (2.28, 5.65), "Pd": (2.20, 5.60), "Au": (2.54, 5.10),
     "Ag": (1.93, 4.26), "Ru": (2.20, 4.71), "Cu": (1.90, 4.65),
@@ -272,13 +277,13 @@ def _kinetics(cand: Dict[str, Any], flows: Tuple[float, float, float]) -> Option
 
 
 def _cond_vec(p: Dict[str, Any], lpd_ref: float) -> np.ndarray:
-    """归一化条件向量：负载、流量、氧浓、相对光强。"""
+    """归一化条件向量：负载、流量、氧浓、相对光强（按灯标定表换算）。"""
     tot = max(p["ch4"] + p["o2"] + p["ar"], 1e-6)
     o2_in = p.get("o2_in")
     if o2_in is None:
         o2_in = 100.0 * p["o2"] / tot if tot > 0 else 1.0
-    lpd = p.get("lpd")
-    rel_i = (float(lpd) / lpd_ref) if (lpd is not None and lpd_ref > 0) else 0.5
+    rel = CAL.rel_from_lpd_ref(p.get("lpd"), lpd_ref)
+    rel_i = (rel if rel is not None else 50.0) / 100.0
     return np.array([
         math.log10(max(p["load"], 1e-3)),
         p["ch4"] / 100.0,
@@ -297,7 +302,9 @@ def _knn_predict(
     if not points:
         return {"y": None, "sel": None, "unc": None, "n_local": 0, "neighbors": []}
     lpds = [p["lpd"] for p in points if p.get("lpd")]
-    lpd_ref = float(max(lpds)) if lpds else max(float(query.get("lpd") or 100.0), 1.0)
+    lpd_ref = max(
+        [float(x) for x in lpds] + [float(query.get("lpd") or 0.0), float(CAL.LPD_MAX)]
+    )
     q = _cond_vec(query, lpd_ref)
     scored = []
     for p in points:
@@ -400,6 +407,144 @@ def _verdict_emp(exact: bool, n_local: int, n_pool: int, d_min: float) -> Dict[s
     if d_min > 1.5:
         return {"level": "risk", "label": "邻域较远", "why": "最近实测偏远，插值外推成分大"}
     return {"level": "go", "label": "邻域插值", "why": "用邻近实测加权平均（仍是数学）"}
+
+
+def _decision(
+    emp: Dict[str, Any],
+    wm: Dict[str, Any],
+    constraints: List[dict],
+    exact: bool,
+) -> Dict[str, Any]:
+    """把三层信息压成「一个结论 + 三句各自说的话 + 一条动作」。
+
+    结论优先级固定：约束有否决权 > 同条件实测 > 经验邻域 > 机理外推。
+    三方言不一致时，明写听谁的、差多少，不留给用户自己对着数字猜。
+    """
+    emp_p = emp.get("predict") or {}
+    wm_p = wm.get("predict") or {}
+    fails = sum(1 for c in constraints if c.get("st") == "fail")
+    warns = sum(1 for c in constraints if c.get("st") == "warn")
+    fail_names = [c.get("name") or c.get("k") for c in constraints if c.get("st") == "fail"][:2]
+    warn_names = [c.get("name") or c.get("k") for c in constraints if c.get("st") == "warn"][:2]
+
+    n_local = (emp.get("verdict") or {}).get("n_local") or len(emp.get("neighbors") or [])
+    d_min = 0.0
+    if emp.get("neighbors"):
+        try:
+            d_min = float(emp["neighbors"][0].get("d") or 0.0)
+        except (TypeError, ValueError):
+            d_min = 0.0
+
+    # ---- 结论 ----
+    if fails > 0:
+        level, label = "reject", "别做"
+        why = f"{fails} 条硬约束不通过（{'、'.join(str(x) for x in fail_names)}）"
+        decided_by = "约束"
+    elif exact and emp_p.get("y") is not None:
+        level, label = "go", "可做"
+        why = "同条件已有实测，直接按实测值安排，不必看外推"
+        decided_by = "数据"
+    elif d_min > 1.2:
+        level, label = "risk", "谨慎"
+        why = f"最近实测也差 {d_min:.2f}（离得远），机理只给方向，产率区间会很宽"
+        decided_by = "机理"
+    elif warns >= 8:
+        level, label = "risk", "谨慎"
+        why = f"告警 {warns} 条（{'、'.join(str(x) for x in warn_names)}），条件本身能做但要盯选择性"
+        decided_by = "约束"
+    else:
+        level, label = "go", "可做"
+        why = "约束无失败，邻近实测能支撑，机理趋势一致" if emp_p.get("y") is not None else "约束无失败，可外推试"
+        decided_by = "约束"
+
+    # ---- 三方言 ----
+    voices = []
+
+    if emp_p.get("y") is not None:
+        voices.append({
+            "who": "数据说",
+            "value": f"p_C2+ {emp_p['y']}（{emp_p.get('y_lo')}~{emp_p.get('y_hi')}）· sel {emp_p.get('sel')}%",
+            "why": f"{n_local} 条邻近实测加权，最近距离 {d_min:.2f}",
+            "tone": "go" if not exact and d_min <= 0.6 else ("risk" if d_min > 1.2 else "go"),
+        })
+    else:
+        voices.append({
+            "who": "数据说",
+            "value": "没有邻近实测",
+            "why": "主表该体系为空，这一条全靠外推",
+            "tone": "risk",
+        })
+
+    trend = "看不出方向"
+    f = wm.get("factors") or {}
+    if f:
+        ups = [k for k, v in f.items() if isinstance(v, (int, float)) and v > 1.02]
+        downs = [k for k, v in f.items() if isinstance(v, (int, float)) and v < 0.98]
+        names = {"act": "活化", "flow": "流量", "h_sel": "选择性", "absorb": "吸光", "load": "负载", "light": "光照"}
+        bits = []
+        if ups:
+            bits.append("抬高 " + "、".join(names.get(k, k) for k in ups))
+        if downs:
+            bits.append("压低 " + "、".join(names.get(k, k) for k in downs))
+        if bits:
+            trend = "；".join(bits)
+    voices.append({
+        "who": "机理说",
+        "value": f"趋势：{trend}",
+        "why": f"参考点 负载 {wm.get('ref_cond', {}).get('load')} wt%、光 {wm.get('ref_cond', {}).get('lpd')} mW/cm²",
+        "tone": "risk" if d_min > 1.2 else "go",
+    })
+
+    voices.append({
+        "who": "约束说",
+        "value": f"失败 {fails} · 告警 {warns} · 共 {len(constraints)}",
+        "why": ("否决：" + "、".join(str(x) for x in fail_names)) if fails
+        else ("要注意：" + "、".join(str(x) for x in warn_names) if warn_names else "无阻塞项"),
+        "tone": "reject" if fails else ("risk" if warns >= 8 else "go"),
+    })
+
+    # ---- 冲突 ----
+    conflict = ""
+    if emp_p.get("y") is not None and wm_p.get("y") is not None and emp_p["y"] > 0:
+        gap = (wm_p["y"] - emp_p["y"]) / emp_p["y"]
+        if abs(gap) >= 0.25:
+            who = "经验（实测近，更可信）" if d_min < 0.8 else "机理（实测太远，趋势更稳）"
+            conflict = (
+                f"经验 {emp_p['y']} vs 机理 {wm_p['y']}，差 {abs(gap) * 100:.0f}%；"
+                f"这次听{who}"
+            )
+    if fails > 0:
+        conflict = "约束已否决，预测值仅供事后对照，不作为做它的理由"
+
+    # ---- 唯一动作 ----
+    action = None
+    sug = (wm.get("suggestions") or [])
+    if sug:
+        s = sug[0]
+        action = {
+            "text": (
+                f"下一组测 负载 {s.get('load')} wt%、CH4/O2/Ar "
+                f"{s.get('ch4')}/{s.get('o2')}/{s.get('ar')}、光 {s.get('lpd')} mW/cm²"
+            ),
+            "why": (
+                "它离已有数据最远，测完能把这一片的区间收窄"
+                if float(s.get("d_min") or 0) > 0.4
+                else "它当前 UCB 最高，既能冲产率又能验证趋势"
+            ),
+        }
+
+    return {
+        "level": level,
+        "label": label,
+        "why": why,
+        "decided_by": decided_by,
+        "voices": voices,
+        "conflict": conflict,
+        "action": action,
+        "fails": fails,
+        "warns": warns,
+        "n_constraints": len(constraints),
+    }
 
 
 def _verdict_wm(constraints: List[dict], kin: Optional[dict]) -> Dict[str, Any]:
@@ -714,7 +859,21 @@ def preview(
         },
     }
 
-    # —— ③ AI / 主动学习层 ——
+    # —— ③ 校准层 · prior+残差（Pd–P25）——
+    layer_cal = None
+    if mk == "Pd" and sk and "P25" in str(sk):
+        try:
+            from .layered_wm_service import snapshot_for_preview
+            layer_cal = snapshot_for_preview(query)
+        except Exception as e:
+            layer_cal = {
+                "name": "校准层 · prior+残差",
+                "role": "动力学先验 + 条件残差",
+                "error": str(e)[:160],
+                "verdict": {"level": "risk", "label": "不可用", "why": str(e)[:100]},
+            }
+
+    # —— ④ AI / 主动学习层 ——
     ai = _ai_suggest(pool, query)
     layer_ai = {
         "name": "主动学习层 · AI 采集",
@@ -725,31 +884,28 @@ def preview(
         "suggestions": ai.get("items") or [],
     }
 
-    # 总裁决：优先约束失败；否则看经验是否精确 / 世界模型风险
-    v_wm = layer_wm["verdict"]
-    if v_wm.get("level") == "reject":
-        verd = dict(v_wm)
-    elif exact and emp_y is not None:
-        verd = {
-            "level": "go", "label": "可做（实测锚定）",
-            "why": "经验层已有同条件实测；世界模型作旁证，主动学习可扫邻域空白",
-            "fails": v_wm.get("fails", 0), "warns": v_wm.get("warns", 0),
-        }
-    else:
-        verd = {
-            "level": v_wm.get("level") or "go",
-            "label": v_wm.get("label") or "可做",
-            "why": "综合三层：经验插值 + 世界模型外推 + 主动学习建议",
-            "fails": v_wm.get("fails", 0), "warns": v_wm.get("warns", 0),
-        }
+    # 总裁决压成「一个结论 + 三方言 + 一条动作」
+    layer_wm["suggestions"] = ai.get("items") or []
+    verd = _decision(layer_emp, layer_wm, constraints, exact)
 
-    # 兼容旧字段：主预测优先经验，否则世界模型
+    # 兼容旧字段：主预测优先经验；Pd–P25 域内校准时用校准层作并列主预测
     if emp_y is not None:
         main = layer_emp["predict"]
         main_tag = emp_tag
+    elif layer_cal and layer_cal.get("predict"):
+        main = layer_cal["predict"]
+        main_tag = "prior+残差校准"
     else:
         main = layer_wm["predict"]
         main_tag = "世界模型外推"
+
+    layers_out = {
+        "empirical": layer_emp,
+        "world_model": layer_wm,
+        "active_learning": layer_ai,
+    }
+    if layer_cal is not None:
+        layers_out["calibrated"] = layer_cal
 
     return {
         "ok": True,
@@ -766,11 +922,7 @@ def preview(
             "light": light,
             "mech": cand.get("mech") or "OCM",
         },
-        "layers": {
-            "empirical": layer_emp,
-            "world_model": layer_wm,
-            "active_learning": layer_ai,
-        },
+        "layers": layers_out,
         # 兼容旧 UI
         "history": {**layer_emp["history"], "tag": main_tag},
         "predict": main,

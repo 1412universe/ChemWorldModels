@@ -1,28 +1,28 @@
-# ChemWorldModel → GitHub 日常更新
-# 复制整段到终端执行即可（先改 commit 说明）：
+# ChemWorldModel → GitHub 日常更新（整段复制到终端即可；先改 commit 说明）
+# 已踩坑：默认 SSH:22 不通；改 HTTPS 会卡住；唯一稳的是 SSH over 443。
 
 cd /Users/fenglongli/Downloads/ChemWorldModel
 
+# 强制 remote 为 SSH（若误改成 https:// 会 push 卡住，勿用 HTTPS）
+git remote set-url origin git@github.com:1412universe/ChemWorldModels.git
+
 git add -A
 git status
-git commit -m "$(cat <<'EOF'
+
+# 有暂存改动才 commit；没有则跳过（避免「nothing to commit」中断后面的 push）
+git diff --cached --quiet || git commit -m "$(cat <<'EOF'
 更新说明写这里
 EOF
 )"
 
-# 推送：强制走 GitHub SSH 的 443 端口（勿用默认 22）
-# 教训：git@github.com 默认连 22，常报
-#   ssh: connect to host github.com port 22: Undefined error: 0
-#   fatal: Could not read from remote repository.
-# 那是网络/防火墙拦了 22，本地 commit 其实已成功；修好推送方式后直接再 push 即可。
+# 推送：必须走 ssh.github.com:443（不要用默认 22，也不要 git push 裸 HTTPS）
 GIT_SSH_COMMAND='ssh -o Hostname=ssh.github.com -p 443 -o User=git' git push origin main
 
-# 若上面仍失败（密钥/权限问题），改用 HTTPS（443）再推一次：
-# git remote set-url origin https://github.com/1412universe/ChemWorldModels.git
-# git push origin main
+# 核对：应显示与 origin/main 对齐，不应再有 ahead
+git status -sb
+git log -1 --oneline
 
 # 说明：
 # - data/、根目录 skills/ 软链等已在 .gitignore，不会上传
 # - 正式 skill 副本在 wm_backend/skills/，会随仓库走
-# - 无改动时 commit 会失败，属正常
-# - status 显示 ahead of origin/main = 本地已有未推送提交，只需再执行上面的 push 行
+# - 仅本地已 commit、上次 push 失败时：不用再 commit，整段再跑一遍即可（会跳过空 commit 再 push）

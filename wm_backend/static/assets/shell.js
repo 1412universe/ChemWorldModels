@@ -16,13 +16,10 @@
   var theme = (window.PAGE_CONFIG && window.PAGE_CONFIG.theme) || "gn"; // gn=金四面体/MOF 合成产线；photo=甲烷偶联光催化闭环
 
   var NAV = [
+    { href: "brief.html",          icon: "📋", label: "数据空间总览", key: "brief" },
     { href: "index.html",          icon: "📊", label: "总览-510", key: "index"  },
     { href: "overview_photo.html", icon: "☀️", label: "总览-光催化闭环设计", key: "photo" },
     { href: "workflow_editor.html", icon: "🛠️", label: "工作流编辑器", key: "wfed" },
-    { href: "lab.html",    icon: "⚗️ ", label: "合成", key: "lab"    },
-    { href: "char.html",   icon: "🔬", label: "表征", key: "char"   },
-    { href: "dft.html",    icon: "⚛️ ", label: "理论", key: "dft"    },
-    { href: "recipe.html", icon: "📋", label: "配方", key: "recipe" }
   ];
 
   var brand = (theme === 'photo') ? '甲烷偶联光催化 · AI 世界模型' : '金四面体/MOF · AI 世界模型';
@@ -36,35 +33,12 @@
   navHtml += "</nav>";
 
   var studioName = (theme === 'photo') ? '甲烷偶联 · AI 世界模型工作室' : '金四面体/MOF · AI 世界模型工作室';
-  var ctrlBtns = (theme === 'photo') ? [
-    '      <button id="btn-neb">⚛ NEB 路径</button>',
+  var ctrlBtns = [
     '      <button id="btn-play" class="primary">▶ 运行</button>',
     '      <button id="btn-worldmodel" class="wm-toolbar" title="世界模型预演：条件→产物 + 物理约束">🌍 世界模型</button>',
     '      <label style="margin-left:6px;font-size:12px;cursor:pointer;user-select:none"><input type="checkbox" id="chk-bo" style="vertical-align:middle"> 纯BO模式</label>',
-    '      <button id="btn-step">⏭ 单步</button>',
     '      <button id="btn-exp-csv" class="exp">⬇ 配方CSV</button>',
     '      <button id="btn-exp-json" class="exp">⬇ 配方JSON</button>',
-    '      <button id="btn-exp-unilab" class="exp primary">⬇ CWM-Lab</button>',
-    '      <button id="btn-char">🔬 表征 &amp; 理论</button>',
-    '      <button id="btn-react">🎯 反应体系 / 可靠性</button>',
-    '      <button id="btn-reaction" class="exp">⚗ 反应：甲烷</button>',
-    '      <span id="oer-target-wrap" style="display:none">',
-    '        <button id="btn-oer-target" class="exp">🎯 OER 目标：H₂O₂</button>',
-    '      </span>'
-  ] : [
-    '      <button id="btn-neb">⚛ NEB 路径</button>',
-    '      <button id="btn-play" class="primary">▶ 运行</button>',
-    '      <label style="margin-left:6px;font-size:12px;cursor:pointer;user-select:none"><input type="checkbox" id="chk-bo" style="vertical-align:middle"> 纯BO模式</label>',
-    '      <button id="btn-step">⏭ 单步</button>',
-    '      <button id="btn-exp-csv" class="exp">⬇ 配方CSV</button>',
-    '      <button id="btn-exp-json" class="exp">⬇ 配方JSON</button>',
-    '      <button id="btn-exp-unilab" class="exp primary">⬇ CWM-Lab</button>',
-    '      <button id="btn-char">🔬 表征 &amp; 理论</button>',
-    '      <button id="btn-react">🎯 反应体系 / 可靠性</button>',
-    '      <button id="btn-reaction" class="exp">⚗ 反应：金四面体</button>',
-    '      <span id="oer-target-wrap" style="display:none">',
-    '        <button id="btn-mof-target" class="exp">🎯 MOF 应用目标：催化</button>',
-    '      </span>'
   ];
 
   var headerHtml = [
@@ -72,28 +46,15 @@
     '    <h1><span class="em">🧪</span> ' + studioName + '</h1>',
     '    <span class="tag real">真实文献库 · 265 篇</span>',
     '    <span class="tag" id="iter-tag">迭代 #0</span>',
-    '    <span class="tag sim" id="ts-tag">⏱ ×10,000</span>',
-    '    <span class="tag sim" id="sim-clock">🌐 模拟 0s</span>',
-    '    <span class="tag sim" id="data-mode-tag">🧪 数据：始终真实</span>',
+    '    <span class="tag sim" id="data-mode-tag">🧪 数据：纯模拟</span>',
     '    <div class="spacer"></div>',
     '    <div class="ctrl">',
   ].concat(ctrlBtns, [
-    '      <label class="lbl">时间倍率</label>',
-    '      <input id="ts-input" type="number" min="1" step="1" value="10000" />',
-    '      <span class="presets">',
-    '        <button class="tsp" data-v="1">1×</button>',
-    '        <button class="tsp" data-v="100">100×</button>',
-    '        <button class="tsp" data-v="1000">1k×</button>',
-    '        <button class="tsp" data-v="10000">10k×</button>',
-    '        <button class="tsp" data-v="100000">100k×</button>',
-    '      </span>',
-    '      <label class="lbl" style="margin-left:10px;">🧠 7B策略接管</label>',
-    '      <input id="use7b" type="checkbox" checked title="每次选取候选时咨询本地 Qwen2.5-7B（无后端或取消勾选时自动回退确定性逻辑）。模型只读数据库、不生成/修改文献。" />',
     '      <label class="lbl" style="margin-left:10px;">🧪 实验数据</label>',
     '      <select id="data-mode" title="选择本轮是否使用真实实验数据，以及何时从模拟切换到真实">',
     '        <option value="real">始终真实</option>',
     '        <option value="hybrid">混合：N 次后真实</option>',
-    '        <option value="sim">纯模拟</option>',
+    '        <option value="sim" selected>纯模拟</option>',
     '      </select>',
     '      <span id="real-after-wrap" style="display:none;gap:4px;align-items:center">',
     '        <label class="lbl">N=</label>',
@@ -106,10 +67,6 @@
     '        <option value="PI">PI（改进概率）</option>',
     '        <option value="TS">TS（Thompson 采样）</option>',
     '      </select>',
-    '      <button id="btn-eval" class="tsp" title="对当前采样轨迹做主动学习评价（遗憾/Top-k/校准/覆盖）">📊 评价</button>',
-    '      <button id="btn-realdata" class="exp" title="上传真实世界实验数据（.csv/.xlsx/.tif），在“真实实验反馈”阶段作为真实反馈；或随时点此上传">📁 上传真实实验数据</button>',
-    '      <label class="lbl" style="margin-left:8px;">自动评价</label>',
-    '      <input id="auto-eval" type="checkbox" checked title="每完成一轮迭代自动重算评价指标（遗憾 / Top-k / 校准 / 覆盖 / 奖励归因），并刷新遗憾趋势曲线。" />',
     '    </div>',
     '  </header>'
   ]).join("\n");
@@ -122,7 +79,6 @@
     '    <div class="stage" data-stage="1"><div class="num">2</div><div class="body"><div class="t">虚拟合成与表征</div><div class="d">称量 · 马弗炉焙烧催化剂</div></div></div>',
     '    <div class="loop-arrow">↓</div>',
     '    <div class="stage" data-stage="2"><div class="num">3</div><div class="body"><div class="t">真实实验反馈</div><div class="d">灯 + 反应器 · 气相色谱 · 表征</div></div></div>',
-    '    <div class="realdata-cta"><button id="btn-stage-realdata" class="rd-cta" title="上传你的真实实验数据（.csv/.xlsx/.tif），作为本轮真实反馈">📁 录入真实数据</button><span class="realdata-hint">手动上传真实实验 · 替代模拟值</span></div>',
     '    <div class="loop-arrow">↻</div>',
     '    <div class="stage" data-stage="3"><div class="num">4</div><div class="body"><div class="t">强化 / 主动学习</div><div class="d">AI 控制中心更新世界模型</div></div></div>',
     '    <div id="acq-box">',
@@ -192,13 +148,10 @@
     '  </div>',
     '  <div class="ai-chat-body" id="ai-chat-body">',
     '    <div class="ai-chat-msgs" id="ai-chat-msgs">',
-    '      <div class="ai-msg bot">👋 你好！我是世界模型助手。告诉我「开始运行」「单步」「切换到 OER」「上传真实数据」等，我来实时操控实验闭环。</div>',
+    '      <div class="ai-msg bot">👋 你好！我是世界模型助手。告诉我「开始运行」，我来实时操控实验闭环。</div>',
     '    </div>',
     '    <div class="ai-chat-quick">',
     '      <button class="ai-quick" data-cmd="开始运行实验闭环">▶ 运行</button>',
-    '      <button class="ai-quick" data-cmd="单步推进一次">⏭ 单步</button>',
-    '      <button class="ai-quick" data-cmd="切换到 OER 反应">⚗ OER</button>',
-    '      <button class="ai-quick" data-cmd="打开真实实验数据上传">📁 真实数据</button>',
     '    </div>',
     '    <div class="ai-chat-input">',
     '      <button id="ai-chat-attach-btn" class="ai-chat-send" style="background:#334155;padding:0 12px" title="上传数据文件（.csv/.xlsx/.tif）用于 AI 分析与原位真实实验反馈">📎</button>',

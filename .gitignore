@@ -75,3 +75,11 @@ obj/
 
 # Local skill symlink (real copy lives in wm_backend/skills/)
 skills/
+
+# 软著材料仅本地留存，不上传
+软著V1.0/
+
+# Headless Chrome 检查留下的用户目录和探针页
+wm_backend/static/q?/
+wm_backend/static/r1/
+wm_backend/static/_probe*.html

@@ -51,7 +51,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg1_e41699"
       },
       {
         "uuid": "e41699a9-77ed-4799-9337-e1ea688c2bda",
@@ -105,7 +106,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg1_e41699"
       },
       {
         "uuid": "63b53cb5-0ad4-403e-8ae2-185ffb860346",
@@ -157,7 +159,8 @@
         "lab_node_type": "Device",
         "template_uuid": "16a27598-6607-4cad-b6d4-a8573b3d2f54",
         "template_name": "auto-shaking_incubation_action",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg1_e41699"
       },
       {
         "uuid": "147411a7-1ecb-4d5e-9b4a-792e9c0bc3e9",
@@ -238,7 +241,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg1_e41699"
       },
       {
         "uuid": "4e2c26cd-b71e-4eb3-a3e9-974837015178",
@@ -278,7 +282,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -290,7 +294,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg2_4e2c26"
       },
       {
         "uuid": "cd6aada3-cc9e-4a00-8a7a-c1b9cb8db5d4",
@@ -330,7 +335,7 @@
         },
         "param": {
           "number": 1,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -342,7 +347,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg3_cd6aad"
       },
       {
         "uuid": "539bc2f9-71c4-42f5-88f0-568a4460568d",
@@ -394,7 +400,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg2_4e2c26"
       },
       {
         "uuid": "6aa76426-1f93-49f8-a422-3206c1691a8b",
@@ -434,7 +441,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -446,7 +453,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg3_cd6aad"
       },
       {
         "uuid": "6d617cd0-0c65-4398-88bd-636f94e0e9a1",
@@ -527,7 +535,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg1_e41699"
       },
       {
         "uuid": "c5523d11-e2df-4dfa-b1f6-19674a063b20",
@@ -629,7 +638,8 @@
         "lab_node_type": "Device",
         "template_uuid": "b1f8991e-9f06-4abf-ad40-38406c5e5b0a",
         "template_name": "transfer_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg1_e41699"
       },
       {
         "uuid": "71040af1-a9cb-42af-ae25-0fe15ff5960b",
@@ -731,7 +741,8 @@
         "lab_node_type": "Device",
         "template_uuid": "b1f8991e-9f06-4abf-ad40-38406c5e5b0a",
         "template_name": "transfer_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg1_e41699"
       }
     ],
     "edges": [

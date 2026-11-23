@@ -16,6 +16,15 @@ LOD = 80  # GC-FID 检测限（μmol·g⁻¹·h⁻¹），与前端 EXP.LOD 对�
 from . import services
 from . import evaluation
 from . import ext_llm
+
+try:
+    import lamp_calib
+except ImportError:  # pragma: no cover - wm_model 在 sys.path 里由 main.py 注入
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "wm_model"))
+    import lamp_calib
 from .data import ALLCAT, CATALYSTS, DEVICES, KB_ALL, POOL, OER_POOL, fam_of, eov_of, dcht3_of
 from .services import (
     nearest_ocm, simulate_experiment, optimal_conditions, default_conditions,
@@ -352,6 +361,23 @@ def nearest_ocm_endpoint(metal: str, support: str):
     return {"hit": hit}
 
 
+# ------------------------------------------------------------
+# HCHO 场景（ZnO 光热制甲醛）：BO 空间定义 + 首轮补点设计
+# ------------------------------------------------------------
+@router.get("/api/hcho/space")
+def hcho_space():
+    """HCHO 探索空间定义（变量/范围/单位/精度/固定值/产物口径）。"""
+    from . import hcho_wm
+    return hcho_wm.space_definition()
+
+
+@router.get("/api/hcho/design")
+def hcho_design():
+    """首轮 15 条分层档位组合补点表（纯 BO 探索，模型层留空）。"""
+    from . import hcho_wm
+    return hcho_wm.design_points()
+
+
 @router.post("/api/generate-workflow")
 def generate_workflow_endpoint(req: WorkflowReq):
     """调用 unilab-workflow-builder skill 的 prcxi_factory.py 生成合规工作流 JSON。
@@ -513,6 +539,79 @@ def overview_photo_html():
 def workflow_editor_html():
     """可视化工作流编辑器：拖拽编排 CWM-Lab 可执行工作流（兼容 unilab_workflow.json）。"""
     return FileResponse(os.path.join(STATIC_DIR, "workflow_editor.html"))
+
+
+@router.get("/brief")
+@router.get("/brief.html")
+def brief_html():
+    """一页式结论：负载-产率现状、数据缺口、下一步建议。"""
+    return FileResponse(os.path.join(STATIC_DIR, "brief.html"))
+
+
+@router.get("/api/selfcheck")
+def api_selfcheck():
+    """模型自检：逐档对比实测与预测，标出可用/不可用。"""
+    try:
+        from .selfcheck import selfcheck
+        return selfcheck()
+    except Exception as e:
+        logger.exception("selfcheck")
+        return {"ok": False, "error": str(e)[:300]}
+
+
+@router.get("/api/old-lamp-surface")
+def api_old_lamp_surface():
+    """旧灯 434 mW、0.05% 的流量响应曲面（IDW 插值，不外推）。"""
+    try:
+        from .selfcheck import old_lamp_surface
+        return old_lamp_surface()
+    except Exception as e:
+        logger.exception("old lamp surface")
+        return {"ok": False, "error": str(e)[:300]}
+
+
+@router.get("/api/data-space")
+def api_data_space():
+    """三维数据空间：负载 × 光强 × CH4 比例，颜色为产率。"""
+    try:
+        from .selfcheck import data_space
+        return data_space()
+    except Exception as e:
+        logger.exception("data space")
+        return {"ok": False, "error": str(e)[:300]}
+
+
+@router.get("/api/flow-model")
+def api_flow_model():
+    """流量响应机理模型：拟合参数、拟合点对照、外推示例。"""
+    try:
+        from .selfcheck import flow_model
+        return flow_model()
+    except Exception as e:
+        logger.exception("flow model")
+        return {"ok": False, "error": str(e)[:300]}
+
+
+@router.get("/api/constraint-cases")
+def api_constraint_cases():
+    """约束否决示例：哪些候选被物理约束直接挡掉。"""
+    try:
+        from .selfcheck import constraint_cases
+        return constraint_cases()
+    except Exception as e:
+        logger.exception("constraint cases")
+        return {"ok": False, "error": str(e)[:300]}
+
+
+@router.get("/api/brief")
+def api_brief():
+    """负载-产率统计汇总（纯统计，不含模型外推）。"""
+    try:
+        from .brief import brief_payload
+        return brief_payload()
+    except Exception as e:
+        logger.exception("brief")
+        return {"ok": False, "error": str(e)[:300]}
 
 
 @router.get("/datalog")
@@ -1683,6 +1782,16 @@ def bo_closed_loop():
         return {"ok": False, "error": str(e)[:300]}
 
 
+@router.get("/api/lamp/calib")
+def lamp_calib_table():
+    """实验灯标定表：输入功率 W ↔ 显示功率 W ↔ LPD mW/cm² ↔ 相对光功率%。"""
+    try:
+        return {"ok": True, "rows": lamp_calib.table(), "lpd_max": lamp_calib.LPD_MAX}
+    except Exception as e:
+        logger.exception("lamp calib")
+        return {"ok": False, "error": str(e)[:200]}
+
+
 @router.get("/api/worldmodel/catalog")
 def worldmodel_catalog():
     """金属/载体下拉与历史组合清单。"""
@@ -1696,7 +1805,10 @@ def worldmodel_catalog():
 
 @router.post("/api/worldmodel/preview")
 def worldmodel_preview(body: dict | None = None):
-    """世界模型预演：历史锚点 + 条件模拟 + 微动力学 + 物理约束 → 可做/高风险/别做。"""
+    """世界模型预演：历史锚点 + 条件模拟 + 微动力学 + 物理约束 → 可做/高风险/别做。
+
+    light 默认按 LPD mW/cm²；传 light_unit="W" 时按实验灯输入功率换算。
+    """
     body = body or {}
     try:
         from .worldmodel_preview import preview
@@ -1704,6 +1816,11 @@ def worldmodel_preview(body: dict | None = None):
         def _f(key, default):
             v = body.get(key)
             return float(v) if v is not None and v != "" else float(default)
+
+        light = _f("light", 100.0)
+        unit = str(body.get("light_unit") or "lpd").lower()
+        if unit in ("w", "power", "input"):
+            light = float(lamp_calib.lpd_from_power(light))
 
         return preview(
             metal=str(body.get("metal") or "Pd"),
@@ -1713,10 +1830,66 @@ def worldmodel_preview(body: dict | None = None):
             ar=_f("ar", 10.0),
             o2_pct=_f("o2_pct", 1.0),
             loading=_f("loading", 1.0),
-            light=_f("light", 100.0),
+            light=light,
         )
     except Exception as e:
         logger.exception("worldmodel preview")
+        return {"ok": False, "error": str(e)[:300]}
+
+
+@router.post("/api/worldmodel/layered/predict")
+def worldmodel_layered_predict(body: dict | None = None):
+    """分层校准世界模型预测（Pd–P25 prior+残差，附 knn 对照）。"""
+    body = body or {}
+    try:
+        from . import layered_wm_service as lws
+
+        def _f(key, default=None):
+            v = body.get(key)
+            if v is None or v == "":
+                return default
+            return float(v)
+
+        return {
+            "ok": True,
+            **lws.predict(
+                load=_f("loading", _f("load", 0.05)),
+                ch4=_f("ch4", 69.0),
+                o2=_f("o2", 1.0),
+                ar=_f("ar", 10.0),
+                o2_in=_f("o2_pct", _f("o2_in", 1.0)),
+                light=_f("light", _f("lpd", 257.3)),
+                light_unit=str(body.get("light_unit") or ("lpd" if body.get("lpd") else "rel")),
+                m_cat=_f("m_cat", None),
+                mode=str(body.get("mode") or "prior_residual"),
+            ),
+        }
+    except Exception as e:
+        logger.exception("layered predict")
+        return {"ok": False, "error": str(e)[:300]}
+
+
+@router.get("/api/worldmodel/layered/ablation")
+def worldmodel_layered_ablation():
+    """hold-out 消融：table_knn / prior_only / prior_residual。"""
+    try:
+        from . import layered_wm_service as lws
+        return lws.run_ablation()
+    except Exception as e:
+        logger.exception("layered ablation")
+        return {"ok": False, "error": str(e)[:300]}
+
+
+@router.post("/api/worldmodel/layered/design")
+def worldmodel_layered_design(body: dict | None = None):
+    """写出下一轮空间填充补点表到 data/pd_p25_fill_design.xlsx。"""
+    body = body or {}
+    try:
+        from . import layered_wm_service as lws
+        n = int(body.get("n") or 80)
+        return lws.write_design(n=max(20, min(n, 200)))
+    except Exception as e:
+        logger.exception("layered design")
         return {"ok": False, "error": str(e)[:300]}
 
 

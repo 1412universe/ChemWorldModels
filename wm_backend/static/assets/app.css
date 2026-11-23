@@ -1203,3 +1203,35 @@ header .ctrl .rm-btn.on.danger{ background:#fee2e2; color:#b91c1c; }
   padding:3px 12px; cursor:pointer; box-shadow:0 2px 10px rgba(220,38,38,.4);
 }
 #runmode-realbar:hover{ filter:brightness(1.1); }
+
+/* ── 场景切换标签（OCM / HCHO 双子面板）── */
+.scene-tabs{display:flex;gap:6px;margin:10px 0 4px}
+.scene-tab{
+  flex:1;padding:7px 10px;border-radius:var(--r-sm);cursor:pointer;font-size:12px;font-weight:600;
+  border:var(--glass-border);background:var(--glass);color:var(--txt-muted);transition:all .15s;
+}
+.scene-tab.active{background:var(--accent-grad);color:#fff;border-color:transparent;box-shadow:var(--accent-glow)}
+
+/* ── HCHO 面板 ── */
+#hcho-card{margin-top:10px;padding:12px;border-radius:var(--r-md);background:var(--glass);border:var(--glass-border)}
+#hcho-card .name{font-weight:800;font-size:13.5px;color:var(--accent)}
+.hcho-meta{color:var(--txt-secondary);font-size:10.5px;margin-top:6px;line-height:1.5}
+.hcho-fixed{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.hcho-fixed .h-chip{font-size:10px;color:var(--txt-primary);background:rgba(255,255,255,.5);border:var(--glass-border);border-radius:8px;padding:4px 8px}
+.hcho-sec{margin-top:12px}
+.hcho-sec-title{font-size:11px;font-weight:700;color:var(--txt-primary);margin-bottom:6px}
+.hcho-table-wrap{max-height:320px;overflow:auto;border:var(--glass-border);border-radius:var(--r-sm)}
+#hcho-table{width:100%;border-collapse:collapse;font-size:10px}
+#hcho-table th,#hcho-table td{padding:5px 6px;border-bottom:1px solid rgba(15,23,42,.06);text-align:center;font-variant-numeric:tabular-nums}
+#hcho-table th{position:sticky;top:0;background:var(--bg-elevated);color:var(--txt-secondary);font-weight:700;white-space:nowrap}
+#hcho-table td.why{text-align:left;color:var(--txt-muted);white-space:normal;min-width:120px}
+.hcho-outputs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.hcho-outputs .h-out{font-size:10px;color:var(--txt-muted);background:rgba(255,255,255,.5);border:var(--glass-border);border-radius:var(--r-sm);padding:6px 8px}
+.hcho-outputs .h-out b{display:block;font-size:11px;color:var(--txt-primary);margin-top:2px}
+.hcho-note{margin-top:10px;font-size:10px;color:var(--txt-muted);line-height:1.5;border-top:1px solid rgba(15,23,42,.06);padding-top:8px}
+
+/* HCHO 首轮设计入口按钮 + 标注（折叠进独立弹窗） */
+.hcho-open-btn{width:100%;padding:10px 12px;border:var(--glass-border);border-radius:var(--r-sm);background:var(--glass);color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;text-align:left}
+.hcho-open-btn:hover{border-color:var(--accent)}
+.hcho-sec-note{font-size:10px;color:var(--txt-muted);margin-top:5px}
+#hcho-modal .hcho-table-wrap{max-height:62vh;border:none}

@@ -183,3 +183,128 @@ if __name__ == '__main__':
     for m, (en, wf) in metals.items():
         r = simulate(en, wf)
         print(f"{m:<6} {r['x_CH4_%']:>8.2f} {r['sel_C2_%']:>9.1f} {r['sel_C2H6_%']:>11.1f} {r['sel_C2H4_%']:>11.1f} {r['sel_CO2_%']:>9.1f}")
+
+
+# ============================================================================
+# 流量响应模型（竞争吸附 Langmuir–Hinshelwood）
+# ============================================================================
+# 用 Pd/P25 0.05 wt%、光强 430 mW/cm2 下的 4 组单日扫描联合拟合
+# （O2 扫描两段 + CH4 扫描两段，共 12 个条件点），参数全部来自最小二乘。
+#
+#   denom   = 1 + K_O*x_O2 + K_C*x_CH4       O2 与 CH4 竞争同一类吸附位
+#   theta_O = K_O*x_O2 / denom               氧覆盖度
+#   theta_C = K_C*x_CH4 / denom              甲烷覆盖度
+#   y       = Y0 * theta_C^p * theta_O^q / (1 + (Q/Q0)^n)
+#   s       = 100 / (1 + B * x_O2^b / x_CH4^g)
+#
+# 拟合质量：R2(log y)=0.899，MAPE=6.8%；选择性 R2=0.998，MAE=0.2 点。
+# 留一序列验证：区域内插 15-16%，外推到未测组合 33-56%。
+# 适用范围：0.05 wt%、430 mW/cm2、O2 5-30%、CH4 30-90%、总流量 100 mL/min。
+
+FLOW_FIT = {
+    'Y0': 671254.0,   # 覆盖度满值时的产率尺度
+    'K_O': 6.33,      # 氧吸附平衡常数
+    'K_C': 0.26,      # 甲烷吸附平衡常数（较小，说明甲烷吸附弱）
+    'Q0': 739.0,      # 停留时间特征流量
+    'n': 4.16,        # 流量衰减指数
+    'p': 0.94,        # 甲烷覆盖度反应级数
+    'q': 0.96,        # 氧覆盖度反应级数
+    'B': 0.51,        # 过度氧化强度
+    'b': 0.44,        # 氧毒性指数
+    'g': 0.71,        # 甲烷保护指数
+    'r2_log_y': 0.899,
+    'mape_y': 0.068,
+    'r2_sel': 0.998,
+    'mae_sel': 0.2,
+    'n_points': 12,
+}
+
+FLOW_RANGE = {
+    'load_wt': 0.05,
+    'lpd': 430.0,
+    'x_o2': (0.05, 0.30),
+    'x_ch4': (0.30, 0.90),
+    'total_flow': 100.0,
+}
+
+
+def coverage(ch4: float, o2: float, ar: float) -> dict:
+    """竞争吸附覆盖度。输入流量 mL/min。"""
+    tot = float(ch4) + float(o2) + float(ar)
+    if tot <= 0:
+        return {'theta_o': 0.0, 'theta_c': 0.0, 'x_o2': 0.0, 'x_ch4': 0.0, 'total': 0.0}
+    x_ch4 = float(ch4) / tot
+    x_o2 = float(o2) / tot
+    f = FLOW_FIT
+    den = 1.0 + f['K_O'] * x_o2 + f['K_C'] * x_ch4
+    return {
+        'theta_o': f['K_O'] * x_o2 / den,
+        'theta_c': f['K_C'] * x_ch4 / den,
+        'x_o2': x_o2,
+        'x_ch4': x_ch4,
+        'total': tot,
+    }
+
+
+def predict_flow(ch4: float, o2: float, ar: float,
+                 load_wt: float = 0.05, lpd: float = 430.0) -> dict:
+    """按流量条件预测产率与选择性。
+
+    输入流量单位 mL/min。返回 y / sel / 覆盖度 / 是否在拟合范围内。
+    in_range 为 False 时数值只能当趋势参考。
+    """
+    cov = coverage(ch4, o2, ar)
+    if cov['total'] <= 0:
+        return {'y': None, 'sel': None, 'in_range': False, 'note': '总流量为 0'}
+    f = FLOW_FIT
+    t_o, t_c = cov['theta_o'], cov['theta_c']
+    if t_o <= 0 or t_c <= 0:
+        return {'y': 0.0, 'sel': None, 'in_range': False, 'note': '缺甲烷或氧'}
+
+    q_term = 1.0 + (cov['total'] / f['Q0']) ** f['n']
+    y = f['Y0'] * (t_c ** f['p']) * (t_o ** f['q']) / q_term
+    denom = 1.0 + f['B'] * (cov['x_o2'] ** f['b']) / (cov['x_ch4'] ** f['g'])
+    sel = 100.0 / denom
+
+    notes = []
+    lo_o, hi_o = FLOW_RANGE['x_o2']
+    lo_c, hi_c = FLOW_RANGE['x_ch4']
+    if not (lo_o <= cov['x_o2'] <= hi_o):
+        notes.append('氧浓度 %.1f%% 超出 %.0f-%.0f%%' % (
+            cov['x_o2'] * 100, lo_o * 100, hi_o * 100))
+    if not (lo_c <= cov['x_ch4'] <= hi_c):
+        notes.append('甲烷浓度 %.1f%% 超出 %.0f-%.0f%%' % (
+            cov['x_ch4'] * 100, lo_c * 100, hi_c * 100))
+    if abs(float(load_wt) - FLOW_RANGE['load_wt']) > 1e-6:
+        notes.append('负载 %.3g%% 非拟合所用 0.05%%' % float(load_wt))
+    if abs(float(lpd) - FLOW_RANGE['lpd']) > 30:
+        notes.append('光强 %.0f 非拟合所用 430' % float(lpd))
+
+    return {
+        'y': round(y, 1),
+        'sel': round(sel, 2),
+        'theta_o': round(t_o, 4),
+        'theta_c': round(t_c, 4),
+        'x_ch4': round(cov['x_ch4'], 4),
+        'x_o2': round(cov['x_o2'], 4),
+        'total_flow': round(cov['total'], 1),
+        'in_range': not notes,
+        'note': '；'.join(notes) if notes else '在拟合范围内',
+    }
+
+
+# 拟合所用 12 个条件点，供页面自检对照
+FLOW_FIT_POINTS = [
+    {'ch4': 90, 'o2': 2.5, 'ar': 7.5, 'y': 15909, 'sel': 90.2, 'series': '氧扫描(CH4=90)'},
+    {'ch4': 90, 'o2': 5.0, 'ar': 5.0, 'y': 21752, 'sel': 87.0, 'series': '氧扫描(CH4=90)'},
+    {'ch4': 90, 'o2': 7.5, 'ar': 2.5, 'y': 31299, 'sel': 84.9, 'series': '氧扫描(CH4=90)'},
+    {'ch4': 30, 'o2': 10.0, 'ar': 60.0, 'y': 15016, 'sel': 69.7, 'series': '甲烷扫描(低)'},
+    {'ch4': 40, 'o2': 10.0, 'ar': 50.0, 'y': 17492, 'sel': 74.0, 'series': '甲烷扫描(低)'},
+    {'ch4': 50, 'o2': 10.0, 'ar': 40.0, 'y': 20394, 'sel': 75.9, 'series': '甲烷扫描(低)'},
+    {'ch4': 65, 'o2': 10.0, 'ar': 25.0, 'y': 28146, 'sel': 80.0, 'series': '甲烷扫描(高)'},
+    {'ch4': 70, 'o2': 10.0, 'ar': 20.0, 'y': 29770, 'sel': 80.9, 'series': '甲烷扫描(高)'},
+    {'ch4': 75, 'o2': 10.0, 'ar': 15.0, 'y': 31093, 'sel': 81.5, 'series': '甲烷扫描(高)'},
+    {'ch4': 50, 'o2': 20.0, 'ar': 30.0, 'y': 19960, 'sel': 78.2, 'series': '氧扫描(CH4=50)'},
+    {'ch4': 50, 'o2': 25.0, 'ar': 25.0, 'y': 22303, 'sel': 75.8, 'series': '氧扫描(CH4=50)'},
+    {'ch4': 50, 'o2': 30.0, 'ar': 20.0, 'y': 24681, 'sel': 74.1, 'series': '氧扫描(CH4=50)'},
+]

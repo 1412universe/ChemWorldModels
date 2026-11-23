@@ -154,7 +154,7 @@ const OP_DUR={system:200, stack:300, liquid:1800, robot:300, solid:300, tube:180
 let best={name:'—',y:-1,s:-1,rec:null};
 let emaY=null, mae=0, maeN=0, rmae=0, rmaeN=0, sampled={};
 let measured=[];                 // 已实测 {(doi,y,r)} —— 世界模型的"自有实验"训练集
-let DATA_MODE='real';            // 实验数据模式：'real'=始终用真实值；'hybrid'=前 N 次用模拟值、第 N+1 次起用真实值；'sim'=纯模拟
+let DATA_MODE='sim';             // 实验数据模式：'real'=始终用真实值；'hybrid'=前 N 次用模拟值、第 N+1 次起用真实值；'sim'=纯模拟（默认）
 let REAL_AFTER_ITER=5;           // hybrid 模式：前 N 次迭代用模拟值作为反馈，第 N+1 次起才开启真实实验闸门
 let supportReuse={};             // 各载体家族累计投料次数（驱动失活约束）
 let expChecks=[];                // 最近一次迭代级的"实验现实性"约束
@@ -3307,7 +3307,7 @@ document.getElementById('btn-play').addEventListener('click',()=>{
   if(running){log('ai',`● 工作室启动（时间倍率 ×${timeScale}）：AI 角色自主跑实验，模拟时钟按真实世界 ${timeScale} 倍加速…`);startIteration();}
   else log('warn','⏸ 已暂停');
 });
-document.getElementById('btn-step').addEventListener('click',()=>{ stepOnce(); });
+document.getElementById('btn-step')?.addEventListener('click',()=>{ stepOnce(); });
 const tsInput=document.getElementById('ts-input');
 function setTimeScale(v){ v=Math.max(1, Math.floor(v)||1); timeScale=v; if(tsInput)tsInput.value=v; updateSimClockUI(); }
 if(tsInput) tsInput.addEventListener('change',e=>setTimeScale(+e.target.value));
@@ -3319,7 +3319,7 @@ document.querySelectorAll('.tsp').forEach(b=>b.addEventListener('click',()=>setT
   const raw=document.getElementById('real-after-wrap');
   function sync(){
     if(!dm) return;
-    DATA_MODE = dm.value || 'real';
+    DATA_MODE = dm.value || 'sim';
     if(ra){ const v=parseInt(ra.value,10); REAL_AFTER_ITER = (isFinite(v)&&v>=1)?v:5; }
     if(raw) raw.style.display = (DATA_MODE==='hybrid') ? 'inline-flex' : 'none';
     updateDataModeTag();
@@ -3328,8 +3328,8 @@ document.querySelectorAll('.tsp').forEach(b=>b.addEventListener('click',()=>setT
   if(ra){ ra.addEventListener('input', sync); ra.addEventListener('change', sync); }
   sync();
 })();
-document.getElementById('btn-neb').addEventListener('click',()=>{
-  nebOn=!nebOn;document.getElementById('btn-neb').classList.toggle('on',nebOn);
+document.getElementById('btn-neb')?.addEventListener('click',()=>{
+  nebOn=!nebOn;const b=document.getElementById('btn-neb');if(b)b.classList.toggle('on',nebOn);
   log('ok',nebOn?'⚛ NEB 路径动画开启（能垒为示意值）':'⚛ NEB 路径动画关闭');
 });
 
@@ -3523,7 +3523,7 @@ document.getElementById('dm-exec').addEventListener('click',()=>{
 
 document.getElementById('btn-exp-csv').addEventListener('click',exportRecipesCSV);
 document.getElementById('btn-exp-json').addEventListener('click',exportRecipesJSON);
-document.getElementById('btn-exp-unilab').addEventListener('click',exportUniLabWorkflow);
+document.getElementById('btn-exp-unilab')?.addEventListener('click',exportUniLabWorkflow);
 /* 启动：渲染循环立即开始，数据已内置，绝不空白 */
 try{
   if(typeof Chart!=='undefined' && window.PAGE_CONFIG && window.PAGE_CONFIG.showFooter!==false){ initCharts(); }
@@ -4322,8 +4322,8 @@ function renderRecipePanel(){
       + `合成调制因子 ≈ ${(r.recipeMod!=null?r.recipeMod.toFixed(2):'—')}<br>设备：${devs}</div></div>`;
   }).join('');
 }
-document.getElementById('btn-char').addEventListener('click', renderCharTheory);
-document.getElementById('btn-react').addEventListener('click', renderReactionsReliability);
+document.getElementById('btn-char')?.addEventListener('click', renderCharTheory);
+document.getElementById('btn-react')?.addEventListener('click', renderReactionsReliability);
 function setReaction(react){
   activeReaction = react;
   const rb=document.getElementById('btn-reaction');
@@ -4352,8 +4352,8 @@ function setReaction(react){
   log('ai', `○ 已切换至 <b>${react==='OER'?'MOF 应用（催化/吸附分离）':'金四面体合成'}</b> 反应轨道，循环状态已重置；点「▶ 运行」开始该反应的主动学习闭环。`);
   refreshBest();
 }
-document.getElementById('btn-reaction').addEventListener('click', ()=> setReaction(activeReaction==='OER'?'CH4':'OER'));
-document.getElementById('btn-mof-target').addEventListener('click', ()=>{
+document.getElementById('btn-reaction')?.addEventListener('click', ()=> setReaction(activeReaction==='OER'?'CH4':'OER'));
+document.getElementById('btn-mof-target')?.addEventListener('click', ()=>{
   mofTarget = (mofTarget==='cat')?'sep':'cat';
   const bt=document.getElementById('btn-mof-target'); if(bt) bt.textContent='🎯 MOF 应用目标：'+(mofTarget==='cat'?'催化':'吸附分离');
   log('ai', `○ MOF 应用目标切换为 <b>${mofTarget==='cat'?'催化（活性优先）':'吸附分离（容量优先）'}</b>；后续主动学习按此权衡活性×选择性×稳定性。`);
