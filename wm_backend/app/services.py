@@ -314,7 +314,8 @@ def compute_constraints(r: dict, oer_target: str = "cat") -> list[dict]:
     # ⑲
     e = P['eovf']
     st = 'pass'
-    d = f'E_ovf≈{e:.2f} eV{"" if not P["hasOv"] else "（文献提及氧空位/Ov/缺陷）"}；窗口 0.8–2.0 eV 最佳'
+    ov_note = '' if not P['hasOv'] else '（文献提及氧空位/Ov/缺陷）'
+    d = f'E_ovf≈{e:.2f} eV{ov_note}；窗口 0.8–2.0 eV 最佳'
     if e < OVF_LO:
         st = 'warn'
         d += '；过低→位点不稳/易复合或溶出'
@@ -446,7 +447,8 @@ def compute_constraints(r: dict, oer_target: str = "cat") -> list[dict]:
         ds = '非多孔/块体，外扩散主导'
     elif P['pore'] < KNUD_PORE:
         st = 'warn' if y > KNUD_Y_THR else 'pass'
-        ds = f"孔径≈{P['pore']:.0f} nm < 平均自由程(~{KNUD_PORE:.0f} nm)，Knudsen 扩散；{('高活性下孔道内传质受限' if y > KNUD_Y_THR else '传质可接受')}"
+        knud_note = '高活性下孔道内传质受限' if y > KNUD_Y_THR else '传质可接受'
+        ds = f"孔径≈{P['pore']:.0f} nm < 平均自由程(~{KNUD_PORE:.0f} nm)，Knudsen 扩散；{knud_note}"
     else:
         ds = f"孔径≈{P['pore']:.0f} nm，分子扩散区"
     out.append({'k': 'knud', 'name': '㉘ 孔道 Knudsen 扩散', 'st': st, 'd': ds, 'cat': '动力学与传质'})

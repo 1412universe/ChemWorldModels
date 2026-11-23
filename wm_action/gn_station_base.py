@@ -337,7 +337,8 @@ class GNStationClient:
                 if val is not None:
                     self.plc.write(node, val)
 
-        # 触发前清掉粘滞的完成位，避免「第一次假完成、轴不动」
+        # 触发前清掉粘滞的完成位，避免「第一次假完成、轴不动」。
+        # clear_done=False（堆栈等）时不写完成位，只等回落。
         if done_node:
             self._ensure_done_idle(done_node, clear_done=clear_done, description=desc)
 
@@ -398,10 +399,13 @@ class GNStationClient:
         timeout: float,
         description: str,
     ) -> bool:
-        """发指令后等到位：对 done_node 与 reach_checks 反馈节点建临时订阅（仅在
-        全局订阅未开时），靠订阅推送值判断。"""
+        """发指令后等到位。
+
+        重要：完成位必须 **force_read**。全局订阅缓存里若 CompleteFB 初值是 0，
+        且该点订阅未刷新，use_cache=True 会永远读到 0 → 堆栈复位「收不到反馈」死等。
+        """
         watch = ([done_node] if done_node else []) + [c[0] for c in (reach_checks or [])]
-        sub = self.plc.subscribe_once(watch) if (watch and not self.plc._use_subscription) else None
+        sub = self.plc.subscribe_once(watch) if (watch and not getattr(self.plc, "_use_subscription", True)) else None
         logger.info(f"[{description}] 已下发，等待到位（{watch}）...")
 
         start = time.time()
@@ -413,7 +417,13 @@ class GNStationClient:
         # 有 reach_checks 时：完成位可选（粘滞/缺失时仍以位置为准）
         require_done = bool(done_node) and not reach_checks
         while time.time() - start < timeout:
-            values = {n: self.plc.read(n, force_read=True) for n in watch}
+            values = {}
+            for n in watch:
+                try:
+                    values[n] = self.plc.read(n, force_read=True)
+                except Exception as ex:
+                    values[n] = None
+                    logger.warning(f"[{description}] 读 {n} 失败: {ex}")
             ok = True
             if done_node and require_done:
                 raw = values.get(done_node)
@@ -454,7 +464,8 @@ class GNStationClient:
                 except Exception:
                     pass
             for name in watch:
-                self.plc._node_values.pop(self.plc._name_mapping.get(name, name), None)
+                mapping = getattr(self.plc, "_name_mapping", {}) or {}
+                getattr(self.plc, "_node_values", {}).pop(mapping.get(name, name), None)
         return reached
 
     # ==================================================================

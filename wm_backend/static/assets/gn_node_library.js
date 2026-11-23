@@ -38418,6 +38418,8 @@ window.GN_NODE_LIBRARY = {
         "trough",
         "deepWell",
         "reader",
+        "shake",
+        "tip",
         "transfer",
         "spare",
         "sonic"
@@ -38438,11 +38440,14 @@ window.GN_NODE_LIBRARY = {
        "roleLabel": "目标 target",
        "value": "resource",
        "accept": [
+        "trough",
         "deepWell",
         "reader",
-        "trough",
+        "shake",
+        "tip",
         "transfer",
-        "spare"
+        "spare",
+        "sonic"
        ],
        "multi": true
       },
@@ -38761,6 +38766,8 @@ window.GN_NODE_LIBRARY = {
         "trough",
         "deepWell",
         "reader",
+        "shake",
+        "tip",
         "transfer",
         "spare",
         "sonic"
@@ -38773,11 +38780,14 @@ window.GN_NODE_LIBRARY = {
        "param": "targets",
        "value": "resource",
        "accept": [
+        "trough",
         "deepWell",
         "reader",
-        "trough",
+        "shake",
+        "tip",
         "transfer",
-        "spare"
+        "spare",
+        "sonic"
        ],
        "multi": true
       },
@@ -38904,10 +38914,10 @@ window.GN_NODE_LIBRARY = {
         "key": "to",
         "label": "终点板位",
         "unit": "号",
-        "desc": "搬运终点板位号（1..16；3/4 号位夹爪行程不覆盖）"
+        "desc": "搬运终点板位号（1..16；T9/T13 空位不覆盖）"
        },
        "unit": "号",
-       "desc": "搬运终点板位号（1..16；3/4 号位夹爪行程不覆盖）",
+       "desc": "搬运终点板位号（1..16；T9/T13 空位不覆盖）",
        "deck": true,
        "role": "to",
        "roleLabel": "终点 to",
@@ -38916,6 +38926,7 @@ window.GN_NODE_LIBRARY = {
         "trough",
         "deepWell",
         "reader",
+        "shake",
         "tip",
         "transfer",
         "spare",
@@ -38932,10 +38943,10 @@ window.GN_NODE_LIBRARY = {
         "key": "from",
         "label": "起点板位",
         "unit": "号",
-        "desc": "搬运起点板位号（1..16；3/4 号位夹爪行程不覆盖）"
+        "desc": "搬运起点板位号（1..16；T9/T13 空位不覆盖）"
        },
        "unit": "号",
-       "desc": "搬运起点板位号（1..16；3/4 号位夹爪行程不覆盖）",
+       "desc": "搬运起点板位号（1..16；T9/T13 空位不覆盖）",
        "deck": true,
        "role": "from",
        "roleLabel": "起点 from",
@@ -38944,6 +38955,7 @@ window.GN_NODE_LIBRARY = {
         "trough",
         "deepWell",
         "reader",
+        "shake",
         "tip",
         "transfer",
         "spare",
@@ -38965,39 +38977,25 @@ window.GN_NODE_LIBRARY = {
       },
       "plate": {
        "type": "json",
-       "default": "[{\"id\": \"/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips2\", \"name\": \"PRCXI_1250uL_Tips2\", \"uuid\": \"e7df077f-ec56-48e6-a7af-9fabf569c418\"}]",
+       "default": "[]",
        "meta": {
         "key": "plate",
-        "label": "搬运耗材",
-        "desc": "被夹爪搬运的孔板/耗材资源实例（JSON 数组）"
+        "label": "搬运对象",
+        "desc": "兼容字段（move_plate 只按 from/to 板位号搬运，不选枪头盒）"
        },
-       "desc": "被夹爪搬运的孔板/耗材资源实例（JSON 数组）",
-       "deck": true,
-       "role": "plate",
-       "roleLabel": "搬运耗材",
-       "value": "resource",
-       "accept": [
-        "trough",
-        "deepWell",
-        "reader",
-        "tip",
-        "transfer",
-        "spare",
-        "sonic"
-       ],
-       "multi": true
+       "desc": "兼容字段（move_plate 只按 from/to 板位号搬运，不选枪头盒）"
       },
       "hierarchy": {
        "type": "int",
        "min": 1,
-       "max": 1,
+       "max": 2,
        "default": 1,
        "meta": {
         "key": "hierarchy",
         "label": "层级",
-        "desc": "搬运层级（1=单层）"
+        "desc": "搬运层级（1=单层→设备 Level0；2=二层→Level1）"
        },
-       "desc": "搬运层级（1=单层）"
+       "desc": "搬运层级（1=单层→设备 Level0；2=二层→Level1）"
       },
       "get_direction": {
        "type": "enum",
@@ -39138,6 +39136,7 @@ window.GN_NODE_LIBRARY = {
         "trough",
         "deepWell",
         "reader",
+        "shake",
         "tip",
         "transfer",
         "spare",
@@ -39154,28 +39153,13 @@ window.GN_NODE_LIBRARY = {
         "trough",
         "deepWell",
         "reader",
+        "shake",
         "tip",
         "transfer",
         "spare",
         "sonic"
        ],
        "multi": false
-      },
-      {
-       "key": "plate",
-       "label": "搬运耗材",
-       "param": "plate",
-       "value": "resource",
-       "accept": [
-        "trough",
-        "deepWell",
-        "reader",
-        "tip",
-        "transfer",
-        "spare",
-        "sonic"
-       ],
-       "multi": true
       }
      ]
     },
@@ -39214,6 +39198,8 @@ window.GN_NODE_LIBRARY = {
         "trough",
         "deepWell",
         "reader",
+        "shake",
+        "tip",
         "transfer",
         "spare",
         "sonic"
@@ -39234,11 +39220,14 @@ window.GN_NODE_LIBRARY = {
        "roleLabel": "目标 target",
        "value": "resource",
        "accept": [
+        "trough",
         "deepWell",
         "reader",
-        "trough",
+        "shake",
+        "tip",
         "transfer",
-        "spare"
+        "spare",
+        "sonic"
        ],
        "multi": true
       },
@@ -39471,6 +39460,8 @@ window.GN_NODE_LIBRARY = {
         "trough",
         "deepWell",
         "reader",
+        "shake",
+        "tip",
         "transfer",
         "spare",
         "sonic"
@@ -39483,11 +39474,14 @@ window.GN_NODE_LIBRARY = {
        "param": "targets",
        "value": "resource",
        "accept": [
+        "trough",
         "deepWell",
         "reader",
-        "trough",
+        "shake",
+        "tip",
         "transfer",
-        "spare"
+        "spare",
+        "sonic"
        ],
        "multi": true
       },
@@ -39513,15 +39507,15 @@ window.GN_NODE_LIBRARY = {
        "type": "int",
        "min": 5,
        "max": 300000,
-       "default": 10,
+       "default": 100,
        "meta": {
         "key": "time",
         "label": "时长",
         "unit": "s",
-        "desc": "震荡孵育时长（秒）"
+        "desc": "震荡孵育时长（秒；对齐 V04 示例默认 100）"
        },
        "unit": "s",
-       "desc": "震荡孵育时长（秒）"
+       "desc": "震荡孵育时长（秒；对齐 V04 示例默认 100）"
       },
       "is_wait": {
        "type": "bool",
@@ -39537,15 +39531,15 @@ window.GN_NODE_LIBRARY = {
        "type": "int",
        "min": 1,
        "max": 1200,
-       "default": 1,
+       "default": 1200,
        "meta": {
         "key": "amplitude",
         "label": "振幅",
         "unit": "rpm",
-        "desc": "震荡转速/振幅档位"
+        "desc": "震荡转速 OscRate（rpm；对齐 V04 示例默认 1200）"
        },
        "unit": "rpm",
-       "desc": "震荡转速/振幅档位"
+       "desc": "震荡转速 OscRate（rpm；对齐 V04 示例默认 1200）"
       },
       "module_no": {
        "type": "int",
@@ -39571,10 +39565,10 @@ window.GN_NODE_LIBRARY = {
         "label": "温度设置",
         "unit": "℃",
         "rw": "W",
-        "desc": "离心机/烘箱温度设定值"
+        "desc": "震荡孵育设定温度（写入真机 Temp，28..50℃）"
        },
        "unit": "℃",
-       "desc": "离心机/烘箱温度设定值"
+       "desc": "震荡孵育设定温度（写入真机 Temp，28..50℃）"
       }
      }
     }

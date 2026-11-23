@@ -1,0 +1,48 @@
+:: ChemWorldModel 日常命令（务必在仓库根目录执行）
+:: 约定：wm_backend/workflows 本机专用，拉/推都不动
+
+set ROOT=D:\Download\ChemWorldModel
+set WF=%ROOT%\wm_backend\workflows
+set WF_BAK=%TEMP%\cwm_workflows_bak
+cd /d %ROOT%
+
+:: ===== 拉最新（其余跟远程；workflows 备份后盖回）=====
+:: 用 reset --hard 对齐 origin/main，避免本地分叉导致 ff-only 失败
+if exist "%WF_BAK%" rmdir /s /q "%WF_BAK%"
+robocopy "%WF%" "%WF_BAK%" /E /NFL /NDL /NJH /NJS /nc /ns /np
+if not exist "%WF_BAK%\demo.json" (
+  echo [ERROR] workflows 备份失败，已中止
+  goto :eof
+)
+
+git remote set-url origin https://ghfast.top/https://github.com/1412universe/ChemWorldModels.git
+git fetch origin
+git reset --hard origin/main
+git remote set-url origin https://github.com/1412universe/ChemWorldModels.git
+
+if exist "%WF%" rmdir /s /q "%WF%"
+robocopy "%WF_BAK%" "%WF%" /E /NFL /NDL /NJH /NJS /nc /ns /np
+echo [OK] 已对齐 origin/main；workflows 已从本机备份盖回
+
+:: ===== 安装依赖（首次 / requirements 变更时）=====
+conda activate ChemWorldModel
+cd /d D:\Download\ChemWorldModel\wm_backend
+pip install -r requirements.txt
+
+:: ===== 启动 =====
+:: Ollama 用托盘/后台即可；main.py 静默检测 11434，不弹黑窗
+conda activate ChemWorldModel
+cd /d D:\Download\ChemWorldModel\wm_backend
+python main.py
+
+:: http://127.0.0.1:8000
+:: 首次：ollama pull qwen2.5:7b ；data/ 需自备
+
+:: ===== 提交推送（排除 workflows；先改说明）=====
+cd /d %ROOT%
+git add -A -- ":!wm_backend/workflows"
+git status
+git commit -m "简述这次改动"
+git remote set-url origin https://ghfast.top/https://github.com/1412universe/ChemWorldModels.git
+git push origin main
+git remote set-url origin https://github.com/1412universe/ChemWorldModels.git

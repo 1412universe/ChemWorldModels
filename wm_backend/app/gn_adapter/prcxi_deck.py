@@ -59,12 +59,9 @@ def _site_geometry(i: int) -> Dict[str, float]:
 # ---------------------------------------------------------------------------
 # 2. 台面工艺语义（逐字取自 app.js DECKS.prcxi.layouts；pos 即板位号 T）
 # ---------------------------------------------------------------------------
-PROCESSES = [
-    {"key": "aus",   "label": "金球合成"},
-    {"key": "autet", "label": "金四面体合成"},
-    {"key": "mof",   "label": "MOF 合成"},
-]
-DEFAULT_PROCESS = "autet"
+# 不再按金球/金四面体/MOF 分台面；UI 不渲染工艺切换行
+PROCESSES: List[Dict[str, str]] = []
+DEFAULT_PROCESS = "default"
 
 GROUP_LABELS = {
     "trough":   "整板储液槽",
@@ -76,65 +73,37 @@ GROUP_LABELS = {
     "trash":    "垃圾桶",
     "reader":   "酶标板",
     "sonic":    "超声混匀",
+    "shake":    "震荡加样模块",
 }
 
-DISABLED_REASON = "夹爪行程不覆盖（新版《9320 台面布局》标停用）"
+DISABLED_REASON = "空位·不覆盖（T9 / T13）"
 
+# 统一 9320 台面：T11/T12/T15 枪头；T10/T14 储液槽；T9/T13 空·不覆盖；
+# T3 震荡加样；T4 酶标板；其余位保持原金四面体台面语义（对齐真机 9320-366 耗材）
+_LAYOUT_DEFAULT: List[Dict[str, Any]] = [
+    {"pos": 1,  "name": "垃圾桶",                 "group": "trash"},
+    {"pos": 2,  "name": "整板储液槽（制冷4℃）",    "group": "trough",   "content": "金球溶液",     "temp": "4℃"},
+    {"pos": 3,  "name": "震荡加样模块",           "group": "shake"},
+    {"pos": 4,  "name": "酶标板",                 "group": "reader"},
+    {"pos": 5,  "name": "废液槽",                 "group": "waste"},
+    {"pos": 6,  "name": "整板储液槽（制冷4℃）",    "group": "trough",   "content": "2.5mM 氯金酸", "temp": "4℃"},
+    {"pos": 7,  "name": "96孔深孔板（金属浴28℃）", "group": "deepWell", "content": "20mM CTAC",    "temp": "28℃"},
+    {"pos": 8,  "name": "96孔深孔板（金属浴28℃）", "group": "deepWell", "content": "CTAC及CTAB混液", "temp": "28℃"},
+    {"pos": 9,  "name": "空位·不覆盖",             "group": None, "enabled": False},
+    {"pos": 10, "name": "整板储液槽",             "group": "trough"},
+    {"pos": 11, "name": "枪头位",                 "group": "tip", "content": "1ml"},
+    {"pos": 12, "name": "枪头位",                 "group": "tip", "content": "1ml"},
+    {"pos": 13, "name": "空位·不覆盖",             "group": None, "enabled": False},
+    {"pos": 14, "name": "整板储液槽",             "group": "trough"},
+    {"pos": 15, "name": "枪头位",                 "group": "tip", "content": "1ml"},
+    {"pos": 16, "name": "中转位（纯水用完须转移走）", "group": "transfer", "content": "纯水（整板储液槽）"},
+]
+# 兼容旧 process=aus|autet|mof 查询参数
 LAYOUTS: Dict[str, List[Dict[str, Any]]] = {
-    "aus": [
-        {"pos": 1,  "name": "垃圾桶",                 "group": "trash"},
-        {"pos": 2,  "name": "废液槽",                 "group": "waste"},
-        {"pos": 3,  "name": "夹爪行程不覆盖·停用",     "group": None, "enabled": False},
-        {"pos": 4,  "name": "夹爪行程不覆盖·停用",     "group": None, "enabled": False},
-        {"pos": 5,  "name": "整板储液槽（制冷4℃）",    "group": "trough",   "content": "NaBH4溶液",     "temp": "4℃"},
-        {"pos": 6,  "name": "整板储液槽（制冷4℃）",    "group": "trough",   "content": "0.5mM 氯金酸",  "temp": "4℃"},
-        {"pos": 7,  "name": "96孔深孔板（金属浴28℃）", "group": "deepWell", "content": "20mM CTAC",     "temp": "28℃"},
-        {"pos": 8,  "name": "整板储液槽（金属浴28℃）", "group": "trough",   "content": "200mM CTAC",    "temp": "28℃"},
-        {"pos": 9,  "name": "96孔深孔板（恒温振荡）",   "group": "deepWell", "content": "混合溶液A/种子溶液", "temp": "恒温振荡"},
-        {"pos": 10, "name": "枪头位",                 "group": "tip", "content": "1ml"},
-        {"pos": 11, "name": "枪头位",                 "group": "tip", "content": "1ml"},
-        {"pos": 12, "name": "枪头位",                 "group": "tip", "content": "1ml"},
-        {"pos": 13, "name": "整板储液槽",             "group": "trough",   "content": "抗坏血酸溶液（100mM）"},
-        {"pos": 14, "name": "96孔深孔板",             "group": "deepWell", "content": "金球溶液"},
-        {"pos": 15, "name": "枪头位",                 "group": "tip", "content": "1ml"},
-        {"pos": 16, "name": "中转位",                 "group": "transfer", "content": ""},
-    ],
-    "autet": [
-        {"pos": 1,  "name": "垃圾桶",                 "group": "trash"},
-        {"pos": 2,  "name": "废液槽",                 "group": "waste"},
-        {"pos": 3,  "name": "夹爪行程不覆盖·停用",     "group": None, "enabled": False},
-        {"pos": 4,  "name": "夹爪行程不覆盖·停用",     "group": None, "enabled": False},
-        {"pos": 5,  "name": "整板储液槽（制冷4℃）",    "group": "trough",   "content": "金球溶液",     "temp": "4℃"},
-        {"pos": 6,  "name": "整板储液槽（制冷4℃）",    "group": "trough",   "content": "2.5mM 氯金酸", "temp": "4℃"},
-        {"pos": 7,  "name": "96孔深孔板（金属浴28℃）", "group": "deepWell", "content": "20mM CTAC",    "temp": "28℃"},
-        {"pos": 8,  "name": "96孔深孔板（金属浴28℃）", "group": "deepWell", "content": "CTAC及CTAB混液", "temp": "28℃"},
-        {"pos": 9,  "name": "96孔深孔板（恒温振荡）",   "group": "deepWell", "content": "抗坏血酸溶液（梯度）", "temp": "恒温振荡"},
-        {"pos": 10, "name": "枪头位",                 "group": "tip", "content": "1ml"},
-        {"pos": 11, "name": "枪头位",                 "group": "tip", "content": "1ml"},
-        {"pos": 12, "name": "枪头位",                 "group": "tip", "content": "1ml"},
-        {"pos": 13, "name": "酶标板",                 "group": "reader", "content": ""},
-        {"pos": 14, "name": "96孔深孔板",             "group": "deepWell", "content": "金四面体成品"},
-        {"pos": 15, "name": "枪头位",                 "group": "tip", "content": "1ml"},
-        {"pos": 16, "name": "中转位（纯水用完须转移走）", "group": "transfer", "content": "纯水（整板储液槽）"},
-    ],
-    "mof": [
-        {"pos": 1,  "name": "垃圾桶",                 "group": "trash"},
-        {"pos": 2,  "name": "废液槽",                 "group": "waste"},
-        {"pos": 3,  "name": "夹爪行程不覆盖·停用",     "group": None, "enabled": False},
-        {"pos": 4,  "name": "夹爪行程不覆盖·停用",     "group": None, "enabled": False},
-        {"pos": 5,  "name": "整板储液槽（制冷4℃）",    "group": "trough", "content": "", "temp": "4℃"},
-        {"pos": 6,  "name": "整板储液槽（制冷4℃）",    "group": "trough", "content": "", "temp": "4℃"},
-        {"pos": 7,  "name": "96孔深孔板（金属浴28℃）", "group": "deepWell", "content": "", "temp": "28℃"},
-        {"pos": 8,  "name": "96孔深孔板（金属浴28℃）", "group": "deepWell", "content": "", "temp": "28℃"},
-        {"pos": 9,  "name": "空位（可放枪头盒）",       "group": "spare", "content": ""},
-        {"pos": 10, "name": "96孔深孔板",             "group": "deepWell", "content": "溶液A"},
-        {"pos": 11, "name": "整板储液槽",             "group": "trough", "content": "DMF溶液"},
-        {"pos": 12, "name": "96孔深孔板",             "group": "deepWell", "content": "成品"},
-        {"pos": 13, "name": "96孔深孔板（恒温振荡）",   "group": "deepWell", "content": "", "temp": "恒温振荡"},
-        {"pos": 14, "name": "空位（可放枪头盒）",       "group": "spare", "content": ""},
-        {"pos": 15, "name": "空位（可放枪头盒）",       "group": "spare", "content": ""},
-        {"pos": 16, "name": "空位（兼中转位）",         "group": "spare", "content": ""},
-    ],
+    "default": _LAYOUT_DEFAULT,
+    "aus":     _LAYOUT_DEFAULT,
+    "autet":   _LAYOUT_DEFAULT,
+    "mof":     _LAYOUT_DEFAULT,
 }
 
 # ---------------------------------------------------------------------------
@@ -168,7 +137,7 @@ RES_BY_NAME = {r["name"]: r for r in RESOURCES}
 KIND_RULES = [
     (re.compile(r"_Tips\d*$", re.I),        "tip",      "枪头盒"),
     (re.compile(r"troughplate\d*$", re.I),  "trough",   "整板储液槽"),
-    (re.compile(r"DeepWell_shake$", re.I),  "deepWell", "96 孔深孔板（恒温振荡）"),
+    (re.compile(r"DeepWell_shake$", re.I),  "shake",    "震荡加样模块"),
     (re.compile(r"DeepWell", re.I),         "deepWell", "96 孔深孔板"),
     (re.compile(r"wellplate$", re.I),       "reader",   "96 孔板（酶标/检测板）"),
 ]
@@ -189,29 +158,29 @@ def kind_of(name: str) -> Dict[str, str]:
 #    可调用 refresh_from_workflows() 用现网工作流重算（需 CWM-Lab 仓库在场）。
 # ---------------------------------------------------------------------------
 _OCC_EVIDENCE: Dict[int, List[Any]] = {
-    1:  [],
-    2:  [["PRCXI_nest_1_troughplate", 1]],
-    3:  [["PRCXI_96_DeepWell5", 3], ["PRCXI_nest_1_troughplate3", 1]],
-    4:  [["PRCXI_nest_1_troughplate5", 3], ["PRCXI_BioER_96_wellplate", 1]],
-    5:  [["PRCXI_nest_1_troughplate5", 8], ["PRCXI_96_DeepWell5", 1]],
+    1:  [],                                      # 垃圾桶（卸载枪头默认位）
+    2:  [["PRCXI_nest_1_troughplate5", 8], ["PRCXI_nest_1_troughplate", 1]],  # 整板储液槽
+    3:  [["PRCXI_96_DeepWell_shake", 1]],          # 震荡加样模块
+    4:  [["PRCXI_BioER_96_wellplate", 1]],         # 酶标板
+    5:  [],                                      # 废液槽
     6:  [["PRCXI_nest_1_troughplate3", 81], ["PRCXI_96_DeepWell_3", 1]],
     7:  [["PRCXI_nest_1_troughplate4", 11], ["PRCXI_96_DeepWell5", 1]],
     8:  [["PRCXI_96_DeepWell_2", 2], ["PRCXI_nest_1_troughplate2", 2]],
-    9:  [],
-    10: [["PRCXI_nest_1_troughplate2", 84], ["PRCXI_96_DeepWell5", 3]],
-    11: [["PRCXI_1250uL_Tips1", 9], ["PRCXI_1250uL_Tips2", 2]],
-    12: [["PRCXI_1250uL_Tips3", 14], ["PRCXI_1250uL_Tips1", 1]],
-    13: [],
-    14: [["PRCXI_96_DeepWell_3", 4], ["PRCXI_nest_1_troughplate1", 1]],
-    15: [["PRCXI_1250uL_Tips2", 92]],
+    9:  [],                                      # 空位·不覆盖
+    10: [["PRCXI_nest_1_troughplate2", 84]],      # 储液槽
+    11: [["PRCXI_1250uL_Tips1", 9], ["PRCXI_1250uL_Tips2", 2]],  # 枪头
+    12: [["PRCXI_1250uL_Tips3", 14]],             # 枪头（原 T14 枪头证据迁此）
+    13: [],                                      # 空位·不覆盖
+    14: [["PRCXI_nest_1_troughplate1", 1]],       # 储液槽（原 T12 储液槽证据迁此）
+    15: [["PRCXI_1250uL_Tips2", 92]],             # 枪头
     16: [["PRCXI_96_DeepWell5", 22], ["PRCXI_nest_1_troughplate2", 4],
          ["PRCXI_nest_1_troughplate4", 1], ["PRCXI_96_DeepWell_2", 1]],
 }
 
-# 无实测证据、但台面工艺语义与某个**已登记实例**一一对应的板位（显式标注为推定）
-_SEMANTIC_OVERRIDE = {
-    9:  "PRCXI_96_DeepWell_shake",        # 台面「96孔深孔板（恒温振荡）」
-    13: "PRCXI_BioER_96_wellplate",       # 台面「酶标板」
+# 无实测证据、但台面语义与已登记实例一一对应的板位（T9/T13 空位不推定资源）
+_SEMANTIC_OVERRIDE: Dict[int, str] = {
+    3: "PRCXI_96_DeepWell_shake",        # 震荡加样模块
+    4: "PRCXI_BioER_96_wellplate",       # 酶标板
 }
 
 
@@ -324,35 +293,34 @@ def _as_resource_names(v: Any) -> List[str]:
 def action_roles(action: str) -> List[Dict[str, Any]]:
     """某个 PRCXI 动作支持的板位角色（空列表 = 该动作与 deck 无关）。"""
     a = (action or "").strip()
+    # transfer / move 共用同一套板位语义（与 move_plate 可选类别对齐）
+    _deck_accept = ["trough", "deepWell", "reader", "shake", "tip", "transfer", "spare", "sonic"]
     if a in ("transfer_liquid", "titration_liquid"):
         return [
             {"key": "source", "label": "来源 source", "param": "sources",
              "value": "resource", "multi": True, "max": 8,
-             "accept": ["trough", "deepWell", "reader", "transfer", "spare", "sonic"],
-             "hint": "吸取液体的板位（储液槽 / 深孔板 / 酶标板）"},
+             "accept": list(_deck_accept),
+             "hint": "吸取液体的板位（与 move_plate 台面一致；T9/T13 空位不覆盖）"},
             {"key": "target", "label": "目标 target", "param": "targets",
              "value": "resource", "multi": True, "max": 8,
-             "accept": ["deepWell", "reader", "trough", "transfer", "spare"],
-             "hint": "排出液体的板位（深孔板 / 酶标板 / 中转位）"},
+             "accept": list(_deck_accept),
+             "hint": "排出液体的板位（与 move_plate 台面一致；T9/T13 空位不覆盖）"},
             {"key": "tips", "label": "枪头 tips", "param": "tip_racks",
              "value": "resource", "multi": True, "max": 4,
              "accept": ["tip"],
-             "hint": "装载枪头的枪头盒板位（10 / 11 / 12 / 15 号位）"},
+             "hint": "装载枪头的枪头盒板位（T11 / T12 / T15；卸载固定去 T1）"},
         ]
     if a == "move_plate":
+        # 只涉及板位搬运，不选枪头盒 / Tips
         return [
             {"key": "from", "label": "起点 from", "param": "from",
              "value": "slot", "multi": False, "max": 1,
-             "accept": ["trough", "deepWell", "reader", "tip", "transfer", "spare", "sonic"],
-             "hint": "搬运起点板位号（3/4 号位夹爪行程不覆盖）"},
+             "accept": list(_deck_accept),
+             "hint": "搬运起点板位号（T9 / T13 空位不覆盖）"},
             {"key": "to", "label": "终点 to", "param": "to",
              "value": "slot", "multi": False, "max": 1,
-             "accept": ["trough", "deepWell", "reader", "tip", "transfer", "spare", "sonic"],
-             "hint": "搬运终点板位号（3/4 号位夹爪行程不覆盖）"},
-            {"key": "plate", "label": "搬运耗材", "param": "plate",
-             "value": "resource", "multi": True, "max": 4,
-             "accept": ["trough", "deepWell", "reader", "tip", "transfer", "spare", "sonic"],
-             "hint": "被夹爪搬运的孔板 / 耗材资源实例"},
+             "accept": list(_deck_accept),
+             "hint": "搬运终点板位号（T9 / T13 空位不覆盖）"},
         ]
     return []
 
@@ -388,7 +356,7 @@ def _site_resource(slot: int) -> Optional[Dict[str, Any]]:
 def snapshot(process: Optional[str] = None, action: Optional[str] = None) -> Dict[str, Any]:
     """deck 快照：16 板位 × (几何 + 台面语义 + 真实资源 + 角色可用性)。
 
-    process: aus | autet | mof（默认 autet）
+    process: default（兼容 aus|autet|mof 查询，台面已统一）
     action : 传入 PRCXI 动作名时，额外给出该动作的角色定义与逐板位可用性
     """
     proc = (process or DEFAULT_PROCESS).strip().lower()

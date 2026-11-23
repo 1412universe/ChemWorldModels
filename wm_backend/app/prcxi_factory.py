@@ -127,8 +127,10 @@ def arm_place(station, number, footer):
 # ---------------------------------------------------------------------------
 def move_plate(frm, to, res, footer):
     t = TPL['move']
+    # move_plate 只按 from/to 搬运；plate 为兼容字段，可空（不再绑定枪头盒）
+    plate = [res] if res else []
     return mk_node('move_plate', t[0], t[1], t[2], t[3],
-                   {'to': to, 'from': frm, 'force': 5, 'plate': [res], 'hierarchy': 1,
+                   {'to': to, 'from': frm, 'force': 5, 'plate': plate, 'hierarchy': 1,
                     'get_direction': '', 'pickup_offset': {'x': 0, 'y': 0, 'z': 0},
                     'put_direction': '', 'drop_direction': '',
                     'resource_offset': {'x': 0, 'y': 0, 'z': 0}, 'pickup_direction': '',

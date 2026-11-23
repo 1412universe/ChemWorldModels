@@ -111,12 +111,12 @@ PRCXI_PARAM_META = {
     'sources':                    dict(label='源板位',     unit='', desc='吸取液体的板位资源实例列表（JSON 数组，元素含 id/name/uuid）'),
     'targets':                    dict(label='目标板位',   unit='', desc='排出液体的板位资源实例列表（JSON 数组，元素含 id/name/uuid）'),
     'tip_racks':                  dict(label='枪头盒板位', unit='', desc='装载枪头的枪头盒资源实例列表（JSON 数组）'),
-    'plate':                      dict(label='搬运耗材',   unit='', desc='被夹爪搬运的孔板/耗材资源实例（JSON 数组）'),
-    'from':                       dict(label='起点板位',   unit='号', desc='搬运起点板位号（1..16；3/4 号位夹爪行程不覆盖）', type='int', min=1, max=16),
-    'to':                         dict(label='终点板位',   unit='号', desc='搬运终点板位号（1..16；3/4 号位夹爪行程不覆盖）', type='int', min=1, max=16),
+    'plate':                      dict(label='搬运对象',   unit='', desc='兼容字段（move_plate 仅用 from/to 板位号，不选枪头盒）'),
+    'from':                       dict(label='起点板位',   unit='号', desc='搬运起点板位号（1..16；T9/T13 空位不覆盖）', type='int', min=1, max=16),
+    'to':                         dict(label='终点板位',   unit='号', desc='搬运终点板位号（1..16；T9/T13 空位不覆盖）', type='int', min=1, max=16),
     'source_slots':               dict(label='源板位数',   unit='个', desc='源板位占用孔位数（2..16）'),
     'target_slots':               dict(label='目标板位数', unit='个', desc='目标板位占用孔位数（3..16）'),
-    'tip_rack_slots':             dict(label='枪头盒板位数', unit='个', desc='枪头盒板位占用孔位数（11..15，即 10/11/12/15 号位）'),
+    'tip_rack_slots':             dict(label='枪头盒板位数', unit='个', desc='枪头盒板位占用孔位数（T11/T12/T15）'),
     # —— 体积 / 流速 ——
     'asp_vols':                   dict(label='吸取体积',   unit='µL', desc='每个源板位的吸取体积（JSON 数组）'),
     'dis_vols':                   dict(label='排出体积',   unit='µL', desc='每个目标板位的排出体积（JSON 数组）'),
@@ -151,7 +151,7 @@ PRCXI_PARAM_META = {
     'protocol_date':              dict(label='方案日期',   unit='', desc='协议日期（留空用默认）', type='string'),
     'protocol_description':       dict(label='方案说明',   unit='', desc='协议备注说明', type='string'),
     'force':                      dict(label='夹持力',     unit='', desc='夹爪夹持力档位（1..5）', type='int', min=1, max=5),
-    'hierarchy':                  dict(label='层级',       unit='', desc='搬运层级（1=单层）'),
+    'hierarchy':                  dict(label='层级',       unit='', desc='搬运层级（1=单层→设备 Level0；2=二层→Level1）'),
     'get_direction':              dict(label='取件方向',   unit='', desc='夹爪取件方向'),
     'put_direction':              dict(label='放件方向',   unit='', desc='夹爪放件方向'),
     'pickup_direction':           dict(label='抓取方向',   unit='', desc='抓取方向'),
@@ -166,38 +166,37 @@ PRCXI_PARAM_META = {
     # —— 滴注 / 震荡孵育 ——
     'repeat_count':               dict(label='重复次数',   unit='次', desc='滴注循环次数'),
     'cycle_delay_s':              dict(label='周期间隔',   unit='s', desc='两次滴注之间的等待时间'),
-    'time':                       dict(label='时长',       unit='s', desc='震荡孵育时长（秒）'),
+    'time':                       dict(label='时长',       unit='s', desc='震荡孵育时长（秒；对齐 V04 示例默认 100）', type='int', default=100),
     'is_wait':                    dict(label='阻塞等待',   unit='', desc='是否阻塞等待震荡孵育完成'),
-    'amplitude':                  dict(label='振幅',       unit='rpm', desc='震荡转速/振幅档位'),
-    'module_no':                  dict(label='温控模块号', unit='号', desc='震荡孵育使用的温控模块编号'),
-    'temperature':                dict(label='温度',       unit='℃', desc='震荡孵育设定温度（28..50℃）'),
+    'amplitude':                  dict(label='振幅',       unit='rpm', desc='震荡转速 OscRate（rpm；对齐 V04 示例默认 1200）', type='int', default=1200),
+    'module_no':                  dict(label='温控模块号', unit='号', desc='震荡孵育使用的温控模块编号（写入 Number）'),
+    'temperature':                dict(label='温度',       unit='℃', desc='震荡孵育设定温度（写入真机 Temp，28..50℃）'),
 }
 
 # PRCXI 动作 → 板位角色（编辑器据此渲染 4×4 板位点选器；顺序即 UI 顺序）
+_PRCXI_DECK_ACCEPT = ['trough', 'deepWell', 'reader', 'shake', 'tip', 'transfer', 'spare', 'sonic']
 PRCXI_DECK_ROLES = {
     'transfer_liquid': [
         dict(key='source', label='来源 source', param='sources',   value='resource',
-             accept=['trough','deepWell','reader','transfer','spare','sonic'], multi=True),
+             accept=list(_PRCXI_DECK_ACCEPT), multi=True),
         dict(key='target', label='目标 target', param='targets',   value='resource',
-             accept=['deepWell','reader','trough','transfer','spare'], multi=True),
+             accept=list(_PRCXI_DECK_ACCEPT), multi=True),
         dict(key='tips',   label='枪头 tips',  param='tip_racks', value='resource',
              accept=['tip'], multi=True),
     ],
     'titration_liquid': [
         dict(key='source', label='来源 source', param='sources',   value='resource',
-             accept=['trough','deepWell','reader','transfer','spare','sonic'], multi=True),
+             accept=list(_PRCXI_DECK_ACCEPT), multi=True),
         dict(key='target', label='目标 target', param='targets',   value='resource',
-             accept=['deepWell','reader','trough','transfer','spare'], multi=True),
+             accept=list(_PRCXI_DECK_ACCEPT), multi=True),
         dict(key='tips',   label='枪头 tips',  param='tip_racks', value='resource',
              accept=['tip'], multi=True),
     ],
     'move_plate': [
         dict(key='from',  label='起点 from', param='from',  value='slot',
-             accept=['trough','deepWell','reader','tip','transfer','spare','sonic'], multi=False),
+             accept=list(_PRCXI_DECK_ACCEPT), multi=False),
         dict(key='to',    label='终点 to',   param='to',    value='slot',
-             accept=['trough','deepWell','reader','tip','transfer','spare','sonic'], multi=False),
-        dict(key='plate', label='搬运耗材',   param='plate', value='resource',
-             accept=['trough','deepWell','reader','tip','transfer','spare','sonic'], multi=True),
+             accept=list(_PRCXI_DECK_ACCEPT), multi=False),
     ],
 }
 
