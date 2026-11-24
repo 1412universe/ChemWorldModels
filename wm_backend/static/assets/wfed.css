@@ -1544,6 +1544,11 @@ button.wm-toolbar:hover{ filter:brightness(1.06); }
 }
 .wfgroup:hover{ box-shadow:0 8px 24px rgba(15,23,42,.16); }
 .wfgroup.selected{ box-shadow:0 0 0 3px rgba(99,102,241,.20), 0 6px 18px rgba(15,23,42,.12); }
+.wfgroup.disabled{ opacity:.55; border-style:dashed; }
+.wfgroup.disabled .g-name{ text-decoration:line-through; text-decoration-color:#94a3b8; }
+.wfgroup.partial{ border-style:dashed; }
+.wfgroup .g-off{ font-size:9.5px; font-weight:700; color:#fff; background:#94a3b8;
+  border-radius:99px; padding:1px 6px; flex:0 0 auto; }
 .wfgroup .g-head{ display:flex; align-items:center; gap:8px; }
 .wfgroup .g-ico{ font-size:15px; }
 .wfgroup .g-name{ font-size:13px; font-weight:700; color:#1e293b; flex:1; min-width:0;

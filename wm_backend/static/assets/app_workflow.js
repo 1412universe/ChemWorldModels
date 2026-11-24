@@ -1150,11 +1150,22 @@
     });
     var devLabels = Object.keys(devs);
     var ico = (dev && dev.icon) || (devLabels.length > 1 ? '🔗' : '📦');
+    var offN = 0, liveN = 0;
+    g.uuids.forEach(function (u) {
+      var nn = findNode(u);
+      if (!nn || nn.type === 'Group') return;
+      liveN++;
+      if (nn.disabled) offN++;
+    });
+    if (liveN && offN === liveN) d.classList.add('disabled');
+    else if (offN) d.classList.add('partial');
 
     d.appendChild(el('div', 'g-head',
       '<span class="g-ico">' + ico + '</span>' +
       '<span class="g-name" data-gname="1" title="双击可重命名">' + esc(g.name) + '</span>' +
-      '<span class="g-count" title="组内节点数">' + g.uuids.length + '</span>'));
+      '<span class="g-count" title="组内节点数">' + g.uuids.length + '</span>' +
+      (offN ? '<span class="g-off" title="运行时跳过已禁用的节点">' +
+        (offN === liveN ? '已禁用' : (offN + '/' + liveN + ' 禁用')) + '</span>' : '')));
     var sub = devLabels.length > 1 ? devLabels.slice(0, 2).join(' + ') + (devLabels.length > 2 ? ' …' : '')
       : steps.slice(0, 3).join(' → ') + (steps.length > 3 ? ' …' : '');
     d.appendChild(el('div', 'g-sub', esc(sub)));
@@ -1171,6 +1182,43 @@
     del.title = '删除整组';
     d.appendChild(del);
     return d;
+  }
+
+  /** 当前选中里要改启用状态的节点：普通节点 + 折叠组的全部成员 */
+  function selectedActionIds() {
+    var ids = [], seen = {};
+    Object.keys(state.selectedIds || {}).forEach(function (k) {
+      if (k.indexOf('__grp__') === 0) {
+        var g = foldState()[k.slice('__grp__'.length)];
+        if (!g) return;
+        (g.uuids || []).forEach(function (u) {
+          if (!seen[u]) { seen[u] = 1; ids.push(u); }
+        });
+        return;
+      }
+      if (!seen[k]) { seen[k] = 1; ids.push(k); }
+    });
+    return ids.filter(function (id) {
+      var n = findNode(id);
+      return n && n.type !== 'Group';
+    });
+  }
+
+  function applyDisabled(off) {
+    var ids = selectedActionIds();
+    if (!ids.length) {
+      note('warn', '没有选中节点', '先点选节点或折叠组，或按住 Shift 框选。', 3000);
+      return;
+    }
+    pushUndo();
+    ids.forEach(function (id) {
+      var n2 = findNode(id);
+      if (n2 && n2.type !== 'Group') n2.disabled = !!off;
+    });
+    renderNodes();
+    showProps();
+    afterChange();
+    note('ok', off ? '已禁用' : '已启用', ids.length + ' 个节点', 2400);
   }
 
   function foldedSet() {
@@ -3806,6 +3854,9 @@
     wrap.addEventListener('pointerdown', function (ev) {
       // 运行抽屉盖在画布上：这里的按下是划选文字，不能当成平移画布
       if (ev.target && ev.target.closest && ev.target.closest('#wfed-run')) return;
+      // 浮条在画布容器里。若不拦住，点「禁用 / 启用」会被当成点空白：
+      // select(null) 先清掉选中并重绘，按钮在 click 到来前就消失了。
+      if (ev.target && ev.target.closest && ev.target.closest('#wfed-batchbar')) return;
       // 点画布就取消「固定展开」，否则钉住的节点库 / 属性面板会一直盖着画布
       if (typeof setPinned === 'function') setPinned(false);
       if (typeof setPropPinned === 'function') setPropPinned(false);
@@ -4030,7 +4081,7 @@
       var node = ev.target.closest ? ev.target.closest('.wfnode') : null;
       if (!node) return;
       if (ev.target.classList.contains('wfnode-del')) { deleteNode(node.dataset.uuid); return; }
-      if (ev.target.classList.contains('wfnode-dis')) {
+      if (ev.target.closest && ev.target.closest('.wfnode-dis')) {
         var n = findNode(node.dataset.uuid);
         if (!n || n.type === 'Group') return;
         pushUndo();
@@ -4066,23 +4117,7 @@
     }
 
     function batchSetDisabled(off) {
-      var ids = selNodeIds();
-      var grpIds = Object.keys(state.selectedIds).filter(function (k) { return k.indexOf('__grp__') === 0; });
-      // 选中的折叠组：整组成员一起启用/禁用
-      grpIds.forEach(function (k) {
-        var gid = k.slice('__grp__'.length);
-        var g = foldState()[gid];
-        if (!g) return;
-        g.uuids.forEach(function (u) { if (ids.indexOf(u) < 0) ids.push(u); });
-      });
-      if (!ids.length) return;
-      pushUndo();
-      ids.forEach(function (id) {
-        var n = findNode(id);
-        if (n && n.type !== 'Group') n.disabled = off;
-      });
-      renderNodes(); showProps(); afterChange();
-      note('ok', off ? '已禁用' : '已启用', ids.length + ' 个节点', 2600);
+      applyDisabled(off);
     }
 
     // 批量浮条按钮统一由 document 级事件委托处理（见 init 末尾）
@@ -6279,26 +6314,8 @@
       on('btn-unfold', function () { unfoldAll(); });
       on('bb-fold', function () { rebuildFolds(); foldAllGroups(); });
       on('bb-unfold', function () { unfoldAll(); });
-      on('bb-disable', function () {
-        var ids = Object.keys(state.selectedIds).filter(function (k) {
-          return k.indexOf('__grp__') !== 0 && findNode(k);
-        });
-        if (!ids.length) { note('warn', '没有选中节点', '先框选几个节点。', 3000); return; }
-        pushUndo();
-        ids.forEach(function (id) { var n2 = findNode(id); if (n2) n2.disabled = true; });
-        renderNodes(); showProps(); afterChange();
-        note('ok', '已禁用', ids.length + ' 个节点', 2400);
-      });
-      on('bb-enable', function () {
-        var ids = Object.keys(state.selectedIds).filter(function (k) {
-          return k.indexOf('__grp__') !== 0 && findNode(k);
-        });
-        if (!ids.length) { note('warn', '没有选中节点', '先框选几个节点。', 3000); return; }
-        pushUndo();
-        ids.forEach(function (id) { var n2 = findNode(id); if (n2) n2.disabled = false; });
-        renderNodes(); showProps(); afterChange();
-        note('ok', '已启用', ids.length + ' 个节点', 2400);
-      });
+      on('bb-disable', function () { applyDisabled(true); });
+      on('bb-enable', function () { applyDisabled(false); });
       on('bb-del', function () {
         var n = Object.keys(state.selectedIds).filter(function (k) {
           return k.indexOf('__grp__') !== 0;
@@ -6376,18 +6393,7 @@
       // —— 批量浮条按钮 ——
       if (t2.id === 'bb-disable' || t2.id === 'bb-enable') {
         ev.preventDefault(); ev.stopPropagation();
-        var off = t2.id === 'bb-disable';
-        var ids = Object.keys(state.selectedIds).filter(function (k) {
-          return k.indexOf('__grp__') !== 0 && findNode(k);
-        });
-        if (!ids.length) { note('warn', '没有选中节点', '先框选或按住 Ctrl 点选几个节点。', 3000); return; }
-        pushUndo();
-        ids.forEach(function (id) {
-          var n2 = findNode(id);
-          if (n2 && n2.type !== 'Group') n2.disabled = off;
-        });
-        renderNodes(); showProps(); afterChange();
-        note('ok', off ? '已禁用' : '已启用', ids.length + ' 个节点', 2400);
+        applyDisabled(t2.id === 'bb-disable');
         return;
       }
       if (t2.id === 'bb-fold') {
