@@ -775,13 +775,46 @@
   }
 
   function groupPos(g) {
-    var head = groupHeadNode(g);
-    if (!head || !head.pose || !head.pose.position) return { x: 0, y: 0 };
-    if (g.x === null || g.x === undefined) {
-      g.x = head.pose.position.x;
-      g.y = head.pose.position.y;
+    if (!g) return { x: 0, y: 0 };
+    if (g.x !== null && g.x !== undefined && g.y !== null && g.y !== undefined) {
+      return { x: g.x, y: g.y };
     }
-    return { x: g.x, y: g.y };
+    var head = groupHeadNode(g);
+    var x = head && head.pose && head.pose.position ? head.pose.position.x : 0;
+    var y = head && head.pose && head.pose.position ? head.pose.position.y : 0;
+    g.x = x;
+    g.y = y;
+    return { x: x, y: y };
+  }
+
+  /** 组内按真实先后排：只看组内的线，先走没有组内前驱的步骤 */
+  function orderGroupUuids(g) {
+    var ids = (g.uuids || []).slice();
+    var set = {};
+    ids.forEach(function (u) { set[u] = 1; });
+    var parents = {}, children = {};
+    ids.forEach(function (u) { parents[u] = []; children[u] = []; });
+    (state.wf.data.edges || []).forEach(function (e) {
+      if (!e || !set[e.source_node_uuid] || !set[e.target_node_uuid]) return;
+      children[e.source_node_uuid].push(e.target_node_uuid);
+      parents[e.target_node_uuid].push(e.source_node_uuid);
+    });
+    var indeg = {};
+    ids.forEach(function (u) { indeg[u] = parents[u].length; });
+    var q = ids.filter(function (u) { return !indeg[u]; });
+    var order = [];
+    while (q.length) {
+      var u = q.shift();
+      if (order.indexOf(u) >= 0) continue;
+      order.push(u);
+      children[u].forEach(function (v) {
+        indeg[v]--;
+        if (indeg[v] === 0) q.push(v);
+      });
+    }
+    ids.forEach(function (u) { if (order.indexOf(u) < 0) order.push(u); });
+    g.uuids = order;
+    return order;
   }
 
   /** 折叠卡的理想位置：成员包围盒的左上角（成员位置变动后仍能紧凑贴合） */
@@ -808,97 +841,20 @@
     if (!on) { expandGroup(gid); return; }
     pushUndo();
     g.collapsed = true;
-    var head = groupHeadNode(g);
-    if (head && head.pose && head.pose.position) {
-      var bb = groupBounds(g);
-      g.x = bb ? bb.x : head.pose.position.x;
-      g.y = bb ? bb.y : head.pose.position.y;
-    }
-    renderNodes(); updatePositions(); afterViewChange();
+    layoutReading();
+    renderNodes(); updatePositions(); frameReading(); afterViewChange();
   }
 
-  /** 展开一组：把成员排成正常横向链（不再 26px 挤在一起），
-   *  并把位于该组右侧的其它节点整体右移，避免与展开后的节点重叠。 */
+  /** 展开一组：成员按先后插回阅读顺序，整条线重新折行 */
   function expandGroup(gid) {
     var g = foldState()[gid];
     if (!g || !g.uuids || g.uuids.length < 2) return;
     pushUndo();
-    var head = groupHeadNode(g);
-    var bb = groupBounds(g);
-    var gx = (g.x !== null && g.x !== undefined) ? g.x : (bb ? bb.x : (head ? head.pose.position.x : 60));
-    var gy = (g.y !== null && g.y !== undefined) ? g.y : (bb ? bb.y : (head ? head.pose.position.y : 60));
-
-    var step = NODE_W + EXPAND_GAP;
-    var inGroup = {};
-    g.uuids.forEach(function (u) { inGroup[u] = 1; });
-
-    // 1) 先把成员摆成一条正常链
-    var placed = [];
-    g.uuids.forEach(function (u, i) {
-      var n = findNode(u);
-      if (!n || !n.pose) return;
-      if (!n.pose.position) n.pose.position = { x: 0, y: 0, z: 0 };
-      n.pose.position.x = gx + i * step;
-      n.pose.position.y = gy;
-      placed.push({ x: n.pose.position.x, y: gy, w: NODE_W });
-    });
-
-    // 2) 这条链占掉的水平区间
-    var chainRight = gx + (g.uuids.length - 1) * step + NODE_W;
-    var oldRight = gx + NODE_W;
-    var grow = chainRight - oldRight;      // 需要给右侧腾出的宽度
-
-    // 3) 其余可见节点：若起点在组卡片右侧，整体右移 grow，保持相对顺序不重叠
-    if (grow > 0) {
-      var foldedMap = foldedSet();
-      state.wf.data.nodes.forEach(function (n) {
-        if (!n || inGroup[n.uuid]) return;
-        if (foldedMap[n.uuid]) return;      // 其它折叠组成员不动（它们由自己的卡片代表）
-        if (!n.pose || !n.pose.position) return;
-        if (n.pose.position.x >= oldRight) n.pose.position.x += grow;
-      });
-      // 其它折叠组卡片也要跟着右移
-      var f = foldState();
-      Object.keys(f).forEach(function (k) {
-        var o = f[k];
-        if (!o || k === gid || !o.collapsed) return;
-        if (o.x !== null && o.x !== undefined && o.x >= oldRight) {
-          o.x += grow;
-          (o.uuids || []).forEach(function (u) {
-            var m = findNode(u);
-            if (m && m.pose && m.pose.position) m.pose.position.x += grow;
-          });
-        }
-      });
-    }
-
+    orderGroupUuids(g);
     g.collapsed = false;
-    g.x = gx; g.y = gy;
-
-    // 4) 垂直避让：展开出的长链可能与其它行节点在矩形上相交，把它们向下推开
-    (function pushDownConflicts() {
-      var bandTop = gy, bandBottom = gy + 132;   // 节点高度约 132
-      var left = gx, right = chainRight;
-      var need = {};
-      var foldedMap2 = foldedSet();
-      state.wf.data.nodes.forEach(function (n) {
-        if (!n || inGroup[n.uuid] || foldedMap2[n.uuid]) return;
-        if (!n.pose || !n.pose.position) return;
-        var el = canvas.querySelector('[data-uuid="' + n.uuid + '"]');
-        var h = el ? el.offsetHeight : 132;
-        var nx = n.pose.position.x, ny = n.pose.position.y;
-        if (nx < right && nx + NODE_W > left && ny < bandBottom && ny + h > bandTop) {
-          need[n.uuid] = bandBottom - ny + 24;   // 推到链下方 24px
-        }
-      });
-      Object.keys(need).forEach(function (u) {
-        var n = findNode(u);
-        if (n && n.pose && n.pose.position) n.pose.position.y += need[u];
-      });
-    })();
-
+    layoutReading();
     renderNodes(); updatePositions();
-    setTimeout(fitView, 30);
+    setTimeout(frameReading, 30);
     afterViewChange();
   }
 
@@ -927,152 +883,131 @@
     var f = foldState();
     Object.keys(f).forEach(function (k) { f[k].collapsed = false; });
     layoutFolded();
-    renderNodes(); updatePositions(); afterViewChange();
+    renderNodes(); updatePositions(); frameReading(); afterViewChange();
   }
 
-  /** 折叠态布局：把每个折叠组当作一个超级节点，重新按拓扑分层摆放组卡片。
-   *  解决「折叠后组卡片仍摊在 436 节点的原始坐标上、连线横穿整张画布」的问题。 */
-  function layoutFolded() {
-    var f = foldState();
-    var groups = Object.keys(f).filter(function (k) {
-      var g = f[k];
-      return g && g.collapsed && g.uuids.length >= 2;
+  /** 按执行先后排成一条序列。折叠组只占一个位置，展开后的步骤按先后插在原处。 */
+  function executionOrder() {
+    var nodes = (state.wf.data.nodes || []).filter(function (n) {
+      return n && n.uuid && n.type !== 'Group';
     });
-    if (!groups.length) return 0;
-
-    // 建立「超级节点」图：组 + 未折叠的普通节点
-    var memberOf = {};
-    groups.forEach(function (k) { f[k].uuids.forEach(function (u) { memberOf[u] = k; }); });
-    function sid(uuid) { return memberOf[uuid] ? ('#' + memberOf[uuid]) : uuid; }
-
-    var sup = {};
-    groups.forEach(function (k) { sup['#' + k] = { id: '#' + k, gid: k }; });
-    (state.wf.data.nodes || []).forEach(function (n) {
-      if (!n || n.type === 'Group') return;
-      if (memberOf[n.uuid]) return;
-      sup[n.uuid] = { id: n.uuid, node: n };
+    var children = {}, parents = {}, indeg = {};
+    nodes.forEach(function (n) {
+      children[n.uuid] = [];
+      parents[n.uuid] = [];
+      indeg[n.uuid] = 0;
     });
-    var kids = {}, par = {};
-    Object.keys(sup).forEach(function (k) { kids[k] = []; par[k] = []; });
     (state.wf.data.edges || []).forEach(function (e) {
-      if (!e) return;
-      var s = sid(e.source_node_uuid), t = sid(e.target_node_uuid);
-      if (!sup[s] || !sup[t] || s === t) return;
-      if (kids[s].indexOf(t) < 0) kids[s].push(t);
-      if (par[t].indexOf(s) < 0) par[t].push(s);
+      if (!e || !children[e.source_node_uuid] || !parents[e.target_node_uuid]) return;
+      children[e.source_node_uuid].push(e.target_node_uuid);
+      parents[e.target_node_uuid].push(e.source_node_uuid);
+      indeg[e.target_node_uuid]++;
     });
-
-    // Kahn 最长路径分层
-    var indeg = {}, rank = {}, q = [];
-    Object.keys(sup).forEach(function (k) { indeg[k] = par[k].length; rank[k] = 0; });
-    Object.keys(sup).forEach(function (k) { if (!indeg[k]) q.push(k); });
-    var seen = {};
-    while (q.length) {
-      var u = q.shift();
-      if (seen[u]) continue;
+    var indexOf = {};
+    nodes.forEach(function (n, i) { indexOf[n.uuid] = i; });
+    var starts = nodes.filter(function (n) { return !indeg[n.uuid]; }).map(function (n) { return n.uuid; });
+    starts.sort(function (a, b) { return indexOf[a] - indexOf[b]; });
+    var seen = {}, order = [];
+    function ready(u) {
+      var ps = parents[u] || [];
+      for (var i = 0; i < ps.length; i++) if (!seen[ps[i]]) return false;
+      return true;
+    }
+    function visit(u) {
+      if (!u || seen[u] || !children[u] || !ready(u)) return;
       seen[u] = 1;
-      kids[u].forEach(function (v) {
-        rank[v] = Math.max(rank[v] || 0, (rank[u] || 0) + 1);
-        indeg[v]--;
-        if (indeg[v] === 0) q.push(v);
+      order.push(u);
+      var cs = children[u].slice();
+      cs.sort(function (a, b) {
+        return ((parents[a] || []).length - (parents[b] || []).length) || (indexOf[a] - indexOf[b]);
       });
+      cs.forEach(visit);
     }
-    Object.keys(sup).forEach(function (k) { if (!seen[k]) rank[k] = rank[k] || 0; });
+    starts.forEach(visit);
+    var guard = 0;
+    while (order.length < nodes.length && guard++ < nodes.length + 2) {
+      var progressed = false;
+      nodes.forEach(function (n) {
+        if (!seen[n.uuid] && ready(n.uuid)) { visit(n.uuid); progressed = true; }
+      });
+      if (!progressed) {
+        nodes.forEach(function (n) {
+          if (!seen[n.uuid]) { seen[n.uuid] = 1; order.push(n.uuid); }
+        });
+        break;
+      }
+    }
+    return order;
+  }
 
-    // 分层 → 行
-    var byRank = {}, rk = [];
-    Object.keys(sup).forEach(function (k) {
-      var r = rank[k];
-      if (!byRank[r]) { byRank[r] = []; rk.push(r); }
-      byRank[r].push(k);
+  function readingUnits() {
+    var collapsed = {};
+    var f = foldState();
+    Object.keys(f).forEach(function (gid) {
+      var g = f[gid];
+      if (g && g.collapsed && g.uuids && g.uuids.length >= 2) {
+        g.uuids.forEach(function (u) { collapsed[u] = g; });
+      }
     });
-    rk.sort(function (a, b) { return a - b; });
-
-    // 同层排序：按上游重心，减少交叉
-    var pos = {};
-    rk.forEach(function (r) { byRank[r].sort(); byRank[r].forEach(function (k, i) { pos[k] = i; }); });
-    for (var pass = 0; pass < 6; pass++) {
-      for (var ri = 1; ri < rk.length; ri++) {
-        var col = byRank[rk[ri]];
-        var bary = {};
-        col.forEach(function (k) {
-          var ps = par[k].filter(function (p) { return pos[p] !== undefined; });
-          bary[k] = ps.length ? ps.reduce(function (a, p) { return a + pos[p]; }, 0) / ps.length : 1e6;
-        });
-        col.sort(function (a, b) { return (bary[a] - bary[b]) || (pos[a] - pos[b]); });
-        col.forEach(function (k, i) { pos[k] = i; });
+    var seq = [], seenG = {};
+    executionOrder().forEach(function (u) {
+      var g = collapsed[u];
+      if (g) {
+        if (seenG[g.id]) return;
+        seenG[g.id] = 1;
+        seq.push({ kind: 'group', gid: g.id });
+      } else {
+        seq.push({ kind: 'node', uuid: u });
       }
-    }
+    });
+    return seq;
+  }
 
-    // 摆放：列距按真实节点宽度收紧，折带控制长宽比
-    var COL = 268, ROW = 168, X0 = 60, Y0 = 60, BAND = 40;
-    var nRk = rk.length;
-    var rowOfR = {};
-    rk.forEach(function (r) { rowOfR[r] = byRank[r].length; });
+  /** 每行从左到右，排满折到下一行的最左边。 */
+  function layoutReading() {
+    var seq = readingUnits();
+    state.reading = seq;
+    if (!seq.length) return 0;
+    var gap = 48;
+    var step = NODE_W + gap;
+    var rowH = 280;
     var cr = wrap.getBoundingClientRect();
-    var canvasAR = (cr.width || 1200) / (cr.height || 800);
-    var best = { rpb: nRk, score: Infinity };
-    for (var rpbTry = 1; rpbTry <= nRk; rpbTry++) {
-      var bands = Math.ceil(nRk / rpbTry), Hh = 0;
-      for (var bi = 0; bi < bands; bi++) {
-        var mx = 1;
-        for (var kk = bi * rpbTry; kk < Math.min(nRk, (bi + 1) * rpbTry); kk++) mx = Math.max(mx, rowOfR[rk[kk]] || 1);
-        Hh += mx * ROW + BAND;
+    var per = Math.min(20, seq.length);
+    seq.forEach(function (it, i) {
+      var row = Math.floor(i / per);
+      var col = i % per;
+      it.row = row;
+      it.col = col;
+      var x = 48 + col * step;
+      var y = 48 + row * rowH;
+      if (it.kind === 'group') {
+        var g = foldState()[it.gid];
+        if (!g) return;
+        g.x = x;
+        g.y = y;
+        (g.uuids || []).forEach(function (u) {
+          var n = findNode(u);
+          if (!n) return;
+          if (!n.pose) n.pose = {};
+          if (!n.pose.position) n.pose.position = { x: 0, y: 0, z: 0 };
+          n.pose.position.x = x;
+          n.pose.position.y = y;
+        });
+      } else {
+        var n = findNode(it.uuid);
+        if (!n) return;
+        if (!n.pose) n.pose = {};
+        if (!n.pose.position) n.pose.position = { x: 0, y: 0, z: 0 };
+        n.pose.position.x = x;
+        n.pose.position.y = y;
       }
-      var ar = (rpbTry * COL) / Hh;
-      var sc = Math.abs(ar - canvasAR) + 0.12 * Math.abs(Math.log(ar) - Math.log(canvasAR))
-        + 0.5 * Math.max(0, ar / canvasAR - 1.4);
-      if (sc < best.score) best = { rpb: rpbTry, score: sc };
-    }
-    var rpb = best.rpb;
+    });
+    return per;
+  }
 
-    var y = Y0;
-    for (var b = 0; b * rpb < nRk; b++) {
-      var idxs = [];
-      for (var k2 = b * rpb; k2 < Math.min(nRk, (b + 1) * rpb); k2++) idxs.push(k2);
-      // 本带每行的行高：按该行实际最高元素（折叠卡≈96、节点≈132，都留足余量）
-      var maxRows = 1;
-      idxs.forEach(function (i) { maxRows = Math.max(maxRows, rowOfR[rk[i]]); });
-      // 逐行放置，y 用累加的实际行高（不再固定 ROW，避免折叠卡压在节点上）
-      // 实测节点最高 ~184px、折叠卡 ~94px，行高按 200 留足余量
-      var rowHeights = [];
-      for (var rr = 0; rr < maxRows; rr++) rowHeights.push(0);
-      idxs.forEach(function (i) {
-        var col = byRank[rk[i]];
-        var off = (maxRows - col.length) / 2;
-        col.forEach(function (k, ii) {
-          var rowIdx = Math.round(off + ii);
-          rowHeights[rowIdx] = Math.max(rowHeights[rowIdx], 200);
-        });
-      });
-      var rowY = [];
-      var acc = y;
-      for (var ri2 = 0; ri2 < maxRows; ri2++) {
-        rowY.push(acc);
-        acc += 200 + 40;
-      }
-      idxs.forEach(function (i, jj) {
-        var rankIdx = (b % 2 === 1) ? (idxs.length - 1 - jj) : jj;
-        var col = byRank[rk[i]];
-        var off = (maxRows - col.length) / 2;
-        col.forEach(function (k, ii) {
-          var rowIdx = Math.round(off + ii);
-          var py = rowY[Math.min(rowIdx, maxRows - 1)];
-          var px = X0 + rankIdx * COL;
-          if (sup[k].gid) {
-            var g = f[sup[k].gid];
-            g.x = px; g.y = py;
-            // 成员坐标不在这里铺开：折叠时看不见，展开时由 expandGroup 统一规整成一条链。
-            // （早先在这里把成员按 292px 排开，多个组会共用同一批坐标，展开后互相重叠。）
-          } else if (sup[k].node && sup[k].node.pose) {
-            sup[k].node.pose.position.x = px;
-            sup[k].node.pose.position.y = py;
-          }
-        });
-      });
-      y = acc;
-    }
-    return rpb;
+  /** 折叠态布局：阅读顺序折行，一根线从行尾接到下一行行首。 */
+  function layoutFolded() {
+    return layoutReading();
   }
 
   function foldAllGroups() {
@@ -1082,8 +1017,8 @@
       var g = f[k];
       if (g.uuids && g.uuids.length >= 2) { g.collapsed = true; n++; }
     });
-    layoutFolded();                 // 折叠态按超级节点重排，连线不再横穿画布
-    renderNodes(); updatePositions(); fitView();
+    layoutFolded();                 // 折叠后按阅读顺序重排成一行
+    renderNodes(); updatePositions(); frameReading();
     if (n) note('ok', '已折叠', n + ' 个同设备连续段被收起，点击卡片可展开。', 3600);
     afterViewChange();
   }
@@ -1181,6 +1116,8 @@
     var del = el('button', 'g-del', '✕');
     del.title = '删除整组';
     d.appendChild(del);
+    d.appendChild(el('span', 'port in', ''));
+    d.appendChild(el('span', 'port out', ''));
     return d;
   }
 
@@ -1261,7 +1198,7 @@
   //   坐标被缩放两次、尺寸只缩放一次 → 放大时内容飞出屏幕、连线脱离节点。
   function nodeRect(uuid) {
     var n = findNode(uuid);
-    if (!n) return null;
+    if (!n || !n.pose || !n.pose.position) return null;
     var d = canvas.querySelector('[data-uuid="' + uuid + '"]');
     var h = d ? d.offsetHeight : 132;
     return { x: n.pose.position.x, y: n.pose.position.y, w: NODE_W, h: h };
@@ -1308,6 +1245,35 @@
   }
   function edgeId(e) { return e.uuid || (e.source_node_uuid + '>' + e.target_node_uuid); }
 
+  /** 一张可见卡片的头、尾。普通节点头尾是它自己，折叠卡头是组内第一步、尾是最后一步。 */
+  function unitEnds(it) {
+    if (!it) return null;
+    if (it.kind === 'node') return { head: it.uuid, tail: it.uuid, ids: [it.uuid] };
+    var g = foldState()[it.gid];
+    if (!g || !g.uuids || !g.uuids.length) return null;
+    return { head: g.uuids[0], tail: g.uuids[g.uuids.length - 1], ids: g.uuids.slice() };
+  }
+
+  /** 相邻两张卡片之间的那条执行线。没有这条边就不画。 */
+  function executionEdge(a, b) {
+    var ea = unitEnds(a), eb = unitEnds(b);
+    if (!ea || !eb) return null;
+    var edges = state.wf.data.edges || [];
+    var i, e;
+    for (i = 0; i < edges.length; i++) {
+      e = edges[i];
+      if (e && e.source_node_uuid === ea.tail && e.target_node_uuid === eb.head) return e;
+    }
+    var inB = {};
+    eb.ids.forEach(function (u) { inB[u] = 1; });
+    for (i = 0; i < edges.length; i++) {
+      e = edges[i];
+      if (!e || !inB[e.target_node_uuid]) continue;
+      if (ea.ids.indexOf(e.source_node_uuid) >= 0) return e;
+    }
+    return null;
+  }
+
   function renderEdges() {
     var ns = 'http://www.w3.org/2000/svg';
     svg.innerHTML = svg.querySelector('defs') ? '' : '';
@@ -1318,105 +1284,73 @@
     svg.appendChild(defs);
     state.edgeSvgMap = [];
 
-    var hideMap = foldedSet();
-    var foldOf = {};
-    (function () {
-      var f = foldState();
-      Object.keys(f).forEach(function (k) {
-        var g = f[k];
-        if (!g || !g.collapsed) return;
-        g.uuids.forEach(function (u) { foldOf[u] = g; });
-      });
-    })();
-    function rectOf(uuid) {
-      if (!hideMap[uuid]) return nodeRect(uuid);
-      var g = foldOf[uuid];
-      if (!g) return null;
-      var ge = canvas.querySelector('[data-group="' + g.id + '"]');
-      var bb = groupBounds(g);
-      var pos = bb ? { x: bb.x, y: bb.y } : groupPos(g);
-      return { x: pos.x, y: pos.y, w: NODE_W, h: ge ? ge.offsetHeight : 110 };
-    }
-    /** 折叠后：把成员 uuid 换成组卡片的身份，避免同组内部重复成线 */
-    function logicalId(uuid) {
-      var g = foldOf[uuid];
-      return g ? ('__grp__' + g.id) : uuid;
-    }
-
-    // —— 端口分摊：同一节点的第 k 条出线/入线在卡片高度上错开，避免全部重叠成一根粗线 ——
-    var outIdx = {}, inIdx = {}, outCnt = {}, inCnt = {};
-    state.wf.data.edges.forEach(function (e) {
-      if (!e) return;
-      var s = logicalId(e.source_node_uuid), t = logicalId(e.target_node_uuid);
-      if (s === t) return;
-      outCnt[s] = (outCnt[s] || 0) + 1;
-      inCnt[t] = (inCnt[t] || 0) + 1;
-    });
-    function portY(uuid, isOut, height) {
-      var id = logicalId(uuid);
-      var k = isOut ? (outIdx[id] || 0) : (inIdx[id] || 0);
-      var n = isOut ? (outCnt[id] || 1) : (inCnt[id] || 1);
-      if (isOut) outIdx[id] = k + 1; else inIdx[id] = k + 1;
-      var h = height || 132;
-      if (n <= 1) return PORT_DY;
-      // 在卡片左/右边缘的竖直区间内均分，留出上下 18px 余量
-      var lo = 26, hi = Math.max(lo + 8, h - 18);
-      var step = (hi - lo) / Math.max(1, n - 1);
-      return lo + step * k;
-    }
-
-    // —— 回绕线（目标在左）按序号分配不同外扩槽，避免叠在一条线上 ——
-    var loopSlot = {};
-
-    state.wf.data.edges.forEach(function (e) {
-      var a = rectOf(e.source_node_uuid), b = rectOf(e.target_node_uuid);
-      if (!a || !b) return;
-      var sa = foldOf[e.source_node_uuid], sb = foldOf[e.target_node_uuid];
-      if (sa && sb && sa.id === sb.id) return;   // 同组内部不画
-
-      var y1 = a.y + portY(e.source_node_uuid, true, a.h);
-      var y2 = b.y + portY(e.target_node_uuid, false, b.h);
-      var x1 = a.x + a.w, x2 = b.x;
-
-      var dAttr;
-      var sameBand = Math.abs((a.y + a.h / 2) - (b.y + b.h / 2)) < Math.max(a.h, b.h) * 0.9;
-      if (x2 >= x1 + 24) {
-        // 正向：中间竖段
-        var midX = (x1 + x2) / 2;
-        if (sameBand) {
-          // 同一行左右相邻：直接水平走，不再折一个多余的小台阶
-          dAttr = 'M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2;
-        } else {
-          dAttr = elbowH(x1, y1, x2, y2, midX);
-        }
-      } else {
-        // 回绕（目标在左 或 几乎同列）：从右侧绕到目标上方/下方，各自一条独立槽位
-        var key = logicalId(e.source_node_uuid) + '>' + logicalId(e.target_node_uuid);
-        var slotN = loopSlot[key] || 0;
-        loopSlot[key] = slotN + 1;
-        var outRight = Math.max(x1, x2 + b.w) + 56 + slotN * 22;
-        dAttr = 'M' + x1 + ' ' + y1 +
-          ' L' + outRight + ' ' + y1 +
-          ' L' + outRight + ' ' + y2 +
-          ' L' + x2 + ' ' + y2;
+    // 画布只画阅读顺序上相邻两项之间的一段。执行用的边仍留在 data.edges，不在这里画。
+    function unitRect(it) {
+      if (!it) return null;
+      if (it.kind === 'group') {
+        var g = foldState()[it.gid];
+        if (!g) return null;
+        var ge = canvas.querySelector('[data-group="' + g.id + '"]');
+        var pos = groupPos(g);
+        return { x: pos.x, y: pos.y, w: NODE_W, h: ge ? ge.offsetHeight : 96 };
       }
-
+      return nodeRect(it.uuid);
+    }
+    function portY(r) {
+      return r.y + Math.min(PORT_DY, Math.max(22, r.h - 16));
+    }
+    function spinePath(a, b) {
+      var y1 = portY(a), y2 = portY(b);
+      var x1 = a.x + a.w, x2 = b.x;
+      if (x2 >= x1 - 8) {
+        if (Math.abs(y1 - y2) < 6) return 'M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2;
+        var mid = x1 + Math.max(16, (x2 - x1) / 2);
+        return 'M' + x1 + ' ' + y1 + ' L' + mid + ' ' + y1 +
+          ' L' + mid + ' ' + y2 + ' L' + x2 + ' ' + y2;
+      }
+      var xR = x1 + 28, xL = x2 - 28;
+      var gy = (a.y + a.h + b.y) / 2;
+      if (gy < a.y + a.h + 10) gy = a.y + a.h + 16;
+      if (gy > b.y - 10) gy = b.y - 16;
+      return 'M' + x1 + ' ' + y1 +
+        ' L' + xR + ' ' + y1 +
+        ' L' + xR + ' ' + gy +
+        ' L' + xL + ' ' + gy +
+        ' L' + xL + ' ' + y2 +
+        ' L' + x2 + ' ' + y2;
+    }
+    function unitKey(it) {
+      return it && (it.kind === 'group' ? ('g:' + it.gid) : ('n:' + it.uuid));
+    }
+    var fresh = readingUnits();
+    var laid = state.reading || [];
+    var seq = fresh;
+    if (laid.length && laid.length === fresh.length) {
+      var want = {};
+      fresh.forEach(function (it) { want[unitKey(it)] = 1; });
+      if (laid.every(function (it) { return want[unitKey(it)]; })) seq = laid;
+    }
+    for (var si = 0; si < seq.length - 1; si++) {
+      var a = unitRect(seq[si]), b = unitRect(seq[si + 1]);
+      var e0 = executionEdge(seq[si], seq[si + 1]);
+      if (!a || !b || !e0) continue;
+      var dAttr = spinePath(a, b);
+      var eid = edgeId(e0);
       var hit = document.createElementNS(ns, 'path');
       hit.setAttribute('d', dAttr);
       hit.setAttribute('class', 'wfedge-hit');
-      hit.dataset.edge = edgeId(e);
+      hit.dataset.edge = eid;
       svg.appendChild(hit);
       var path = document.createElementNS(ns, 'path');
       path.setAttribute('d', dAttr);
-      path.dataset.edge = edgeId(e);
-      var k2 = edgeKind(e);
-      var cls = 'wfedge' + (k2 === 'parallel' ? ' parallel' : k2 === 'material' ? ' material' : '');
-      if (state.selected && state.selected.type === 'edge' && state.selected.id === edgeId(e)) cls += ' selected';
+      var cls = 'wfedge';
+      if (state.selected && state.selected.type === 'edge' && state.selected.id === eid) cls += ' selected';
       path.setAttribute('class', cls);
-      path.dataset.id = edgeId(e);
+      path.dataset.edge = eid;
+      path.dataset.id = eid;
       svg.appendChild(path);
-      state.edgeSvgMap.push({ id: edgeId(e), el: path });
-    });
+      state.edgeSvgMap.push({ id: eid, el: path });
+    }
 
     if (state.linking) {
       var p2 = document.createElementNS(ns, 'path');
@@ -1428,17 +1362,38 @@
     }
   }
 
-  /** 圆角正交折线：水平 → 竖直 → 水平 */
-  function elbowH(x1, y1, x2, y2, midX) {
-    var r = 8;
-    var vy = (y2 > y1 ? 1 : -1);
-    if (Math.abs(y2 - y1) < r * 2) return 'M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2;
-    return 'M' + x1 + ' ' + y1 +
-      ' L' + (midX - r) + ' ' + y1 +
-      ' Q' + midX + ' ' + y1 + ' ' + midX + ' ' + (y1 + vy * r) +
-      ' L' + midX + ' ' + (y2 - vy * r) +
-      ' Q' + midX + ' ' + y2 + ' ' + (midX + r) + ' ' + y2 +
-      ' L' + x2 + ' ' + y2;
+  /** 打开时清掉对不上步骤的线，以及入和出都没有的步骤。头、尾保留。可撤销。 */
+  function sweepLooseEnds() {
+    var nodes = state.wf.data.nodes || [];
+    var edges = state.wf.data.edges || [];
+    var ids = {};
+    nodes.forEach(function (n) { if (n && n.uuid) ids[n.uuid] = 1; });
+    var keptE = edges.filter(function (e) {
+      return e && ids[e.source_node_uuid] && ids[e.target_node_uuid];
+    });
+    var touch = {};
+    keptE.forEach(function (e) {
+      touch[e.source_node_uuid] = 1;
+      touch[e.target_node_uuid] = 1;
+    });
+    var keptN = nodes.filter(function (n) {
+      if (!n || !n.uuid) return false;
+      if (n.type === 'Group') return true;
+      return !!touch[n.uuid];
+    });
+    var keptIds = {};
+    keptN.forEach(function (n) { keptIds[n.uuid] = 1; });
+    keptE = keptE.filter(function (e) {
+      return keptIds[e.source_node_uuid] && keptIds[e.target_node_uuid];
+    });
+    var dn = nodes.length - keptN.length;
+    var de = edges.length - keptE.length;
+    if (!dn && !de) return null;
+    state.undo.push(snapshot());
+    if (state.undo.length > 60) state.undo.shift();
+    state.wf.data.nodes = keptN;
+    state.wf.data.edges = keptE;
+    return { nodes: dn, edges: de };
   }
 
   // ---------- 视图 ----------
@@ -1464,6 +1419,37 @@
     state.view.y = cy - py * ns;
     applyView(); updatePositions();
   }
+  /** 阅读顺序排好后：按一行的宽度适配，停在开头。往下滚动就是下一行。 */
+  function frameReading() {
+    var cr = wrap.getBoundingClientRect();
+    var ns = state.wf.data.nodes || [];
+    if (!ns.length) { state.view = { x: 40, y: 40, scale: 1 }; applyView(); return; }
+    var minX = 1e9, minY = 1e9, maxX = -1e9;
+    var folded = foldedSet();
+    ns.forEach(function (n) {
+      if (!n || !n.pose || !n.pose.position || folded[n.uuid]) return;
+      minX = Math.min(minX, n.pose.position.x);
+      minY = Math.min(minY, n.pose.position.y);
+      maxX = Math.max(maxX, n.pose.position.x + NODE_W);
+    });
+    Object.keys(foldState()).forEach(function (gid) {
+      var g = foldState()[gid];
+      if (!g || !g.collapsed || !g.uuids || g.uuids.length < 2) return;
+      var p = groupPos(g);
+      minX = Math.min(minX, p.x);
+      minY = Math.min(minY, p.y);
+      maxX = Math.max(maxX, p.x + NODE_W);
+    });
+    if (minX > maxX) { state.view = { x: 40, y: 40, scale: 1 }; applyView(); return; }
+    var pad = 28;
+    var s = (cr.width - pad * 2) / Math.max(1, maxX - minX);
+    s = Math.min(1, Math.max(0.45, s));
+    state.view.scale = s;
+    state.view.x = pad - minX * s;
+    state.view.y = pad - minY * s;
+    applyView();
+  }
+
   function fitView(pad) {
     pad = pad == null ? 60 : pad;
     var ns = state.wf.data.nodes;
@@ -3234,299 +3220,18 @@
     return r;
   }
 
-  // ---------- 自动布局（按连线拓扑分层，层内按边序/重心排，不按旧坐标乱排） ----------
-  // 列 = 最长路径 rank（沿边的执行先后）；行 = 沿出边 BFS 发现序 + 父节点重心，减少交叉。
-  // 长链折成多带蛇形，避免拉成一条超长横线。
-  var LAYOUT = { COL: 300, ROW: 186, X0: 60, Y0: 56, BAND_GAP: 34 };
-
+  // ---------- 自动布局：阅读顺序，每行从左到右，行尾接到下一行行首 ----------
   function autoLayout(opts) {
     opts = opts || {};
-    var nodes = state.wf.data.nodes, edges = state.wf.data.edges;
+    var nodes = state.wf.data.nodes;
     if (!nodes.length) return;
     if (!opts.silent) pushUndo();
     clearNotes();
-
-    var uuidOk = {};
-    nodes.forEach(function (n) { if (n && n.uuid) uuidOk[n.uuid] = 1; });
-
-    var indeg = {}, children = {}, parents = {};
-    nodes.forEach(function (n) {
-      indeg[n.uuid] = 0;
-      children[n.uuid] = [];
-      parents[n.uuid] = [];
-    });
-    // 严格按 edges 数组顺序建邻接 = 「连线顺序」
-    edges.forEach(function (e) {
-      if (!e) return;
-      var s = e.source_node_uuid, t = e.target_node_uuid;
-      if (!uuidOk[s] || !uuidOk[t]) return;
-      indeg[t]++;
-      children[s].push(t);
-      parents[t].push(s);
-    });
-
-    var linked = {};
-    edges.forEach(function (e) {
-      if (!e) return;
-      if (uuidOk[e.source_node_uuid]) linked[e.source_node_uuid] = 1;
-      if (uuidOk[e.target_node_uuid]) linked[e.target_node_uuid] = 1;
-    });
-
-    // rank = 沿边最长路径（Kahn）；环内未入队的节点保持 0
-    var rank = {}, q = [];
-    nodes.forEach(function (n) {
-      rank[n.uuid] = 0;
-      if (!indeg[n.uuid]) q.push(n.uuid);
-    });
-    // 起点也按「作为某条边的 source 首次出现」排序，贴近连线书写顺序
-    var srcFirst = {};
-    edges.forEach(function (e, ei) {
-      var s = e && e.source_node_uuid;
-      if (s && uuidOk[s] && srcFirst[s] === undefined) srcFirst[s] = ei;
-    });
-    q.sort(function (a, b) {
-      var fa = srcFirst[a], fb = srcFirst[b];
-      if (fa === undefined && fb === undefined) return 0;
-      if (fa === undefined) return 1;
-      if (fb === undefined) return -1;
-      return fa - fb;
-    });
-
-    var seen = {};
-    while (q.length) {
-      var u = q.shift();
-      if (seen[u]) continue;
-      seen[u] = 1;
-      (children[u] || []).forEach(function (v) {
-        rank[v] = Math.max(rank[v] || 0, (rank[u] || 0) + 1);
-        indeg[v]--;
-        if (indeg[v] === 0) q.push(v);
-      });
-    }
-    nodes.forEach(function (n) {
-      if (!seen[n.uuid]) rank[n.uuid] = rank[n.uuid] || 0;
-    });
-
-    // 沿边 BFS 发现序：同层上下位置主依据（不是旧 x/y，也不是设备名）
-    // Kahn 已把 indeg 清零，用 parents 长度还原入度找真正起点
-    var discover = {}, di = 0;
-    var bq = [];
-    nodes.forEach(function (n) {
-      if (linked[n.uuid] && !(parents[n.uuid] || []).length) bq.push(n.uuid);
-    });
-    bq.sort(function (a, b) {
-      var fa = srcFirst[a], fb = srcFirst[b];
-      if (fa === undefined && fb === undefined) return 0;
-      if (fa === undefined) return 1;
-      if (fb === undefined) return -1;
-      return fa - fb;
-    });
-    while (bq.length) {
-      var u2 = bq.shift();
-      if (discover[u2] !== undefined) continue;
-      discover[u2] = di++;
-      (children[u2] || []).forEach(function (v) {
-        if (discover[v] === undefined) bq.push(v);
-      });
-    }
-    // 孤立节点 / 未遍历到的：排在连线节点之后
-    nodes.forEach(function (n) {
-      if (discover[n.uuid] === undefined) discover[n.uuid] = di++;
-    });
-
-    // 无连线的孤立节点单独放到最后一列之后，避免和流程起点挤在一起
-    var maxLinkedRank = 0;
-    nodes.forEach(function (n) {
-      if (linked[n.uuid]) maxLinkedRank = Math.max(maxLinkedRank, rank[n.uuid] || 0);
-    });
-    nodes.forEach(function (n) {
-      if (!linked[n.uuid]) rank[n.uuid] = maxLinkedRank + 1;
-    });
-
-    var byRank = {}, rankKeys = [];
-    nodes.forEach(function (n) {
-      var r = rank[n.uuid];
-      if (!byRank[r]) { byRank[r] = []; rankKeys.push(r); }
-      byRank[r].push(n);
-    });
-    rankKeys.sort(function (a, b) { return a - b; });
-
-    function baryOf(n, prevList) {
-      var idx = {};
-      prevList.forEach(function (p, i) { idx[p.uuid] = i; });
-      var ps = parents[n.uuid] || [];
-      var sum = 0, c = 0;
-      ps.forEach(function (p) {
-        if (idx[p] !== undefined) { sum += idx[p]; c++; }
-      });
-      return c ? (sum / c) : 1e6;
-    }
-
-    // 先按发现序，再多趟重心排序（顺着边减少交叉）
-    rankKeys.forEach(function (r) {
-      byRank[r].sort(function (a, b) { return discover[a.uuid] - discover[b.uuid]; });
-    });
-    var posInRank = {};
-    function reindex() {
-      rankKeys.forEach(function (r) {
-        byRank[r].forEach(function (n, i) { posInRank[n.uuid] = i; });
-      });
-    }
-    function baryByParents(n) {
-      var ps = parents[n.uuid] || [];
-      var s = 0, c = 0;
-      ps.forEach(function (p) { if (posInRank[p] !== undefined) { s += posInRank[p]; c++; } });
-      return c ? s / c : 1e6;
-    }
-    function baryByChildren(n) {
-      var cs = children[n.uuid] || [];
-      var s = 0, c = 0;
-      cs.forEach(function (v) { if (posInRank[v] !== undefined) { s += posInRank[v]; c++; } });
-      return c ? s / c : 1e6;
-    }
-
-    // 下扫 + 上扫交替，8 轮收敛，比单向 4 轮明显少交叉
-    for (var pass = 0; pass < 8; pass++) {
-      if (pass % 2 === 0) {
-        for (var ri2 = 1; ri2 < rankKeys.length; ri2++) {
-          byRank[rankKeys[ri2]].sort(function (a, b) {
-            var ba = baryByParents(a), bb = baryByParents(b);
-            if (Math.abs(ba - bb) > 1e-9) return ba - bb;
-            return discover[a.uuid] - discover[b.uuid];
-          });
-          reindex();
-        }
-      } else {
-        for (var ri3 = rankKeys.length - 2; ri3 >= 0; ri3--) {
-          byRank[rankKeys[ri3]].sort(function (a, b) {
-            var ba = baryByChildren(a), bb = baryByChildren(b);
-            if (Math.abs(ba - bb) > 1e-9) return ba - bb;
-            return discover[a.uuid] - discover[b.uuid];
-          });
-          reindex();
-        }
-      }
-      reindex();
-    }
-
-    // 同源多出边：把同一父节点的子节点排在一起（避免「一个模块连两个模块」散落）
-    rankKeys.forEach(function (r) {
-      if (r === 0) return;
-      var col = byRank[r];
-      var keyed = col.map(function (n) {
-        var ps = parents[n.uuid] || [];
-        var pk = ps.length === 1 ? (posInRank[ps[0]] !== undefined ? posInRank[ps[0]] : 9999) : 9998;
-        return { n: n, pk: pk };
-      });
-      keyed.sort(function (a, b) {
-        if (a.pk !== b.pk) return a.pk - b.pk;
-        return posInRank[a.n.uuid] - posInRank[b.n.uuid];
-      });
-      byRank[r] = keyed.map(function (x) { return x.n; });
-      reindex();
-    });
-
-    var nR = rankKeys.length;
-    var rowOf = {};
-    rankKeys.forEach(function (r) { rowOf[r] = byRank[r].length; });
-
-    var cr = wrap.getBoundingClientRect();
-    var canvasAR = (cr.width || 1200) / (cr.height || 800);
-    var best = { rpb: nR, score: Infinity };
-    for (var rpbTry = 1; rpbTry <= nR; rpbTry++) {
-      var bands = Math.ceil(nR / rpbTry);
-      // 逐带累计真实高度（每带高度 = 该带最大列行数 × ROW + BAND_GAP）
-      var H = 0;
-      for (var bi = 0; bi < bands; bi++) {
-        var mx = 1;
-        for (var k = bi * rpbTry; k < Math.min(nR, (bi + 1) * rpbTry); k++) {
-          mx = Math.max(mx, rowOf[rankKeys[k]] || 1);
-        }
-        H += mx * LAYOUT.ROW + LAYOUT.BAND_GAP;
-      }
-      var W = rpbTry * LAYOUT.COL;
-      // 目标：内容长宽比接近画布；单带过长（横条）额外加罚
-      var ar = W / H;
-      var score = Math.abs(ar - canvasAR)
-        + 0.12 * Math.abs(Math.log(ar) - Math.log(canvasAR))
-        + 0.5 * Math.max(0, ar / canvasAR - 1.5);
-      if (score < best.score) best = { rpb: rpbTry, score: score };
-    }
-    var rpb = opts.ranksPerBand || best.rpb;
-
-    var y = LAYOUT.Y0;
-    for (var b = 0; b * rpb < nR; b++) {
-      var idxs = [];
-      for (var k2 = b * rpb; k2 < Math.min(nR, (b + 1) * rpb); k2++) idxs.push(k2);
-      var maxRows2 = 1;
-      idxs.forEach(function (i) { maxRows2 = Math.max(maxRows2, rowOf[rankKeys[i]]); });
-      // 列距按该列真实行数收紧：单行窄列不必占满 300px，横条能短一截
-      var xs = [], accX = LAYOUT.X0;
-      for (var ci = 0; ci < idxs.length; ci++) {
-        var nr = rowOf[rankKeys[idxs[ci]]] || 1;
-        xs.push(accX);
-        accX += (nr <= 1 ? 214 : (nr === 2 ? 266 : LAYOUT.COL));
-      }
-      idxs.forEach(function (i, jj) {
-        var rankIdx = (b % 2 === 1) ? (idxs.length - 1 - jj) : jj;
-        var rk = rankKeys[i];
-        var colNodes = byRank[rk];
-        var offset = (maxRows2 - colNodes.length) / 2;
-        colNodes.forEach(function (n, ii) {
-          if (!n.pose) n.pose = {};
-          if (!n.pose.position) n.pose.position = { x: 0, y: 0, z: 0 };
-          n.pose.position.x = xs[rankIdx];
-          n.pose.position.y = y + (offset + ii) * LAYOUT.ROW;
-        });
-      });
-      y += maxRows2 * LAYOUT.ROW + LAYOUT.BAND_GAP;
-    }
-
-    // —— 拉直：只在同一带内、且是相邻层直连时才对齐同一行 ——
-    (function straighten() {
-      var rowH = LAYOUT.ROW;
-      var posOf = {}, rankOf = {}, bandOf = {};
-      nodes.forEach(function (n) {
-        posOf[n.uuid] = { x: n.pose.position.x, y: n.pose.position.y };
-        rankOf[n.uuid] = rank[n.uuid];
-        bandOf[n.uuid] = Math.floor(rankKeys.indexOf(rank[n.uuid]) / rpb);
-      });
-      rankKeys.forEach(function (r) {
-        var col = byRank[r] || [];
-        var occupied = {};
-        col.forEach(function (n) { occupied[Math.round(posOf[n.uuid].y / rowH)] = n.uuid; });
-        col.forEach(function (n) {
-          var ps = (parents[n.uuid] || []);
-          if (ps.length !== 1) return;
-          var p = findNode(ps[0]);
-          if (!p) return;
-          if ((rankOf[n.uuid] || 0) - (rankOf[p.uuid] || 0) !== 1) return;
-          if ((children[p.uuid] || []).length !== 1) return;
-          if (bandOf[n.uuid] !== bandOf[p.uuid]) return;   // 跨带不对齐，否则带会被压扁
-          var wantY = posOf[p.uuid].y;
-          var wantRow = Math.round(wantY / rowH);
-          var owner = occupied[wantRow];
-          if (owner && owner !== n.uuid) return;
-          var oldRow = Math.round(posOf[n.uuid].y / rowH);
-          delete occupied[oldRow];
-          occupied[wantRow] = n.uuid;
-          n.pose.position.y = wantY;
-          posOf[n.uuid].y = wantY;
-        });
-      });
-    })();
-
-    // 布局后重算折叠组（位置变了，组坐标要跟着走）
-    rebuildFolds();
-    compactFolds();     // 折叠态：把组内成员聚到组卡片处，避免展开时散落
+    layoutReading();
     renderNodes(); showProps(); afterChange();
-    fitView();
-    setTimeout(fitView, 60);
-    if (!opts.silent) {
-      note('ok', '已按连线顺序布局', nR + ' 个拓扑层级 · 折成 ' + Math.ceil(nR / rpb) +
-        ' 带（每带 ' + rpb + ' 级）；同层按边序/重心排列，不按旧坐标。', 4200);
-    }
-    return { ranks: nR, ranksPerBand: rpb, bands: Math.ceil(nR / rpb) };
+    frameReading();
+    if (!opts.silent) note('ok', '已排成阅读顺序', '每行从左到右，行尾接到下一行行首。', 3600);
+    return;
   }
 
   // ---------- 草稿 ----------
@@ -3559,6 +3264,15 @@
 
     function beginLink(uuid) {
       var r = nodeRect(uuid);
+      var f = foldState();
+      Object.keys(f).forEach(function (gid) {
+        var g = f[gid];
+        if (!g || !g.collapsed || !g.uuids || g.uuids.indexOf(uuid) < 0) return;
+        var ge = canvas.querySelector('[data-group="' + gid + '"]');
+        var pos = groupPos(g);
+        r = { x: pos.x, y: pos.y, w: NODE_W, h: ge ? ge.offsetHeight : 96 };
+      });
+      if (!r) return;
       // 连线层与节点层同变换，预览线也用世界坐标
       state.linking = { srcUuid: uuid, sx: r.x + r.w, sy: r.y + PORT_DY,
                         vx: r.x + r.w, vy: r.y + PORT_DY };
@@ -3710,9 +3424,15 @@
         var portEl = target && target.classList && target.classList.contains('port') && target.classList.contains('in') ? target : null;
         if (portEl) {
           var tgtNode = portEl.closest('.wfnode');
-          var tgt = tgtNode.dataset.uuid;
+          var grpHit = portEl.closest('.wfgroup');
+          var tgt = null;
+          if (tgtNode) tgt = tgtNode.dataset.uuid;
+          else if (grpHit) {
+            var gg = foldState()[grpHit.dataset.group];
+            tgt = gg && gg.uuids && gg.uuids[0];
+          }
           var src = state.linking.srcUuid;
-          if (src !== tgt && !edgeExists(src, tgt) && !createsCycle(src, tgt)) {
+          if (tgt && src !== tgt && !edgeExists(src, tgt) && !createsCycle(src, tgt)) {
             pushUndo();
             var srcN = findNode(src), tgtN = findNode(tgt);
             var edge = {
@@ -3730,7 +3450,7 @@
             state.wf.data.edges.push(edge);
             state.wf.data.nodes.forEach(refreshDisplay);
             updateStats(); afterChange();
-          } else if (src !== tgt && createsCycle(src, tgt)) {
+          } else if (tgt && src !== tgt && createsCycle(src, tgt)) {
             note('warn', '连线被拒绝', '这条连线会让工作流形成循环依赖，调度器无法确定执行顺序。');
           }
         }
@@ -3764,6 +3484,13 @@
     /** 从一个按下点决定这次手势做什么（鼠标左右键、触屏单指共用） */
     function decideGesture(ev, cx, cy) {
       var tgt = ev.target;
+      var portEl0 = tgt.classList && tgt.classList.contains('port') ? tgt : null;
+      var grpPort = tgt.closest ? tgt.closest('.wfgroup') : null;
+      if (grpPort && portEl0 && portEl0.classList.contains('out')) {
+        var gOut = foldState()[grpPort.dataset.group];
+        var tail = gOut && gOut.uuids && gOut.uuids[gOut.uuids.length - 1];
+        if (tail) { beginLink(tail); return 'link'; }
+      }
       // 折叠组卡片：按住拖动
       var grpEl = tgt.closest ? tgt.closest('.wfgroup') : null;
       if (grpEl && !(tgt.closest('.g-btn') || tgt.closest('.g-del') || tgt.closest('.g-name'))) {
@@ -5532,6 +5259,14 @@
     cacheTemplate(collectLinked());
     var paint = function () {
       expandAllEmbeds();
+      var swept = sweepLooseEnds();
+      if (swept) {
+        note('ok', '已清掉悬空内容',
+          (swept.edges ? ('去掉 ' + swept.edges + ' 条对不上的线') : '') +
+          (swept.edges && swept.nodes ? '，' : '') +
+          (swept.nodes ? ('去掉 ' + swept.nodes + ' 个没有前后的步骤') : '') +
+          '。Ctrl+Z 可恢复。', 4200);
+      }
       try {
         var savedFolds = (wf.data.folds || []).slice();
         rebuildFolds();        // 容器组 + 同设备连续段
@@ -5555,12 +5290,7 @@
       emptyHint.style.display = state.wf.data.nodes.length ? 'none' : '';
       setTimeout(function () {
         if (!state.wf.data.nodes.length) return;
-        fitView();
-        if (state.view.scale < 0.62) {
-          note('info', '画布已缩放到 ' + Math.round(state.view.scale * 100) + '%',
-            ['这份工作流的节点排得比较长，整体概览时文字会偏小。',
-              '点工具栏「🧭 自动布局」可按依赖折行重排（同设备靠拢、并行分支并列），更易读。'], 8000);
-        }
+        frameReading();
       }, 90);
     };
     if (wf.data.embeds.length) loadTemplatesFor(wf).then(paint);
