@@ -1,0 +1,11 @@
+{
+  "target_lab_uuid": "3b032a70-96c2-4177-9210-b29454f59d77",
+  "name": "全流程压力测试流程",
+  "data": {
+    "workflow_uuid": "f998fb55-264f-415b-8623-a9162fb8b97b",
+    "workflow_name": "全流程压力测试流程",
+    "nodes": [],
+    "edges": [],
+    "embeds": []
+  }
+}

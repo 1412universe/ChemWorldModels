@@ -1,0 +1,209 @@
+{
+  "target_lab_uuid": "4b2a8c1f-5b1c-43d3-9185-297f8affe010",
+  "name": "离心管",
+  "data": {
+    "workflow_uuid": "721d4d41-f7b7-4b24-8cdd-a96523f07615",
+    "workflow_name": "离心管",
+    "nodes": [
+      {
+        "uuid": "b67b7864-6e25-4f14-a036-4c3393d77aab",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2740,
+            "y": 1390,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": "",
+          "y_pos": "",
+          "z1_pos": "",
+          "p1_pos": "",
+          "z2_pos": "",
+          "p2_pos": "",
+          "z3_pos": "",
+          "z4_pos": "",
+          "m_pos": "",
+          "x_speed": "",
+          "y_speed": "",
+          "z1_speed": "",
+          "p1_speed": "",
+          "z2_speed": "",
+          "p2_speed": "",
+          "z3_speed": "",
+          "z4_speed": "",
+          "m_speed": "",
+          "mix_counts": "",
+          "ultrasound_time": "",
+          "shaking_speed": 300,
+          "shaking_time": 300,
+          "small_gripper_angle": "",
+          "small_gripper_force": "",
+          "ch8_blow": "",
+          "ch1_blow": "",
+          "ch8_reverse_aspirate": "",
+          "ch1_reverse_aspirate": "",
+          "open_lid_start": "",
+          "open_lid_end": "",
+          "close_lid_start": "",
+          "close_lid_end": "",
+          "open_lid_speed": "",
+          "close_lid_speed": "",
+          "open_lid_rotation_speed": "",
+          "close_lid_rotation_speed": "",
+          "thermo1_temperature": 50,
+          "thermo1_time": "",
+          "thermo2_temperature": 50,
+          "thermo2_time": "",
+          "thermo3_temperature": 50,
+          "thermo3_time": "",
+          "thermo4_temperature": 50,
+          "thermo4_time": null,
+          "ultrasound_stop": false,
+          "timeout": 180,
+          "cmd_type": 46
+        },
+        "footer": "",
+        "device_name": "gn_centrifuge_tube_liquid_handling",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge_tube_liquid_handling"
+      },
+      {
+        "uuid": "c4152ace-71dc-4fd5-9e7a-d883d0fa4e7a",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 3090,
+            "y": 1390,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": "",
+          "y_pos": "",
+          "z1_pos": "",
+          "p1_pos": "",
+          "z2_pos": "",
+          "p2_pos": "",
+          "z3_pos": "",
+          "z4_pos": "",
+          "m_pos": "",
+          "x_speed": "",
+          "y_speed": "",
+          "z1_speed": "",
+          "p1_speed": "",
+          "z2_speed": "",
+          "p2_speed": "",
+          "z3_speed": "",
+          "z4_speed": "",
+          "m_speed": "",
+          "mix_counts": "",
+          "ultrasound_time": "",
+          "shaking_speed": "",
+          "shaking_time": "",
+          "small_gripper_angle": "",
+          "small_gripper_force": "",
+          "ch8_blow": "",
+          "ch1_blow": "",
+          "ch8_reverse_aspirate": "",
+          "ch1_reverse_aspirate": "",
+          "open_lid_start": "",
+          "open_lid_end": "",
+          "close_lid_start": "",
+          "close_lid_end": "",
+          "open_lid_speed": "",
+          "close_lid_speed": "",
+          "open_lid_rotation_speed": "",
+          "close_lid_rotation_speed": "",
+          "thermo1_temperature": "",
+          "thermo1_time": "",
+          "thermo2_temperature": "",
+          "thermo2_time": "",
+          "thermo3_temperature": "",
+          "thermo3_time": "",
+          "thermo4_temperature": "",
+          "thermo4_time": "",
+          "ultrasound_stop": false,
+          "timeout": 180,
+          "cmd_type": 47
+        },
+        "footer": "",
+        "device_name": "gn_centrifuge_tube_liquid_handling",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge_tube_liquid_handling"
+      }
+    ],
+    "edges": [
+      {
+        "source_node_uuid": "b67b7864-6e25-4f14-a036-4c3393d77aab",
+        "target_node_uuid": "c4152ace-71dc-4fd5-9e7a-d883d0fa4e7a",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      }
+    ],
+    "embeds": []
+  }
+}

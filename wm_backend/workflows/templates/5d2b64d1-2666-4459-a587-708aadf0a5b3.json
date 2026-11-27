@@ -14,8 +14,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 302.95035,
-            "y": -1283.8856,
+            "x": 2460,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -62,8 +62,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2517.4,
-            "y": 239.9737,
+            "x": 360,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -91,7 +91,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -114,8 +114,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 0,
-            "y": 0,
+            "x": 60,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -168,8 +168,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 912.9774,
-            "y": 45.370434,
+            "x": 2160,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -197,7 +197,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -220,8 +220,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 726.1709,
-            "y": 1643.9104,
+            "x": 5460,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -249,7 +249,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -272,8 +272,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4866.383,
-            "y": 2066.3542,
+            "x": 1560,
+            "y": 1748,
             "z": 0
           },
           "position_3d": {
@@ -301,7 +301,7 @@
         },
         "param": {
           "number": 5,
-          "station": "stack",
+          "station": 8,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -324,8 +324,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4145.697,
-            "y": 1.248291,
+            "x": 5160,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -353,7 +353,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -376,8 +376,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2178.163,
-            "y": 0,
+            "x": 3360,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -424,8 +424,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -5319.8647,
-            "y": 692.5418,
+            "x": 60,
+            "y": 56,
             "z": 0
           },
           "position_3d": {
@@ -469,8 +469,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3699.6677,
-            "y": 247.14708,
+            "x": 360,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -526,8 +526,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3493.6653,
-            "y": 602.97363,
+            "x": 5760,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -555,7 +555,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -578,8 +578,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -373.54218,
-            "y": 666.12366,
+            "x": 5760,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -607,7 +607,7 @@
         },
         "param": {
           "number": 70,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -630,8 +630,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 241.14865,
-            "y": 973.032,
+            "x": 3960,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -659,7 +659,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -682,8 +682,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 630.81866,
-            "y": 85,
+            "x": 1860,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -730,8 +730,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1605.6613,
-            "y": -782.8634,
+            "x": 6960,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -807,8 +807,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3105.759,
-            "y": 553.95886,
+            "x": 6060,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -836,7 +836,7 @@
         },
         "param": {
           "number": 72,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -859,8 +859,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2363.7566,
-            "y": 562.9319,
+            "x": 6660,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -940,8 +940,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1382.7919,
-            "y": 597.79193,
+            "x": 7260,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -969,7 +969,7 @@
         },
         "param": {
           "number": 71,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -992,8 +992,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2503.478,
-            "y": 1.248291,
+            "x": 3660,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -1021,7 +1021,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1044,8 +1044,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 978.85547,
-            "y": 618.9047,
+            "x": 6960,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -1092,8 +1092,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1885.1649,
-            "y": -787.64734,
+            "x": 7260,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -1140,8 +1140,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2245.306,
-            "y": 1341.9602,
+            "x": 6360,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -1194,8 +1194,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2024.7845,
-            "y": 555.52484,
+            "x": 6960,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -1248,8 +1248,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 294.00333,
-            "y": 1624.3711,
+            "x": 5760,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -1305,8 +1305,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4409.0054,
-            "y": -66.47309,
+            "x": 2460,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -1353,8 +1353,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3169.088,
-            "y": 2.496582,
+            "x": 4260,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -1407,8 +1407,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4206.3604,
-            "y": 562.0118,
+            "x": 5160,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -1488,8 +1488,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3833.2002,
-            "y": 2.496582,
+            "x": 4860,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -1536,8 +1536,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1698.2885,
-            "y": 520.0011,
+            "x": 7260,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -1565,7 +1565,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1588,8 +1588,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 188.79361,
-            "y": -737.9545,
+            "x": 5460,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -1617,7 +1617,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -1640,8 +1640,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4507.502,
-            "y": 270.83206,
+            "x": 960,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -1697,8 +1697,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2191.6372,
-            "y": -62.161877,
+            "x": 3960,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -1726,7 +1726,7 @@
         },
         "param": {
           "number": 66,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1749,8 +1749,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1794.9369,
-            "y": -159.87584,
+            "x": 4260,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -1778,7 +1778,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1801,8 +1801,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2785.319,
-            "y": 584.9316,
+            "x": 6360,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -1849,8 +1849,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2565.1292,
-            "y": -68.00861,
+            "x": 3660,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -1878,7 +1878,7 @@
         },
         "param": {
           "number": 69,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1901,8 +1901,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4090.272,
-            "y": -990.3004,
+            "x": 5460,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -1958,8 +1958,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1733.6663,
-            "y": 1640.8849,
+            "x": 4560,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -2023,8 +2023,6 @@
           ],
           "touch_tip": false,
           "is_96_well": true,
-          "source_slots": 16,
-          "target_slots": 7,
           "use_channels": [],
           "liquid_height": null,
           "asp_flow_rates": [
@@ -2033,7 +2031,6 @@
           "dis_flow_rates": [
             100
           ],
-          "tip_rack_slots": 15,
           "post_air_volume": [],
           "dispensing_method": [],
           "mix_liquid_height": null,
@@ -2063,8 +2060,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1647.6089,
-            "y": 183.55513,
+            "x": 960,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -2111,8 +2108,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3914.5247,
-            "y": -7.5859537,
+            "x": 2760,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -2192,8 +2189,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1660.551,
-            "y": -1174.5076,
+            "x": 660,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -2249,8 +2246,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1979.4795,
-            "y": 1986.9165,
+            "x": 660,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -2311,8 +2308,6 @@
           ],
           "touch_tip": false,
           "is_96_well": true,
-          "source_slots": 16,
-          "target_slots": 5,
           "use_channels": [],
           "liquid_height": [],
           "asp_flow_rates": [
@@ -2321,7 +2316,6 @@
           "dis_flow_rates": [
             100
           ],
-          "tip_rack_slots": 12,
           "post_air_volume": [],
           "dispensing_method": [],
           "blow_out_air_volume": [
@@ -2350,8 +2344,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 587.9541,
-            "y": 652.23615,
+            "x": 6660,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -2431,8 +2425,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1636.022,
-            "y": 2002.8945,
+            "x": 960,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -2485,8 +2479,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 864.82654,
-            "y": 1967.7135,
+            "x": 1560,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -2514,7 +2508,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -2537,8 +2531,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3328.558,
-            "y": 298.1972,
+            "x": 60,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -2594,8 +2588,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1104.1543,
-            "y": 1643.8513,
+            "x": 5160,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -2623,7 +2617,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -2646,8 +2640,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3490.0361,
-            "y": 1606.1179,
+            "x": 3060,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -2703,8 +2697,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2299.736,
-            "y": 1986.1654,
+            "x": 360,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -2765,8 +2759,6 @@
           ],
           "touch_tip": false,
           "is_96_well": true,
-          "source_slots": 16,
-          "target_slots": 5,
           "use_channels": [],
           "liquid_height": [],
           "asp_flow_rates": [
@@ -2775,7 +2767,6 @@
           "dis_flow_rates": [
             100
           ],
-          "tip_rack_slots": 12,
           "post_air_volume": [],
           "dispensing_method": [],
           "blow_out_air_volume": [
@@ -2804,8 +2795,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1894.4828,
-            "y": 850.6649,
+            "x": 2460,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -2869,8 +2860,6 @@
           ],
           "touch_tip": false,
           "is_96_well": true,
-          "source_slots": 8,
-          "target_slots": 16,
           "use_channels": [],
           "liquid_height": null,
           "asp_flow_rates": [
@@ -2879,7 +2868,6 @@
           "dis_flow_rates": [
             300
           ],
-          "tip_rack_slots": 11,
           "post_air_volume": [],
           "dispensing_method": [],
           "mix_liquid_height": null,
@@ -2909,8 +2897,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1317.1299,
-            "y": -773.3898,
+            "x": 6660,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -2974,8 +2962,6 @@
           ],
           "touch_tip": false,
           "is_96_well": true,
-          "source_slots": 8,
-          "target_slots": 16,
           "use_channels": [],
           "liquid_height": null,
           "asp_flow_rates": [
@@ -2984,7 +2970,6 @@
           "dis_flow_rates": [
             300
           ],
-          "tip_rack_slots": 11,
           "post_air_volume": [],
           "dispensing_method": [],
           "mix_liquid_height": null,
@@ -3014,8 +2999,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3458.9155,
-            "y": -20.964325,
+            "x": 3060,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -3068,8 +3053,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4054.3591,
-            "y": 936.5413,
+            "x": 660,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -3125,8 +3110,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1379.6012,
-            "y": -154.37279,
+            "x": 4560,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -3173,8 +3158,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2853.1104,
-            "y": 4.993408,
+            "x": 3960,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -3202,7 +3187,7 @@
         },
         "param": {
           "number": 68,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -3225,8 +3210,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1224.53,
-            "y": 42.99912,
+            "x": 960,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -3254,7 +3239,7 @@
         },
         "param": {
           "number": 70,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -3277,8 +3262,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4146.4316,
-            "y": 1.248291,
+            "x": 3660,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -3306,7 +3291,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -3329,8 +3314,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1606.9789,
-            "y": 48,
+            "x": 1260,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -3383,8 +3368,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2178.163,
-            "y": 0,
+            "x": 1860,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -3431,8 +3416,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3325.0508,
-            "y": -1002.05414,
+            "x": 6060,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -3488,8 +3473,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3024.3245,
-            "y": -19.824705,
+            "x": 3360,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -3517,7 +3502,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -3540,8 +3525,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1849.852,
-            "y": 4.993408,
+            "x": 3060,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -3621,8 +3606,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2449.1562,
-            "y": -792.7519,
+            "x": 6960,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -3650,7 +3635,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -3673,8 +3658,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -64.104515,
-            "y": 1688.2668,
+            "x": 6060,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -3730,8 +3715,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4078.5886,
-            "y": 2068.5125,
+            "x": 960,
+            "y": 1748,
             "z": 0
           },
           "position_3d": {
@@ -3787,8 +3772,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4455.0146,
-            "y": 2.5785882,
+            "x": 3960,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -3816,7 +3801,7 @@
         },
         "param": {
           "number": 72,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -3839,8 +3824,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2853.1104,
-            "y": 4.993408,
+            "x": 2460,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -3868,7 +3853,7 @@
         },
         "param": {
           "number": 71,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -3891,8 +3876,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3833.2002,
-            "y": 2.496582,
+            "x": 3360,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -3939,8 +3924,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 355.67346,
-            "y": -91.17613,
+            "x": 5160,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -3993,8 +3978,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1532.1501,
-            "y": 35.404926,
+            "x": 2760,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -4047,8 +4032,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 615.07166,
-            "y": 1311.238,
+            "x": 4860,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -4101,8 +4086,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4630.256,
-            "y": 1269.8696,
+            "x": 6360,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -4149,8 +4134,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2904.9856,
-            "y": 1305.0713,
+            "x": 6960,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -4197,8 +4182,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3207.6472,
-            "y": 1339.5359,
+            "x": 7260,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -4226,7 +4211,7 @@
         },
         "param": {
           "number": 75,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -4249,8 +4234,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1291.6047,
-            "y": 1330.5134,
+            "x": 5460,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -4297,8 +4282,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3781.7327,
-            "y": 1621.7682,
+            "x": 2760,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -4354,8 +4339,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1612.1091,
-            "y": 1292.4314,
+            "x": 5760,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -4383,7 +4368,7 @@
         },
         "param": {
           "number": 74,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -4406,8 +4391,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1225.6965,
-            "y": 40.66606,
+            "x": 2460,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -4435,7 +4420,7 @@
         },
         "param": {
           "number": 67,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -4458,8 +4443,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4458.514,
-            "y": 3.7451172,
+            "x": 5460,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -4487,7 +4472,7 @@
         },
         "param": {
           "number": 69,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -4510,8 +4495,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 927.4076,
-            "y": 62.34871,
+            "x": 660,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -4539,7 +4524,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -4562,8 +4547,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1849.852,
-            "y": 4.993408,
+            "x": 1560,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -4643,8 +4628,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -5054.112,
-            "y": 1324.1914,
+            "x": 60,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -4688,8 +4673,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1026.3334,
-            "y": -743.67377,
+            "x": 6360,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -4786,8 +4771,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3840.0022,
-            "y": 1237.2416,
+            "x": 6960,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -4840,8 +4825,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1934.0826,
-            "y": 1286.2072,
+            "x": 6060,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -4869,7 +4854,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -4892,8 +4877,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1293.8988,
-            "y": -1242.3988,
+            "x": 3360,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -4949,8 +4934,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 757.6467,
-            "y": -739.7716,
+            "x": 6060,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -5026,8 +5011,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3643.5586,
-            "y": 2058.9395,
+            "x": 660,
+            "y": 1748,
             "z": 0
           },
           "position_3d": {
@@ -5083,8 +5068,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 351.5064,
-            "y": 0,
+            "x": 1560,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -5164,8 +5149,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -841.5605,
-            "y": -703.5698,
+            "x": 4560,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -5221,8 +5206,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 967.15936,
-            "y": 1320.7709,
+            "x": 5160,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -5302,8 +5287,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 627.1443,
-            "y": 2.8981934,
+            "x": 360,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -5350,8 +5335,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3493.704,
-            "y": 3.7451172,
+            "x": 4560,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -5431,8 +5416,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1287.4999,
-            "y": 920.50323,
+            "x": 3060,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -5508,8 +5493,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2360.5676,
-            "y": 1624.3534,
+            "x": 3960,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -5537,7 +5522,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -5560,8 +5545,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -133.8968,
-            "y": 1298.176,
+            "x": 4260,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -5589,7 +5574,7 @@
         },
         "param": {
           "number": 73,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -5612,8 +5597,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -108.06832,
-            "y": -736.7604,
+            "x": 5160,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -5641,7 +5626,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -5664,8 +5649,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4562.0547,
-            "y": 903.25195,
+            "x": 360,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -5721,8 +5706,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 230.58043,
-            "y": 1260.1841,
+            "x": 4560,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -5750,7 +5735,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -5773,8 +5758,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 465.58704,
-            "y": 1964.8594,
+            "x": 1860,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -5830,8 +5815,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3169.088,
-            "y": 2.496582,
+            "x": 2760,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -5884,8 +5869,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2690.368,
-            "y": 1627.9482,
+            "x": 3660,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -5913,7 +5898,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -5936,8 +5921,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3513.0708,
-            "y": 1308.3744,
+            "x": 7260,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -5965,7 +5950,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -5988,8 +5973,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3048.651,
-            "y": 1634.0206,
+            "x": 3360,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -6045,8 +6030,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2503.478,
-            "y": 1.248291,
+            "x": 2160,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -6074,7 +6059,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -6097,8 +6082,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 518.9898,
-            "y": 295.03018,
+            "x": 1860,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -6126,7 +6111,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -6149,8 +6134,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2882.5588,
-            "y": 259.37308,
+            "x": 60,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -6206,8 +6191,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 959.49744,
-            "y": 936.5767,
+            "x": 3360,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -6252,8 +6237,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4217.9854,
-            "y": 1605.6216,
+            "x": 2460,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -6305,8 +6290,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3599.9182,
-            "y": 947.3993,
+            "x": 960,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -6334,7 +6319,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -6357,8 +6342,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2974.4067,
-            "y": 2005.9203,
+            "x": 60,
+            "y": 1748,
             "z": 0
           },
           "position_3d": {
@@ -6386,7 +6371,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -6409,8 +6394,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 483.5576,
-            "y": -742.81256,
+            "x": 5760,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -6463,8 +6448,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2578.7993,
-            "y": 1301.2278,
+            "x": 6660,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -6544,8 +6529,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 135.68887,
-            "y": 297.56366,
+            "x": 2160,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -6573,7 +6558,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -6596,8 +6581,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3266.7932,
-            "y": 2014.882,
+            "x": 360,
+            "y": 1748,
             "z": 0
           },
           "position_3d": {
@@ -6648,8 +6633,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3837.1492,
-            "y": 550.3313,
+            "x": 5460,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -6702,8 +6687,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4551.937,
-            "y": 561.26544,
+            "x": 4860,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -6750,8 +6735,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2636.5754,
-            "y": 1989.699,
+            "x": 60,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -6796,8 +6781,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -2280.9731,
-            "y": -1194.1844,
+            "x": 60,
+            "y": 428,
             "z": 0
           },
           "position_3d": {
@@ -6825,7 +6810,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -6848,8 +6833,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 321.2683,
-            "y": 6.78833,
+            "x": 60,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -6929,8 +6914,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1596.4661,
-            "y": -1498.453,
+            "x": 3660,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -6986,8 +6971,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4671.04,
-            "y": 1649.5265,
+            "x": 2160,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -7043,8 +7028,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3037.4392,
-            "y": -908.1641,
+            "x": 6360,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -7100,8 +7085,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4526.2896,
-            "y": 2057.2346,
+            "x": 1260,
+            "y": 1748,
             "z": 0
           },
           "position_3d": {
@@ -7129,7 +7114,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -7152,8 +7137,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2082.9448,
-            "y": 1658.5773,
+            "x": 4260,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -7198,8 +7183,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3493.704,
-            "y": 3.7451172,
+            "x": 3060,
+            "y": 1308,
             "z": 0
           },
           "position_3d": {
@@ -7279,8 +7264,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1035.3458,
-            "y": -1185.1661,
+            "x": 1260,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -7308,7 +7293,7 @@
         },
         "param": {
           "number": 5,
-          "station": "stack",
+          "station": 8,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -7331,8 +7316,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 983.3819,
-            "y": -1264.3169,
+            "x": 3060,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -7360,7 +7345,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -7383,8 +7368,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1257.856,
-            "y": 2005.8164,
+            "x": 1260,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -7412,7 +7397,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -7435,8 +7420,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 638.26636,
-            "y": -1263.4071,
+            "x": 2760,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -7464,7 +7449,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -7487,8 +7472,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -668.3294,
-            "y": -1169.4275,
+            "x": 1560,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -7516,7 +7501,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -7539,8 +7524,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4255.94,
-            "y": 1234.9564,
+            "x": 6660,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -7620,8 +7605,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1357.3993,
-            "y": -1173.1158,
+            "x": 960,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -7677,8 +7662,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1960.1561,
-            "y": -1193.4987,
+            "x": 360,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -7706,7 +7691,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -7729,8 +7714,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -71.377754,
-            "y": 646.7188,
+            "x": 6060,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -7758,7 +7743,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -7781,8 +7766,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2572.273,
-            "y": 1001.0708,
+            "x": 1860,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -7858,8 +7843,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 557.2293,
-            "y": 956.0029,
+            "x": 3660,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -7887,7 +7872,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -7910,8 +7895,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 0,
-            "y": 4.527832,
+            "x": 1260,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -7964,8 +7949,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -34.44148,
-            "y": -1266.3578,
+            "x": 2160,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -8062,8 +8047,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 861.6517,
-            "y": 265.40393,
+            "x": 1560,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -8116,8 +8101,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2012.8256,
-            "y": -1293.3429,
+            "x": 3960,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -8169,8 +8154,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1143.5073,
-            "y": -744.73004,
+            "x": 4260,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -8226,8 +8211,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -416.74237,
-            "y": -736.0344,
+            "x": 4860,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -8283,8 +8268,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2218.878,
-            "y": 876.9437,
+            "x": 2160,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -8348,8 +8333,6 @@
           ],
           "touch_tip": false,
           "is_96_well": true,
-          "source_slots": 16,
-          "target_slots": 4,
           "use_channels": [],
           "liquid_height": null,
           "asp_flow_rates": [
@@ -8358,7 +8341,6 @@
           "dis_flow_rates": [
             300
           ],
-          "tip_rack_slots": 15,
           "post_air_volume": [],
           "dispensing_method": [],
           "mix_liquid_height": null,
@@ -8388,8 +8370,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1580.0773,
-            "y": 847.6551,
+            "x": 2760,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -8453,8 +8435,6 @@
           ],
           "touch_tip": false,
           "is_96_well": true,
-          "source_slots": 16,
-          "target_slots": 5,
           "use_channels": [],
           "liquid_height": null,
           "asp_flow_rates": [
@@ -8463,7 +8443,6 @@
           "dis_flow_rates": [
             300
           ],
-          "tip_rack_slots": 12,
           "post_air_volume": [],
           "dispensing_method": [],
           "mix_liquid_height": null,
@@ -8493,8 +8472,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 990.732,
-            "y": -121.718575,
+            "x": 4860,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -8574,8 +8553,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1207.9738,
-            "y": 135.98077,
+            "x": 1260,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -8639,8 +8618,6 @@
           ],
           "touch_tip": false,
           "is_96_well": true,
-          "source_slots": 7,
-          "target_slots": 16,
           "use_channels": [],
           "liquid_height": null,
           "asp_flow_rates": [
@@ -8649,7 +8626,6 @@
           "dis_flow_rates": [
             300
           ],
-          "tip_rack_slots": 15,
           "post_air_volume": [],
           "dispensing_method": [],
           "mix_liquid_height": null,
@@ -8679,8 +8655,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2879.658,
-            "y": 973.6712,
+            "x": 1560,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -8725,8 +8701,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -61.972176,
-            "y": 933.8,
+            "x": 4260,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -8782,8 +8758,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1410.9446,
-            "y": 1641.9933,
+            "x": 4860,
+            "y": 1528,
             "z": 0
           },
           "position_3d": {
@@ -8828,8 +8804,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 224.54819,
-            "y": 632.84454,
+            "x": 6360,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -8882,8 +8858,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -327.7115,
-            "y": -1223.6578,
+            "x": 1860,
+            "y": 242,
             "z": 0
           },
           "position_3d": {
@@ -8936,8 +8912,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4116.6035,
-            "y": 279.9659,
+            "x": 660,
+            "y": 868,
             "z": 0
           },
           "position_3d": {
@@ -8989,8 +8965,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2027.2423,
-            "y": 225.35199,
+            "x": 660,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -9018,7 +8994,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -9041,8 +9017,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3224.6418,
-            "y": 954.45905,
+            "x": 1260,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {
@@ -9070,7 +9046,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -9093,8 +9069,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2759.2026,
-            "y": -832.19354,
+            "x": 6660,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -9150,8 +9126,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2163.834,
-            "y": -792.1119,
+            "x": 7260,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -9179,7 +9155,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -9202,8 +9178,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3651.9612,
-            "y": -1001.8978,
+            "x": 5760,
+            "y": 648,
             "z": 0
           },
           "position_3d": {
@@ -9259,8 +9235,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -378.52658,
-            "y": 935.25305,
+            "x": 4560,
+            "y": 1088,
             "z": 0
           },
           "position_3d": {

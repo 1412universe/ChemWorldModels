@@ -14,8 +14,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 970,
-            "y": 60,
+            "x": 4308,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -65,7 +65,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "9e3312e4-8d23-4264-bc84-e63fca243458",
@@ -76,8 +76,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 554,
-            "y": 60,
+            "x": 5444,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -127,7 +127,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "79a41809-ed78-4c2d-b1d1-ec19a4f1353c",
@@ -138,8 +138,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1048,
-            "y": 60,
+            "x": 5160,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -189,7 +189,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "676c5daa-e7b9-49cf-b94c-7f462f29ebae",
@@ -200,8 +200,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 892,
-            "y": 60,
+            "x": 3456,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -251,7 +251,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "d4ad7190-bd8e-41cc-a2fe-d575d2bf934d",
@@ -262,8 +262,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 346,
-            "y": 60,
+            "x": 3172,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -313,7 +313,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "1c136785-1dc0-4555-85fd-ef876a2c26bd",
@@ -324,8 +324,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 840,
-            "y": 60,
+            "x": 2888,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -375,7 +375,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "fd676f82-1c4e-4035-90b0-83053fd0a32f",
@@ -386,8 +386,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 216,
-            "y": 60,
+            "x": 1752,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -437,7 +437,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "9a33810b-6a01-4efc-b120-bb1eded586be",
@@ -448,8 +448,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1022,
-            "y": 60,
+            "x": 4876,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -499,7 +499,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "2365af56-c4ff-4c3c-8a12-ac9493e8d733",
@@ -510,8 +510,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 450,
-            "y": 60,
+            "x": 4308,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -561,7 +561,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "82e48c2a-3edd-44ea-9cce-a1b0972e1333",
@@ -572,8 +572,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 684,
-            "y": 60,
+            "x": 1184,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -623,7 +623,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "2e126c97-830d-4f06-948a-9d56a48a83f4",
@@ -634,8 +634,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 112,
-            "y": 60,
+            "x": 616,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -684,7 +684,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "993b98f0-89e2-47bf-a6e0-29d6d22ff469",
@@ -695,8 +695,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 320,
-            "y": 60,
+            "x": 2888,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -746,7 +746,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "7ccfc805-ab11-4b09-ac93-9268a0824802",
@@ -757,8 +757,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 606,
-            "y": 60,
+            "x": 332,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -808,7 +808,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "e7a0e98c-de17-4c98-a0df-e2025bfa88dc",
@@ -819,8 +819,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1100,
-            "y": 60,
+            "x": 48,
+            "y": 608,
             "z": 0
           },
           "position_3d": {
@@ -870,7 +870,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "79c6da09-6da2-49c6-aee2-c9769cf0a175",
@@ -881,8 +881,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 658,
-            "y": 60,
+            "x": 900,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -932,7 +932,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "55bddcfa-c722-4cce-acc6-268f883ec23c",
@@ -943,8 +943,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 814,
-            "y": 60,
+            "x": 2604,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -994,7 +994,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "5d7dee27-a73b-4b00-8386-de58820ec8f0",
@@ -1005,8 +1005,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 762,
-            "y": 60,
+            "x": 2036,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -1056,7 +1056,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "e75d99f7-d68f-4c86-aefd-390c10b2da83",
@@ -1067,8 +1067,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 866,
-            "y": 60,
+            "x": 3172,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -1118,7 +1118,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "ea6de7d6-b1df-4c02-84d3-bc288c9abafc",
@@ -1129,8 +1129,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 60,
-            "y": 60,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1180,7 +1180,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "611109e4-6978-455e-9261-cfae64bb80f2",
@@ -1191,8 +1191,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 86,
-            "y": 60,
+            "x": 332,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1241,7 +1241,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "6d9ad2c4-35cc-4092-8e45-ca6085c5b72d",
@@ -1252,8 +1252,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 138,
-            "y": 60,
+            "x": 900,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1303,7 +1303,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "82171519-52fd-4da3-9163-cb43397f6d89",
@@ -1314,8 +1314,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 242,
-            "y": 60,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1365,7 +1365,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "1da069e9-aba1-4198-8e83-378f16152308",
@@ -1376,8 +1376,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 710,
-            "y": 60,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -1427,7 +1427,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "801071cd-b931-4726-a46a-a6912c790e1b",
@@ -1438,8 +1438,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 788,
-            "y": 60,
+            "x": 2320,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -1489,7 +1489,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "31a87547-f76a-4663-8079-a0d4573d18d8",
@@ -1500,8 +1500,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1126,
-            "y": 60,
+            "x": 332,
+            "y": 608,
             "z": 0
           },
           "position_3d": {
@@ -1551,7 +1551,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "ea7f3bd9-dc50-4cc2-ab16-976566dba505",
@@ -1562,8 +1562,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 372,
-            "y": 60,
+            "x": 3456,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1613,7 +1613,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "4c371300-0183-4be9-9440-2adbe07dd07e",
@@ -1624,8 +1624,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 580,
-            "y": 60,
+            "x": 48,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -1675,7 +1675,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "d5ad8ebb-7364-4159-9ec7-668c602c21f5",
@@ -1686,8 +1686,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 190,
-            "y": 60,
+            "x": 1468,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1737,7 +1737,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "f5c9325d-5ae7-4b69-9630-c0ab75bef43e",
@@ -1748,8 +1748,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 528,
-            "y": 60,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1799,7 +1799,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "2ed96085-a06c-46a9-b79a-67d64a50e898",
@@ -1810,8 +1810,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 294,
-            "y": 60,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1861,7 +1861,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "46b6bc89-e4c3-43af-b7c8-1d34be93d8d3",
@@ -1872,8 +1872,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 632,
-            "y": 60,
+            "x": 616,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -1923,7 +1923,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "7c32c0ce-85eb-4e38-90f1-7ef9b54022c8",
@@ -1934,8 +1934,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 736,
-            "y": 60,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -1985,7 +1985,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "732308d1-b293-4674-8fe0-044b0419767d",
@@ -1996,8 +1996,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 164,
-            "y": 60,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2047,7 +2047,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "9bc60a13-0d5e-49a0-9e35-8ad02c00616c",
@@ -2058,8 +2058,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 502,
-            "y": 60,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2109,7 +2109,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "eae79b1b-58dd-45df-8f4a-5a212e38f9c8",
@@ -2120,8 +2120,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 268,
-            "y": 60,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2171,7 +2171,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "ba1ce93d-f5e4-49ac-b062-41c28d5908ce",
@@ -2182,8 +2182,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 476,
-            "y": 60,
+            "x": 4592,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2233,7 +2233,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "23356ecc-5da5-472e-87e1-f33401767f18",
@@ -2244,8 +2244,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 944,
-            "y": 60,
+            "x": 4024,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -2295,7 +2295,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "3daa215d-ab40-42fd-8726-3a143081d5cf",
@@ -2306,8 +2306,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 398,
-            "y": 60,
+            "x": 3740,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2357,7 +2357,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "eaff2c95-206a-46f5-ba0f-52c84974d42d",
@@ -2368,8 +2368,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 918,
-            "y": 60,
+            "x": 3740,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -2419,7 +2419,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "3adc089c-1dad-4b8f-a184-045673720d7f",
@@ -2430,8 +2430,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 996,
-            "y": 60,
+            "x": 4592,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -2481,7 +2481,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "dad4519e-46da-4589-b48a-fa6cb859c5e8",
@@ -2492,8 +2492,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1074,
-            "y": 60,
+            "x": 5444,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -2543,7 +2543,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       },
       {
         "uuid": "f69ba345-b778-4411-930c-aacad5713b80",
@@ -2554,8 +2554,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 424,
-            "y": 60,
+            "x": 4024,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2605,7 +2605,7 @@
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
         "resource_name": "gn_solid_weighing",
-        "_foldGroup": "fg1_ea6de7"
+        "_foldGroup": "fg44_ea6de7"
       }
     ],
     "edges": [

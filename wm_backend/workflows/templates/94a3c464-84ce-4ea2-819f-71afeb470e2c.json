@@ -14,8 +14,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 9300,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -63,7 +63,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "4d466322-59b8-400c-911d-460e983b17ae",
@@ -74,8 +75,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5920,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -124,7 +125,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "97530c5e-3281-408d-9f6e-098191aeb075",
@@ -135,8 +137,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6960,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -185,7 +187,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "c6ab9647-d0b8-45ef-9420-13f1926250df",
@@ -196,8 +199,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 7220,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -246,7 +249,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "45aecb68-2dde-4b57-a507-95b7ab6da6a9",
@@ -257,8 +261,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 9560,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -306,7 +310,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "5cbc213e-e30d-4ee7-aeeb-7c445a657324",
@@ -317,8 +322,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4360,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -367,7 +372,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "bf205f2b-9a48-4c0a-af4f-e26c98537577",
@@ -378,8 +384,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5140,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -428,7 +434,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "f7c9c4be-2a1f-4ded-adbe-9f202f0c9483",
@@ -439,8 +446,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 8260,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -489,7 +496,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "c3e3d952-a708-4bde-9075-458b44fafe03",
@@ -500,8 +508,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 460,
-            "y": 0,
+            "x": 332,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -529,7 +537,7 @@
         },
         "param": {
           "number": 59,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -541,7 +549,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_c3e3d9"
       },
       {
         "uuid": "e84dcdfa-af64-4dc7-8052-20b37c7c1449",
@@ -552,8 +561,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 720,
-            "y": 0,
+            "x": 332,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -581,7 +590,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -593,7 +602,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_c3e3d9"
       },
       {
         "uuid": "920c3ef1-d18b-4b10-8e52-bc4686f35a14",
@@ -604,8 +614,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3060,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -654,7 +664,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "abe47aa5-997d-4e0c-8e2e-ce56a70fcaf8",
@@ -665,8 +676,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5660,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -715,7 +726,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "f7ce65f3-b0a5-4d8a-bf37-6fde5a050a24",
@@ -726,8 +738,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 7480,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -776,7 +788,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "b3bf7968-705f-4b40-824a-89da8390aef3",
@@ -787,8 +800,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 7740,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -837,7 +850,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "b021d22c-d88d-46e0-9809-1bffe2455c6e",
@@ -848,8 +862,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 8520,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -898,7 +912,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "50a7db8a-6c36-4656-a659-22bf6fd11edf",
@@ -909,8 +924,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1760,
-            "y": 0,
+            "x": 900,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -938,7 +953,7 @@
         },
         "param": {
           "number": 8,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -950,7 +965,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_50a7db"
       },
       {
         "uuid": "e3dfcd59-8135-40ab-b937-a6b1caa04d43",
@@ -961,8 +977,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2020,
-            "y": 0,
+            "x": 900,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -990,7 +1006,7 @@
         },
         "param": {
           "number": 1,
-          "station": "solid",
+          "station": 9,
           "timeout": 30000,
           "x_speed": 400,
           "item_type": "plate"
@@ -1002,7 +1018,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_50a7db"
       },
       {
         "uuid": "04539061-67dc-460e-8b78-141014e3dd5d",
@@ -1013,8 +1030,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3580,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1063,7 +1080,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "1ade8c46-2e80-469e-9b88-8197375178f2",
@@ -1074,8 +1092,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3840,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1124,7 +1142,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "b0bfb158-f08e-4267-96d5-aa63345e0a21",
@@ -1135,8 +1154,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4100,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1185,7 +1204,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "2c6c9ebe-6915-44d6-bf29-4fa9f6ee97c2",
@@ -1196,8 +1216,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 8000,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1246,7 +1266,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "a7825d74-8773-43b6-86cc-d0a9224c7c63",
@@ -1257,8 +1278,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1500,
-            "y": 0,
+            "x": 616,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1294,7 +1315,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_611614"
       },
       {
         "uuid": "a0770231-6eab-4a22-bb8f-5a194aab9628",
@@ -1305,8 +1327,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6440,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1355,7 +1377,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "349cea24-2bb6-4129-9029-7e251084bbcf",
@@ -1366,8 +1389,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 11120,
-            "y": 0,
+            "x": 1752,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1453,7 +1476,8 @@
         "lab_node_type": "Device",
         "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
         "template_name": "titration_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_767e79"
       },
       {
         "uuid": "5a0fbcc6-7bd4-4f08-ba37-eec33f1a6b2e",
@@ -1464,8 +1488,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1240,
-            "y": 0,
+            "x": 616,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1534,7 +1558,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_611614"
       },
       {
         "uuid": "7cf436df-0022-4b0d-a512-79d578497209",
@@ -1545,8 +1570,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2540,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1594,7 +1619,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "d7912853-0efc-4feb-8ca2-f5596d91700d",
@@ -1605,8 +1631,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 10080,
-            "y": 0,
+            "x": 1468,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1634,7 +1660,7 @@
         },
         "param": {
           "number": 1,
-          "station": "solid",
+          "station": 9,
           "timeout": 30000,
           "x_speed": 400,
           "item_type": "plate"
@@ -1646,7 +1672,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_d79128"
       },
       {
         "uuid": "e33c8b64-5e2a-454e-8ef4-bd3df6777666",
@@ -1657,8 +1684,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 10340,
-            "y": 0,
+            "x": 1468,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1686,7 +1713,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1698,7 +1725,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_d79128"
       },
       {
         "uuid": "beeeaf74-c5c3-4cdc-98d9-8e13acc24c5b",
@@ -1709,8 +1737,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 11900,
-            "y": 0,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1738,7 +1766,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1750,7 +1778,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_beeeaf"
       },
       {
         "uuid": "11b28d6b-ad12-4a00-8e9f-a167cc7c7f0a",
@@ -1761,8 +1790,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3320,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1811,7 +1840,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "ec5e57ba-ccc3-452f-bdeb-a14434bd1bfd",
@@ -1822,8 +1852,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 9820,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1871,7 +1901,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "8c2cf385-619e-4b00-b85a-5c1f7d42e26d",
@@ -1882,8 +1913,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2800,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1931,7 +1962,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "d916d6ce-0f85-47c3-8d8b-1b591323ba36",
@@ -1942,8 +1974,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5400,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1992,7 +2024,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "e5678a0f-d490-49d7-8915-4ebaacc92cfd",
@@ -2003,8 +2036,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 9040,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2053,7 +2086,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "767e793d-279c-42e8-921c-6e34912e7a94",
@@ -2064,8 +2098,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 10600,
-            "y": 0,
+            "x": 1752,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2107,7 +2141,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_767e79"
       },
       {
         "uuid": "7b569453-d186-4715-9c6f-543b74e4e753",
@@ -2118,8 +2153,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2280,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2167,7 +2202,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "32d7c48f-9493-404f-b7e0-2da9fc55e82e",
@@ -2178,8 +2214,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6180,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2228,7 +2264,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "3cd08c97-8300-448a-943d-b4ca48a949b7",
@@ -2239,8 +2276,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 11640,
-            "y": 0,
+            "x": 1752,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2276,7 +2313,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_767e79"
       },
       {
         "uuid": "55fc81a4-c8ba-4616-85ba-37dcc184c140",
@@ -2287,8 +2325,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 12160,
-            "y": 0,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2316,7 +2354,7 @@
         },
         "param": {
           "number": 59,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -2328,7 +2366,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_beeeaf"
       },
       {
         "uuid": "628d0a38-d3a5-441c-8155-c7e5d66b51d4",
@@ -2339,8 +2378,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4620,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2389,7 +2428,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "826856de-1739-4383-951f-52478e28734f",
@@ -2400,8 +2440,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6700,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2450,7 +2490,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "ec7b5921-5463-4def-b670-072fecce15f7",
@@ -2461,8 +2502,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 11380,
-            "y": 0,
+            "x": 1752,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2531,7 +2572,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_767e79"
       },
       {
         "uuid": "7e869579-a523-4f6b-aea9-0d6b84a69225",
@@ -2542,8 +2584,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 10860,
-            "y": 0,
+            "x": 1752,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2612,7 +2654,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_767e79"
       },
       {
         "uuid": "d498e9fa-b7cb-4cd6-9cda-9404f7b15661",
@@ -2623,8 +2666,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4880,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2673,7 +2716,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       },
       {
         "uuid": "c2b996d7-7f23-4d57-87c1-319e047eefd9",
@@ -2684,8 +2728,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 200,
-            "y": 0,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2737,8 +2781,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 980,
-            "y": 0,
+            "x": 616,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2780,7 +2824,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_611614"
       },
       {
         "uuid": "71af981a-0348-47d5-99fc-dd44c14957df",
@@ -2791,8 +2836,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 8780,
-            "y": 0,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2841,7 +2886,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_7b5694"
       }
     ],
     "edges": [

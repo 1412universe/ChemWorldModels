@@ -345,8 +345,6 @@
           ],
           "touch_tip": false,
           "is_96_well": false,
-          "source_slots": 16,
-          "target_slots": 7,
           "use_channels": [],
           "liquid_height": null,
           "asp_flow_rates": [
@@ -355,7 +353,6 @@
           "dis_flow_rates": [
             300
           ],
-          "tip_rack_slots": 15,
           "post_air_volume": [],
           "dispensing_method": [],
           "mix_liquid_height": null,
@@ -414,7 +411,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -518,7 +515,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -570,7 +567,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -778,7 +775,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"

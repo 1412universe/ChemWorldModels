@@ -14,8 +14,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 164,
-            "y": 60,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -52,7 +52,7 @@
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
         "resource_name": "liquid_handler.prcxi",
-        "_foldGroup": "fg18_8e64ea"
+        "_foldGroup": "fg44_8e64ea"
       },
       {
         "uuid": "f21bc15e-90da-47ca-95f9-48e9366cc4c3",
@@ -63,8 +63,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 112,
-            "y": 60,
+            "x": 616,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -151,7 +151,7 @@
         "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
         "template_name": "titration_liquid",
         "resource_name": "liquid_handler.prcxi",
-        "_foldGroup": "fg18_8e64ea"
+        "_foldGroup": "fg44_8e64ea"
       },
       {
         "uuid": "d43ac8ad-2450-4189-9fbe-fefa60d2873b",
@@ -162,8 +162,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 86,
-            "y": 60,
+            "x": 332,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -250,7 +250,7 @@
         "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
         "template_name": "titration_liquid",
         "resource_name": "liquid_handler.prcxi",
-        "_foldGroup": "fg18_8e64ea"
+        "_foldGroup": "fg44_8e64ea"
       },
       {
         "uuid": "8e64ea01-c450-451f-b0b4-e3e2cc95816d",
@@ -261,8 +261,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 60,
-            "y": 60,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -305,7 +305,7 @@
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
         "resource_name": "liquid_handler.prcxi",
-        "_foldGroup": "fg18_8e64ea"
+        "_foldGroup": "fg44_8e64ea"
       },
       {
         "uuid": "474eda63-ef75-4290-b093-dfeb64454900",
@@ -316,8 +316,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 138,
-            "y": 60,
+            "x": 900,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -404,7 +404,7 @@
         "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
         "template_name": "titration_liquid",
         "resource_name": "liquid_handler.prcxi",
-        "_foldGroup": "fg18_8e64ea"
+        "_foldGroup": "fg44_8e64ea"
       }
     ],
     "edges": [

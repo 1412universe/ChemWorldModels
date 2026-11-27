@@ -1,0 +1,209 @@
+{
+  "target_lab_uuid": "2d1ec9a3-ad0e-4a76-9dd9-21f12fee028c",
+  "name": "未命名工作流",
+  "data": {
+    "workflow_uuid": "cfc91a4c-b6e5-4a4a-a917-1faae4c39450",
+    "workflow_name": "未命名工作流",
+    "nodes": [
+      {
+        "uuid": "1d77408d-4a1d-48f6-b636-19994a3f4561",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 770,
+            "y": 350,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": "",
+          "y_pos": "",
+          "z1_pos": "",
+          "z2_pos": "",
+          "x_speed": "",
+          "y_speed": "",
+          "z1_speed": "",
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": "",
+          "timeout": 180,
+          "cmd_type": 16
+        },
+        "footer": "",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "109c7c30-6253-454e-a9f7-42c10a537ae9",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 130,
+            "y": 350,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": "",
+          "y_pos": "",
+          "z1_pos": "",
+          "z2_pos": "",
+          "x_speed": "",
+          "y_speed": "",
+          "z1_speed": "",
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": "",
+          "timeout": 180,
+          "cmd_type": 16
+        },
+        "footer": "",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "48a00e7d-edaf-4cc1-87d5-a873f78bdde2",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 440,
+            "y": 350,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 338,
+          "y_pos": 307,
+          "z1_pos": 1070,
+          "z2_pos": "",
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": "",
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 100,
+          "timeout": 3600,
+          "cmd_type": 12
+        },
+        "footer": "",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      }
+    ],
+    "edges": [
+      {
+        "source_node_uuid": "109c7c30-6253-454e-a9f7-42c10a537ae9",
+        "target_node_uuid": "48a00e7d-edaf-4cc1-87d5-a873f78bdde2",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "48a00e7d-edaf-4cc1-87d5-a873f78bdde2",
+        "target_node_uuid": "1d77408d-4a1d-48f6-b636-19994a3f4561",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      }
+    ],
+    "embeds": []
+  }
+}

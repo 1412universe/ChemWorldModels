@@ -1,0 +1,11 @@
+{
+  "target_lab_uuid": "b78e2180-2893-43a3-8754-ab0c6bab348b",
+  "name": "超声震荡",
+  "data": {
+    "workflow_uuid": "98c44d68-ff26-4743-88d5-6ff0840c2007",
+    "workflow_name": "超声震荡",
+    "nodes": [],
+    "edges": [],
+    "embeds": []
+  }
+}

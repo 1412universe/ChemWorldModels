@@ -6,51 +6,6 @@
     "workflow_name": "9320到离心机第二到n次离心工作流（第一次是取水，后面是放水，故要区分一下）",
     "nodes": [
       {
-        "uuid": "5f5fdc0b-a95a-4bf4-a847-4fda78f4378e",
-        "parent_uuid": "",
-        "name": "9320到离心机第一次离心工作流",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": null,
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
-      },
-      {
         "uuid": "fc528394-87f1-4be0-81f7-54ea43d81f0b",
         "parent_uuid": "5f5fdc0b-a95a-4bf4-a847-4fda78f4378e",
         "name": "pick",
@@ -59,8 +14,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3201.9688,
-            "y": 788.72186,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -88,7 +43,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -100,7 +55,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fc5283"
       },
       {
         "uuid": "04ff7bc6-3c41-4739-a4f1-bca52075fa81",
@@ -111,8 +67,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 0,
-            "y": 408.53546,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -140,7 +96,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -152,7 +108,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fc5283"
       },
       {
         "uuid": "4c4a748b-2f63-4a25-86cb-00e25fd10fbc",
@@ -163,8 +120,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3580.5938,
-            "y": 5.7616577,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -192,7 +149,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -204,7 +161,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fc5283"
       },
       {
         "uuid": "1801175b-bbdc-4e87-9c9c-6122cada1373",
@@ -215,8 +173,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3553.8367,
-            "y": 785.79596,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -244,7 +202,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -256,7 +214,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fc5283"
       },
       {
         "uuid": "7d634d2a-e865-47dc-80a2-2631c0d38f6d",
@@ -267,8 +226,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 568.2428,
-            "y": 136.1239,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -296,7 +255,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -308,7 +267,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fc5283"
       },
       {
         "uuid": "a1bb4ffa-915a-4a8e-8746-141dadca91d4",
@@ -319,8 +279,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1750.3396,
-            "y": 39.059498,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -348,7 +308,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -360,7 +320,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fc5283"
       },
       {
         "uuid": "db92334b-463b-4225-ad1c-cb358f1c21e3",
@@ -371,8 +332,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3909.1216,
-            "y": 1.1668701,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -400,7 +361,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -412,7 +373,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fc5283"
       },
       {
         "uuid": "43c0a2a6-4685-44e8-9d1e-1e248c0cf828",
@@ -423,8 +385,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2096.325,
-            "y": 51.401352,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -452,7 +414,7 @@
         },
         "param": {
           "number": 1,
-          "station": "centrifuge",
+          "station": 4,
           "timeout": 30000,
           "x_speed": 300,
           "item_type": "plate"
@@ -464,7 +426,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fc5283"
       },
       {
         "uuid": "515565a8-e45e-4cdd-99f1-7cc0b490755e",
@@ -475,8 +438,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1786.7952,
-            "y": 789.425,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -521,7 +484,8 @@
         "lab_node_type": "Device",
         "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_centrifuge"
+        "resource_name": "gn_centrifuge",
+        "_foldGroup": "fg44_515565"
       },
       {
         "uuid": "88391768-eb59-4e12-917f-636a204787f4",
@@ -532,8 +496,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 385.9004,
-            "y": 459.9357,
+            "x": 332,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -578,7 +542,8 @@
         "lab_node_type": "Device",
         "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_centrifuge"
+        "resource_name": "gn_centrifuge",
+        "_foldGroup": "fg44_5e9fe5"
       },
       {
         "uuid": "5e9fe5ad-cc5b-4175-86f9-e84f2aef9b1d",
@@ -589,8 +554,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 0,
-            "y": 401.22186,
+            "x": 332,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -635,7 +600,8 @@
         "lab_node_type": "Device",
         "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_centrifuge"
+        "resource_name": "gn_centrifuge",
+        "_foldGroup": "fg44_5e9fe5"
       },
       {
         "uuid": "d463948a-1d1d-4079-aca4-41f9b182e419",
@@ -646,8 +612,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2721.8513,
-            "y": 64.05989,
+            "x": 1752,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -692,7 +658,8 @@
         "lab_node_type": "Device",
         "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_centrifuge"
+        "resource_name": "gn_centrifuge",
+        "_foldGroup": "fg44_ddabb2"
       },
       {
         "uuid": "a74cefda-595b-46cf-9d50-6d60b1bfc730",
@@ -703,8 +670,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2137.2966,
-            "y": 790,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -749,7 +716,8 @@
         "lab_node_type": "Device",
         "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_centrifuge"
+        "resource_name": "gn_centrifuge",
+        "_foldGroup": "fg44_515565"
       },
       {
         "uuid": "83307bea-d077-42a9-a8ad-a33b5ae90196",
@@ -760,8 +728,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2940.466,
-            "y": 75.55411,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -806,7 +774,8 @@
         "lab_node_type": "Device",
         "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_centrifuge"
+        "resource_name": "gn_centrifuge",
+        "_foldGroup": "fg44_ddabb2"
       },
       {
         "uuid": "d238a3ef-0806-49a8-8492-068033613815",
@@ -817,8 +786,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2937.7144,
-            "y": 316.32486,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -863,7 +832,8 @@
         "lab_node_type": "Device",
         "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_centrifuge"
+        "resource_name": "gn_centrifuge",
+        "_foldGroup": "fg44_ddabb2"
       },
       {
         "uuid": "c91dcacd-0775-48bf-903a-6960faf6afea",
@@ -874,8 +844,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3042.7554,
-            "y": 1189.9686,
+            "x": 2888,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -931,8 +901,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2500.8965,
-            "y": 321.70358,
+            "x": 900,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -977,7 +947,8 @@
         "lab_node_type": "Device",
         "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_centrifuge"
+        "resource_name": "gn_centrifuge",
+        "_foldGroup": "fg44_ddabb2"
       },
       {
         "uuid": "e5692671-aa1b-4fb4-a428-36671d21ca73",
@@ -988,8 +959,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3049.7207,
-            "y": 224.78584,
+            "x": 1468,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1034,97 +1005,8 @@
         "lab_node_type": "Device",
         "template_uuid": "7e175cf2-3149-4805-96cc-5e7a48b17e41",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_centrifuge"
-      },
-      {
-        "uuid": "14758368-ca4b-43ba-8b04-ff5d20c7d433",
-        "parent_uuid": "",
-        "name": "9320从16号板吸水到10号板（用于配平）",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 780.9065,
-            "y": 370.00665,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": null,
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
-      },
-      {
-        "uuid": "650f5c97-b859-4fdb-b1fb-d58e3bc6b05d",
-        "parent_uuid": "14758368-ca4b-43ba-8b04-ff5d20c7d433",
-        "name": "9320从10号板吸水到16号板",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": null,
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
+        "resource_name": "gn_centrifuge",
+        "_foldGroup": "fg44_ddabb2"
       },
       {
         "uuid": "5be973f7-7353-486b-ac1b-e68742f90807",
@@ -1135,8 +1017,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 0,
-            "y": 0,
+            "x": 616,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1178,7 +1060,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5be973"
       },
       {
         "uuid": "97132ced-bbe3-4b8b-9316-87ba5dd1d70e",
@@ -1189,8 +1072,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 412,
-            "y": 17.600006,
+            "x": 616,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1273,7 +1156,8 @@
         "lab_node_type": "Device",
         "template_uuid": "b1f8991e-9f06-4abf-ad40-38406c5e5b0a",
         "template_name": "transfer_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5be973"
       },
       {
         "uuid": "7b9347a2-14e3-44ca-a24f-0c2ae7b56afc",
@@ -1284,8 +1168,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 772,
-            "y": 20,
+            "x": 616,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1321,7 +1205,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5be973"
       }
     ],
     "edges": [
@@ -1487,5 +1372,10 @@
       }
     ],
     "embeds": []
-  }
+  },
+  "_importGroupNames": [
+    "9320到离心机第一次离心工作流",
+    "9320从16号板吸水到10号板（用于配平）",
+    "9320从10号板吸水到16号板"
+  ]
 }

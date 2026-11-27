@@ -1,0 +1,441 @@
+{
+  "target_lab_uuid": "803298d7-ba98-4cd5-a546-b7ca08b4cb12",
+  "name": "81次滴注",
+  "data": {
+    "workflow_uuid": "782e4a20-883e-4449-9e00-08fe8e66064e",
+    "workflow_name": "81次滴注",
+    "nodes": [
+      {
+        "uuid": "007b0bf3-28c1-4d3f-b6a0-17e8965669c2",
+        "parent_uuid": "",
+        "name": "auto-run_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1418,
+            "y": 96.94444,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "protocol_id": null
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
+        "template_name": "auto-run_protocol",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "f21bc15e-90da-47ca-95f9-48e9366cc4c3",
+        "parent_uuid": "",
+        "name": "titration_liquid",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 537,
+            "y": 93.72222,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "offsets": null,
+          "sources": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_nest_1_troughplate3",
+              "name": "PRCXI_nest_1_troughplate3",
+              "uuid": "dd9a0925-8aa7-44c0-a1bc-7dc9776ee6e0"
+            }
+          ],
+          "targets": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_shake",
+              "name": "PRCXI_96_DeepWell_shake",
+              "uuid": "a2e75ff7-6b1a-494a-8b18-0b6d93619a11"
+            }
+          ],
+          "asp_vols": [
+            4.8
+          ],
+          "dis_vols": [
+            4.8
+          ],
+          "none_keys": [],
+          "tip_racks": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips3",
+              "name": "PRCXI_1250uL_Tips3",
+              "uuid": "0014ea7c-9743-452a-96ab-5407f475a32c"
+            }
+          ],
+          "is_96_well": true,
+          "repeat_count": 2,
+          "use_channels": [],
+          "cycle_delay_s": 10,
+          "liquid_height": null,
+          "asp_flow_rates": [
+            10
+          ],
+          "dis_flow_rates": [
+            10
+          ],
+          "post_air_volume": null,
+          "dispensing_method": [
+            "BottleNeck"
+          ],
+          "blow_out_air_volume": [
+            20
+          ],
+          "hover_below_liquid_level": null,
+          "blow_out_air_volume_before": null,
+          "z_start_point_offset_height": null,
+          "post_discharge_pause_time_ms": null
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
+        "template_name": "titration_liquid",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "d43ac8ad-2450-4189-9fbe-fefa60d2873b",
+        "parent_uuid": "",
+        "name": "titration_liquid",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 238.44046,
+            "y": 257.5272,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "offsets": null,
+          "sources": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_nest_1_troughplate3",
+              "name": "PRCXI_nest_1_troughplate3",
+              "uuid": "dd9a0925-8aa7-44c0-a1bc-7dc9776ee6e0"
+            }
+          ],
+          "targets": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_shake",
+              "name": "PRCXI_96_DeepWell_shake",
+              "uuid": "a2e75ff7-6b1a-494a-8b18-0b6d93619a11"
+            }
+          ],
+          "asp_vols": [
+            4.8
+          ],
+          "dis_vols": [
+            4.8
+          ],
+          "none_keys": [],
+          "tip_racks": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips3",
+              "name": "PRCXI_1250uL_Tips3",
+              "uuid": "0014ea7c-9743-452a-96ab-5407f475a32c"
+            }
+          ],
+          "is_96_well": true,
+          "repeat_count": 27,
+          "use_channels": [],
+          "cycle_delay_s": 20,
+          "liquid_height": null,
+          "asp_flow_rates": [
+            10
+          ],
+          "dis_flow_rates": [
+            10
+          ],
+          "post_air_volume": null,
+          "dispensing_method": [
+            "BottleNeck"
+          ],
+          "blow_out_air_volume": [
+            20
+          ],
+          "hover_below_liquid_level": null,
+          "blow_out_air_volume_before": null,
+          "z_start_point_offset_height": null,
+          "post_discharge_pause_time_ms": null
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
+        "template_name": "titration_liquid",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "8e64ea01-c450-451f-b0b4-e3e2cc95816d",
+        "parent_uuid": "",
+        "name": "auto-create_protocol",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -118.556114,
+            "y": 211.84357,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "none_keys": [],
+          "protocol_date": "",
+          "protocol_name": "",
+          "protocol_type": "",
+          "protocol_author": "",
+          "protocol_version": "",
+          "protocol_description": ""
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
+        "template_name": "auto-create_protocol",
+        "resource_name": "liquid_handler.prcxi"
+      },
+      {
+        "uuid": "474eda63-ef75-4290-b093-dfeb64454900",
+        "parent_uuid": "",
+        "name": "titration_liquid",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 974,
+            "y": 95.44444,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "offsets": null,
+          "sources": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_nest_1_troughplate3",
+              "name": "PRCXI_nest_1_troughplate3",
+              "uuid": "dd9a0925-8aa7-44c0-a1bc-7dc9776ee6e0"
+            }
+          ],
+          "targets": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_96_DeepWell_shake",
+              "name": "PRCXI_96_DeepWell_shake",
+              "uuid": "a2e75ff7-6b1a-494a-8b18-0b6d93619a11"
+            }
+          ],
+          "asp_vols": [
+            4.8
+          ],
+          "dis_vols": [
+            4.8
+          ],
+          "none_keys": [],
+          "tip_racks": [
+            {
+              "id": "/gn_workstation/PRCXI/PRCXI_Deck/PRCXI_1250uL_Tips1",
+              "name": "PRCXI_1250uL_Tips1",
+              "uuid": "2c525d62-d238-48d5-892a-993e5c0065d7"
+            }
+          ],
+          "is_96_well": true,
+          "repeat_count": 27,
+          "use_channels": [],
+          "cycle_delay_s": 60,
+          "liquid_height": null,
+          "asp_flow_rates": [
+            10
+          ],
+          "dis_flow_rates": [
+            10
+          ],
+          "post_air_volume": null,
+          "dispensing_method": [
+            "BottleNeck"
+          ],
+          "blow_out_air_volume": [
+            20
+          ],
+          "hover_below_liquid_level": null,
+          "blow_out_air_volume_before": null,
+          "z_start_point_offset_height": null,
+          "post_discharge_pause_time_ms": null
+        },
+        "footer": "",
+        "device_name": "PRCXI",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
+        "template_name": "titration_liquid",
+        "resource_name": "liquid_handler.prcxi"
+      }
+    ],
+    "edges": [
+      {
+        "source_node_uuid": "d43ac8ad-2450-4189-9fbe-fefa60d2873b",
+        "target_node_uuid": "f21bc15e-90da-47ca-95f9-48e9366cc4c3",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "f21bc15e-90da-47ca-95f9-48e9366cc4c3",
+        "target_node_uuid": "474eda63-ef75-4290-b093-dfeb64454900",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "474eda63-ef75-4290-b093-dfeb64454900",
+        "target_node_uuid": "007b0bf3-28c1-4d3f-b6a0-17e8965669c2",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "8e64ea01-c450-451f-b0b4-e3e2cc95816d",
+        "target_node_uuid": "d43ac8ad-2450-4189-9fbe-fefa60d2873b",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      }
+    ],
+    "embeds": []
+  }
+}

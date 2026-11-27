@@ -14,8 +14,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4146.4316,
-            "y": 1.248291,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -43,7 +43,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -55,52 +55,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
-      },
-      {
-        "uuid": "a86afd7b-94b5-404b-af64-7cbb30c27907",
-        "parent_uuid": "",
-        "name": "从堆栈到9320三次放枪头",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 4890.5894,
-            "y": -708.0723,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": null,
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "1430d869-c5dd-4ac7-a0e2-f2ed338417a6",
@@ -111,8 +67,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3670.2751,
-            "y": 339.50812,
+            "x": 3456,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -163,8 +119,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2300.797,
-            "y": 0,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -233,7 +189,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "f673bdfb-94c3-4f6e-a381-cb132306df61",
@@ -244,8 +201,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4058.4355,
-            "y": 207.40178,
+            "x": 3740,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -292,8 +249,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2808.455,
-            "y": 196.42966,
+            "x": 2888,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -346,8 +303,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2366.9592,
-            "y": 238.05792,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -383,7 +340,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b005fc"
       },
       {
         "uuid": "b005fcb8-3ad8-4688-a8e3-12d5e2ca9dd1",
@@ -394,8 +352,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 670,
-            "y": 199,
+            "x": 332,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -437,7 +395,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b005fc"
       },
       {
         "uuid": "70bedecd-aff9-4b32-800f-672e218d908c",
@@ -448,8 +407,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2178.163,
-            "y": 0,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -485,7 +444,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "82efef05-6d23-41b5-a90e-b1e424021018",
@@ -496,8 +456,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 627.1443,
-            "y": 2.8981934,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -533,7 +493,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "e4d16958-b926-4fa1-afb4-c10c34730a79",
@@ -544,8 +505,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3253.1921,
-            "y": 369.20953,
+            "x": 3172,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -646,8 +607,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 377,
-            "y": 199.6,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -675,7 +636,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -687,7 +648,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_15fb97"
       },
       {
         "uuid": "ca970a0b-9721-43f4-bdb1-7f533b515e46",
@@ -698,8 +660,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 964.5,
-            "y": 199,
+            "x": 616,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -768,7 +730,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b005fc"
       },
       {
         "uuid": "f52799bb-eeed-4dfd-8477-f1421fa1bba2",
@@ -779,8 +742,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2853.1104,
-            "y": 4.993408,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -808,7 +771,7 @@
         },
         "param": {
           "number": 75,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -820,7 +783,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "31d12cd5-b65f-48e3-862a-0f8a06f1042e",
@@ -831,8 +795,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1288.9489,
-            "y": 208.6634,
+            "x": 900,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -922,7 +886,8 @@
         "lab_node_type": "Device",
         "template_uuid": "b1f8991e-9f06-4abf-ad40-38406c5e5b0a",
         "template_name": "transfer_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b005fc"
       },
       {
         "uuid": "d19097fa-4415-4713-9db7-c024e52bd3b3",
@@ -933,8 +898,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 918.81006,
-            "y": 8.041504,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -962,7 +927,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -974,7 +939,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "5db43903-8c6d-44ed-9d8e-d61299dfbb5c",
@@ -985,8 +951,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3213.6267,
-            "y": 5.4862185,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1014,7 +980,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1026,7 +992,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "5ab46fcb-494d-4b8d-b07f-0d5cd4cb841b",
@@ -1037,8 +1004,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 0,
-            "y": 9.2947445,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1066,7 +1033,7 @@
         },
         "param": {
           "number": 73,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1078,7 +1045,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "3508d092-a488-4211-af70-2e89e93fab7d",
@@ -1089,8 +1057,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1125.0992,
-            "y": 0,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1126,7 +1094,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "c3e5700b-c9b7-4a7b-bb25-7b3262bd85b5",
@@ -1137,8 +1106,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2911.991,
-            "y": 4.730493,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1166,7 +1135,7 @@
         },
         "param": {
           "number": 71,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1178,7 +1147,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "75fbec47-5f5c-4452-b749-e5f6c9e191b8",
@@ -1189,8 +1159,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1580.26,
-            "y": 203.82623,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1280,7 +1250,8 @@
         "lab_node_type": "Device",
         "template_uuid": "b1f8991e-9f06-4abf-ad40-38406c5e5b0a",
         "template_name": "transfer_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b005fc"
       },
       {
         "uuid": "5e25deeb-ed5a-4bff-969a-2347c907f088",
@@ -1291,8 +1262,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1880.6664,
-            "y": 189.68945,
+            "x": 1468,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1382,7 +1353,8 @@
         "lab_node_type": "Device",
         "template_uuid": "b1f8991e-9f06-4abf-ad40-38406c5e5b0a",
         "template_name": "transfer_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b005fc"
       },
       {
         "uuid": "6cf91cc0-2a97-42b7-81c9-bbe4a6e38fc8",
@@ -1393,8 +1365,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 550.1879,
-            "y": 0,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1436,7 +1408,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "362151f8-8b31-4109-b863-c940f0a43d21",
@@ -1447,8 +1420,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 270.98117,
-            "y": 2.7313707,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1476,7 +1449,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1488,7 +1461,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "69b8e13a-042d-49c0-9e70-ee16f407b610",
@@ -1499,8 +1473,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 817.4821,
-            "y": 0,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1569,7 +1543,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "63a7a357-2bff-426e-afa9-7deff354d510",
@@ -1580,8 +1555,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 868.0783,
-            "y": 534.53235,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1650,7 +1625,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "e68bdf13-e4cf-4649-8d6c-ca4e03555f21",
@@ -1661,8 +1637,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2503.478,
-            "y": 1.248291,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1690,7 +1666,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1702,7 +1678,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "bb5b63e3-bd53-41f6-be9c-a6be493906c3",
@@ -1713,8 +1690,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3833.2002,
-            "y": 2.496582,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1750,7 +1727,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "de71ff64-3897-4c46-86e8-1f49259b7427",
@@ -1761,8 +1739,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1223.3635,
-            "y": 4.503662,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1790,7 +1768,7 @@
         },
         "param": {
           "number": 74,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -1802,7 +1780,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "a1da6885-5d55-43cf-af12-d88e3f22a06b",
@@ -1813,8 +1792,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 330.55606,
-            "y": 0,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1883,7 +1862,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "9973e247-018b-4b40-bea5-d45bff6ea6a9",
@@ -1894,8 +1874,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1849.852,
-            "y": 4.993408,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1964,7 +1944,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "6c473a89-b592-4c42-975b-aefe42eaa34e",
@@ -1975,8 +1956,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1540.3159,
-            "y": 6.241699,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2018,7 +1999,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "890e1c9f-c5f4-4e9d-bc99-29266c285454",
@@ -2029,8 +2011,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3533.1245,
-            "y": 39.549934,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2072,7 +2054,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "15fb9752-07ce-4283-b088-840a38b538ba",
@@ -2083,8 +2066,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 63,
-            "y": 202.2,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2112,7 +2095,7 @@
         },
         "param": {
           "number": 1,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -2124,7 +2107,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_15fb97"
       },
       {
         "uuid": "9f47eec9-c0bb-4c39-b90c-92f008f32f9a",
@@ -2135,8 +2119,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 0,
-            "y": 0,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2178,7 +2162,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "b764055c-7b34-4c23-b2db-3ff965b9f8be",
@@ -2189,8 +2174,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2217.4692,
-            "y": 518.8324,
+            "x": 1752,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2230,52 +2215,8 @@
         "lab_node_type": "Device",
         "template_uuid": "16a27598-6607-4cad-b6d4-a8573b3d2f54",
         "template_name": "auto-shaking_incubation_action",
-        "resource_name": "liquid_handler.prcxi"
-      },
-      {
-        "uuid": "3d71c8b9-f78b-4c34-b103-67617b7b6894",
-        "parent_uuid": "",
-        "name": "从9320到堆栈三次取枪头",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 27.934048,
-            "y": -739.01074,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": null,
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b005fc"
       },
       {
         "uuid": "12bd930b-c503-45dd-905c-1ee52eabcdf0",
@@ -2286,8 +2227,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1735.3235,
-            "y": 1.5112058,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2315,7 +2256,7 @@
         },
         "param": {
           "number": 1,
-          "station": "nine9320",
+          "station": 6,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -2327,52 +2268,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
-      },
-      {
-        "uuid": "e52a4c45-c486-48d8-be67-b04f32e6f0fe",
-        "parent_uuid": "a86afd7b-94b5-404b-af64-7cbb30c27907",
-        "name": "从9320到堆栈三次取枪头",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": 450.05545,
-            "y": 0,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": null,
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "a2080a8d-536b-47cd-8673-33adba70048c",
@@ -2383,8 +2280,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1410.0665,
-            "y": 2.7313707,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2412,7 +2309,7 @@
         },
         "param": {
           "number": 72,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -2424,7 +2321,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "fd8146ee-efaf-41ec-9ed1-2f57543b7217",
@@ -2435,8 +2333,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4211.3687,
-            "y": 522.44934,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2472,7 +2370,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "e770c862-cf53-4632-b16e-992ed7e16ed4",
@@ -2483,8 +2382,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2618.6616,
-            "y": 3.4822023,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2520,7 +2419,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "09e5cf78-36c0-4250-bba2-e932f1d1ab99",
@@ -2531,8 +2431,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2017.3776,
-            "y": 0,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2574,7 +2474,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5ab46f"
       },
       {
         "uuid": "6796f72e-788e-4763-85a7-f81a8ab4bb08",
@@ -2585,8 +2486,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4458.514,
-            "y": 3.7451172,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2614,7 +2515,7 @@
         },
         "param": {
           "number": 76,
-          "station": "stack",
+          "station": 8,
           "timeout": 180,
           "x_speed": 300,
           "item_type": "plate"
@@ -2626,7 +2527,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "900b3dc9-ca8c-4472-8664-b70a73de6758",
@@ -2637,8 +2539,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3167.7686,
-            "y": 2.496582,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2680,7 +2582,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9f47ee"
       },
       {
         "uuid": "1c4c302f-1d87-422e-8c44-89c26ae30867",
@@ -2691,8 +2594,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3493.704,
-            "y": 3.7451172,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2761,7 +2664,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9f47ee"
       }
     ],
     "edges": [
@@ -3103,5 +3007,10 @@
       }
     ],
     "embeds": []
-  }
+  },
+  "_importGroupNames": [
+    "从堆栈到9320三次放枪头",
+    "从9320到堆栈三次取枪头",
+    "从9320到堆栈三次取枪头"
+  ]
 }

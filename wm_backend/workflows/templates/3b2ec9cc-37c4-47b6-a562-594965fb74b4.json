@@ -1,0 +1,821 @@
+{
+  "target_lab_uuid": "0923073e-2638-4305-9e4c-fdf4c5c84a96",
+  "name": "彻底锁死11.18",
+  "data": {
+    "workflow_uuid": "3b2ec9cc-37c4-47b6-a562-594965fb74b4",
+    "workflow_name": "彻底锁死11.18",
+    "nodes": [
+      {
+        "uuid": "0248f3f2-ba3d-43ee-9bf2-95822cc04578",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 250,
+            "y": -250,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": "",
+          "y_pos": "",
+          "z1_pos": "",
+          "z2_pos": "",
+          "x_speed": "",
+          "y_speed": "",
+          "z1_speed": "",
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": "",
+          "timeout": 3600,
+          "cmd_type": 16
+        },
+        "footer": "",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "ea783a31-4cb7-4365-8733-480df18ee8b4",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 600,
+            "y": -240,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 204,
+          "y_pos": 792,
+          "z1_pos": 1063,
+          "z2_pos": "",
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 15,
+          "timeout": 3600,
+          "cmd_type": 11
+        },
+        "footer": "1号",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "f9c581b3-fb99-45d3-9a7d-2c708c2dde39",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 880,
+            "y": 0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 736,
+          "y_pos": 2302,
+          "z1_pos": 1063,
+          "z2_pos": "",
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 15,
+          "timeout": 3600,
+          "cmd_type": 11
+        },
+        "footer": "9",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "3eaa9e17-ec8b-42ca-bb09-56018b976276",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 580,
+            "y": 230,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 1264,
+          "y_pos": 1052,
+          "z1_pos": 1063,
+          "z2_pos": "",
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 15,
+          "timeout": 3600,
+          "cmd_type": 11
+        },
+        "footer": "5号",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "9121afec-ca69-4223-bf85-e13d1cc1227b",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1510,
+            "y": 230,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 200,
+          "y_pos": 2031,
+          "z1_pos": 1063,
+          "z2_pos": "",
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": "",
+          "timeout": 3600,
+          "cmd_type": 11
+        },
+        "footer": "6",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "93791175-a3f1-48ca-8a48-eb3241c12584",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1210,
+            "y": 0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 196,
+          "y_pos": 1052,
+          "z1_pos": 1063,
+          "z2_pos": "",
+          "x_speed": "",
+          "y_speed": "",
+          "z1_speed": "",
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 15,
+          "timeout": 3600,
+          "cmd_type": 11
+        },
+        "footer": "4号",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "1ad2ab1f-421c-4628-b725-3749e7afebb9",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1200,
+            "y": -240,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 1264,
+          "y_pos": 792,
+          "z1_pos": 1063,
+          "z2_pos": "",
+          "x_speed": 300,
+          "y_speed": 297,
+          "z1_speed": "",
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 15,
+          "timeout": 3600,
+          "cmd_type": 11
+        },
+        "footer": "3号",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "66482c5d-2cdd-48b2-b485-111d210d29c4",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 590,
+            "y": 0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 729,
+          "y_pos": 764,
+          "z1_pos": 1063,
+          "z2_pos": "",
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 15,
+          "timeout": 3600,
+          "cmd_type": 11
+        },
+        "footer": "2号",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "ba58cfa2-007b-4a96-922a-d69de964950c",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1480,
+            "y": -240,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 214,
+          "y_pos": 2291,
+          "z1_pos": 1063,
+          "z2_pos": "",
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 15,
+          "timeout": 3600,
+          "cmd_type": 11
+        },
+        "footer": "8",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "f4b2ae52-e81a-401a-b7bf-4736b359e4ab",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1500,
+            "y": 0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 1270,
+          "y_pos": 2031,
+          "z1_pos": 1063,
+          "z2_pos": "",
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 15,
+          "timeout": 3600,
+          "cmd_type": 11
+        },
+        "footer": "7",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "a82b9dde-08aa-4cdb-bf1c-db7432972bdd",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 890,
+            "y": -240,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": 1264,
+          "y_pos": 2291,
+          "z1_pos": 1062,
+          "z2_pos": "",
+          "x_speed": 300,
+          "y_speed": 300,
+          "z1_speed": 300,
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": 15,
+          "timeout": 3600,
+          "cmd_type": 11
+        },
+        "footer": "10",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      },
+      {
+        "uuid": "fa983caa-4304-4b9c-a93a-8aea3690bdeb",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1890,
+            "y": 240,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "x_pos": "",
+          "y_pos": "",
+          "z1_pos": "",
+          "z2_pos": "",
+          "x_speed": "",
+          "y_speed": "",
+          "z1_speed": "",
+          "z2_speed": "",
+          "jaw_position": "",
+          "jaw_force": "",
+          "pre_turns": "",
+          "timeout": 3600,
+          "cmd_type": 16
+        },
+        "footer": "",
+        "device_name": "gn_locking_mechanism",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_locking_mechanism"
+      }
+    ],
+    "edges": [
+      {
+        "source_node_uuid": "0248f3f2-ba3d-43ee-9bf2-95822cc04578",
+        "target_node_uuid": "ea783a31-4cb7-4365-8733-480df18ee8b4",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "ea783a31-4cb7-4365-8733-480df18ee8b4",
+        "target_node_uuid": "a82b9dde-08aa-4cdb-bf1c-db7432972bdd",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "a82b9dde-08aa-4cdb-bf1c-db7432972bdd",
+        "target_node_uuid": "1ad2ab1f-421c-4628-b725-3749e7afebb9",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "1ad2ab1f-421c-4628-b725-3749e7afebb9",
+        "target_node_uuid": "ba58cfa2-007b-4a96-922a-d69de964950c",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "ba58cfa2-007b-4a96-922a-d69de964950c",
+        "target_node_uuid": "66482c5d-2cdd-48b2-b485-111d210d29c4",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "66482c5d-2cdd-48b2-b485-111d210d29c4",
+        "target_node_uuid": "f9c581b3-fb99-45d3-9a7d-2c708c2dde39",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "f9c581b3-fb99-45d3-9a7d-2c708c2dde39",
+        "target_node_uuid": "93791175-a3f1-48ca-8a48-eb3241c12584",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "93791175-a3f1-48ca-8a48-eb3241c12584",
+        "target_node_uuid": "f4b2ae52-e81a-401a-b7bf-4736b359e4ab",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "f4b2ae52-e81a-401a-b7bf-4736b359e4ab",
+        "target_node_uuid": "3eaa9e17-ec8b-42ca-bb09-56018b976276",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "3eaa9e17-ec8b-42ca-bb09-56018b976276",
+        "target_node_uuid": "9121afec-ca69-4223-bf85-e13d1cc1227b",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "9121afec-ca69-4223-bf85-e13d1cc1227b",
+        "target_node_uuid": "fa983caa-4304-4b9c-a93a-8aea3690bdeb",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      }
+    ],
+    "embeds": []
+  }
+}

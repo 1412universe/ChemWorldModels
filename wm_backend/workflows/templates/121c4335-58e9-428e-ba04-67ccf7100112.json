@@ -1,0 +1,11 @@
+{
+  "target_lab_uuid": "5a7ccfa5-098f-4fae-ab36-83d6e5a267c8",
+  "name": "未命名工作流",
+  "data": {
+    "workflow_uuid": "121c4335-58e9-428e-ba04-67ccf7100112",
+    "workflow_name": "未命名工作流",
+    "nodes": [],
+    "edges": [],
+    "embeds": []
+  }
+}

@@ -6,51 +6,6 @@
     "workflow_name": "金四面体AA溶液制备与溶液的混合，并放到T16等待离心",
     "nodes": [
       {
-        "uuid": "523051b1-a51f-4bc6-98f8-5ddbd8b4e265",
-        "parent_uuid": "",
-        "name": "从堆栈到9320三次放枪头",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": -5700,
-            "y": 182,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {},
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
-      },
-      {
         "uuid": "f9642dff-d008-4c09-af03-a5784d59e99f",
         "parent_uuid": "",
         "name": "auto-execute_command",
@@ -59,8 +14,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -2400,
-            "y": 1112,
+            "x": 1184,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -112,8 +67,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3600,
-            "y": 3040,
+            "x": 332,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -149,7 +104,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b3afdc"
       },
       {
         "uuid": "ee34b60a-1ec1-4c9c-8ff0-58d1cf011e87",
@@ -160,8 +116,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1500,
-            "y": 3226,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -201,7 +157,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "9989ae07-69d6-4b51-a0f7-a8e6469c5fec",
@@ -212,8 +169,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1200,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -255,7 +212,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "c2ad8e0a-bea9-43ae-a89f-af0670b580e9",
@@ -266,8 +224,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2700,
-            "y": 3133,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -309,7 +267,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "65110692-4a2e-4c43-8137-bc846851b697",
@@ -320,8 +279,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5700,
-            "y": 3133,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -363,7 +322,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "f997148f-afa7-4f82-8003-cc7b4e4c8c68",
@@ -374,8 +334,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1200,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -415,7 +375,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "5d4491b7-e387-4fe2-bb06-38354c81a182",
@@ -426,8 +387,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -900,
-            "y": 3040,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -469,7 +430,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "0c3396b5-267c-4886-89e8-d0ca89838493",
@@ -480,8 +442,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6600,
-            "y": 2634,
+            "x": 4308,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -521,7 +483,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_01c853"
       },
       {
         "uuid": "69bb055c-8b4e-4c87-a33c-0b231e0826f7",
@@ -532,8 +495,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3300,
-            "y": 3133,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -569,7 +532,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "29386e46-1efa-48e7-b659-1ed045996ad0",
@@ -580,8 +544,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1200,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -630,7 +594,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "a42accf7-0974-45fa-95fb-eedc7c1c308a",
@@ -641,8 +606,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1800,
-            "y": 3412,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -682,7 +647,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "8fc5457c-ca9f-4b3e-95f0-fffc9e474698",
@@ -693,8 +659,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6600,
-            "y": 3133,
+            "x": 2036,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -747,8 +713,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3300,
-            "y": 3040,
+            "x": 616,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -801,8 +767,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 7800,
-            "y": 926,
+            "x": 2888,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -844,7 +810,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_c9e32c"
       },
       {
         "uuid": "1102b943-7c8b-4b0c-8a00-f0455ff61578",
@@ -855,8 +822,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -2400,
-            "y": 2634,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -896,7 +863,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "c65fa8f9-3385-4329-b244-b34fb6302987",
@@ -907,8 +875,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 0,
-            "y": 2634,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -948,7 +916,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "e80b7aa3-dd29-4186-b4b8-058f45db8999",
@@ -959,8 +928,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -300,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1009,7 +978,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "d0f1105d-af9a-49fb-8947-5d7380dda6f2",
@@ -1020,8 +990,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -2100,
-            "y": 2634,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1061,7 +1031,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "9364b1df-a933-411e-981b-9c9641b4e864",
@@ -1072,8 +1043,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 300,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1122,7 +1093,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "01c853d8-c7b0-437f-8863-8da4e170a8f4",
@@ -1133,8 +1105,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6900,
-            "y": 2820,
+            "x": 4308,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1174,7 +1146,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_01c853"
       },
       {
         "uuid": "3c24c606-98e4-456e-b60e-107c8a23a818",
@@ -1185,8 +1158,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2400,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1228,7 +1201,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "9c7de428-f2e2-4d47-a474-8fa1b7995756",
@@ -1239,8 +1213,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3000,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1280,7 +1254,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "5e7e7683-1bbf-4fcd-bbc8-6a979fcbc796",
@@ -1291,8 +1266,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4200,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1341,7 +1316,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "0c6e04a5-02a2-4a11-869a-96180b2f40a4",
@@ -1352,8 +1328,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3600,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1402,7 +1378,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "3020fcfb-da23-467c-a69a-b85c32204da4",
@@ -1413,8 +1390,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5700,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1463,7 +1440,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "889e452a-5f30-42d2-ab88-8cbe985082c0",
@@ -1474,8 +1452,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3600,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1544,7 +1522,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "a6a9d50a-2ff0-4386-92e3-4e1641355c64",
@@ -1555,8 +1534,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -4800,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1592,7 +1571,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "4d566f8e-dda9-4b8c-a2ed-cf3828fd3d5a",
@@ -1603,8 +1583,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 8100,
-            "y": 926,
+            "x": 2888,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1672,7 +1652,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_c9e32c"
       },
       {
         "uuid": "547f5b7f-d5e7-4a47-a2b9-d8b04d02fecf",
@@ -1683,8 +1664,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3300,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1733,52 +1714,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
-      },
-      {
-        "uuid": "e526d2d1-4f4d-4a91-ba2c-e1ec68e88521",
-        "parent_uuid": "",
-        "name": "从9320到堆栈三次取枪头",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": -5700,
-            "y": 368,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {},
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "43d21f0d-716a-4cda-9e48-8b323865b877",
@@ -1789,8 +1726,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1500,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1830,7 +1767,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "ca356893-e77c-4828-b157-ec4f8a711380",
@@ -1841,8 +1779,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1200,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -1890,52 +1828,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
-      },
-      {
-        "uuid": "642256d8-4dc1-4d49-a524-188800d07a7e",
-        "parent_uuid": "df1285b7-c551-4c4f-bdee-124f140a268b",
-        "name": "从9320到堆栈三次取枪头",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": -5700,
-            "y": 554,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {},
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "99516985-baff-4472-be61-55e1728d366c",
@@ -1946,8 +1840,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 9000,
-            "y": 2448,
+            "x": 3456,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2015,7 +1909,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_ed3145"
       },
       {
         "uuid": "e9a7678d-b859-4c86-a30d-38ebb83836a5",
@@ -2026,8 +1921,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -4500,
-            "y": 3040,
+            "x": 332,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -2115,7 +2010,8 @@
         "lab_node_type": "Device",
         "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
         "template_name": "titration_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b3afdc"
       },
       {
         "uuid": "cb61b1a6-a6d0-4d1d-b14f-b8dc8343a727",
@@ -2126,8 +2022,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3900,
-            "y": 3040,
+            "x": 332,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -2167,7 +2063,8 @@
         "lab_node_type": "Device",
         "template_uuid": "16a27598-6607-4cad-b6d4-a8573b3d2f54",
         "template_name": "auto-shaking_incubation_action",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b3afdc"
       },
       {
         "uuid": "fa78bc7d-7d6a-4adc-8900-2a16e4d1a543",
@@ -2178,8 +2075,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3300,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2215,7 +2112,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "b0e58a9d-5074-481c-85a8-41ca9f975a19",
@@ -2226,8 +2124,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 0,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2276,7 +2174,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "79d7b91e-f6af-4d5a-a867-c73ee0494949",
@@ -2287,8 +2186,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3900,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2337,7 +2236,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "0fa3510a-cb51-4b8a-906e-16f007b2768b",
@@ -2348,8 +2248,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 9000,
-            "y": 926,
+            "x": 3172,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2389,7 +2289,8 @@
         "lab_node_type": "Device",
         "template_uuid": "16a27598-6607-4cad-b6d4-a8573b3d2f54",
         "template_name": "auto-shaking_incubation_action",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_3ebbbb"
       },
       {
         "uuid": "585b2d2b-3b0a-4eea-a9ee-62a89aaf4904",
@@ -2400,8 +2301,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -600,
-            "y": 3040,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -2470,7 +2371,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "7c341c69-9c53-4ca1-9f57-c4c585e67a33",
@@ -2481,8 +2383,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6900,
-            "y": 3133,
+            "x": 2320,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -2562,8 +2464,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -900,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2603,7 +2505,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "2b9e5142-0f7c-46fa-b811-8428c3152ed3",
@@ -2614,8 +2517,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1500,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2664,7 +2567,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "dabb815a-21b8-4949-98e7-88403aaa0af5",
@@ -2675,8 +2579,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6000,
-            "y": 3133,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -2745,7 +2649,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "0887b1cf-4a1a-4203-acde-2e990c3ff325",
@@ -2756,8 +2661,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -4500,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -2826,7 +2731,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "bf32e07b-2f91-4bac-8286-e06ee160e8a1",
@@ -2837,8 +2743,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -4800,
-            "y": 3040,
+            "x": 332,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -2926,7 +2832,8 @@
         "lab_node_type": "Device",
         "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
         "template_name": "titration_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b3afdc"
       },
       {
         "uuid": "b595c9e7-05b7-43f2-9520-4f7b60637857",
@@ -2937,8 +2844,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 300,
-            "y": 3226,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -2978,7 +2885,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "faee26c0-7224-4373-a427-1052211fcf3b",
@@ -2989,8 +2897,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1500,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -3059,7 +2967,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "917b5a0b-3b9b-4a91-8080-73e3f90d40e6",
@@ -3070,8 +2979,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -4800,
-            "y": 1112,
+            "x": 332,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -3140,7 +3049,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9ee366"
       },
       {
         "uuid": "088c0c04-0651-4560-b4e6-552186698c39",
@@ -3151,8 +3061,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3000,
-            "y": 3133,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -3221,7 +3131,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "a27bd28c-d29d-4f3a-8db8-45daa9f38bec",
@@ -3232,8 +3143,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3300,
-            "y": 926,
+            "x": 900,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -3302,7 +3213,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_4aa3d6"
       },
       {
         "uuid": "1c322757-5b66-454e-b2bd-06645a9fb662",
@@ -3313,8 +3225,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 9300,
-            "y": 1112,
+            "x": 3172,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -3383,7 +3295,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_3ebbbb"
       },
       {
         "uuid": "0e11f16c-a166-47d9-823e-74859ec7f5a1",
@@ -3394,8 +3307,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4500,
-            "y": 3133,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -3464,7 +3377,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "2c2d8d4f-b582-4ae4-988d-2085d01ef6ec",
@@ -3475,8 +3389,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5400,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -3525,52 +3439,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
-      },
-      {
-        "uuid": "5fca96fe-79aa-4be2-9c37-d4b18b942c58",
-        "parent_uuid": "",
-        "name": "从9320到堆栈三次取枪头",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": -5700,
-            "y": 740,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {},
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "f204eaeb-ef34-4096-8dfa-2e0719fea835",
@@ -3581,8 +3451,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1500,
-            "y": 3412,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -3622,7 +3492,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "b47bde09-d733-431f-8059-421abb7b596f",
@@ -3633,8 +3504,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1800,
-            "y": 3040,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -3670,7 +3541,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "85e01fcb-3831-4567-862b-f4110879c1a3",
@@ -3681,8 +3553,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4500,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -3731,7 +3603,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "7102d847-f3e3-4698-81d6-c396c34d3521",
@@ -3742,8 +3615,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -300,
-            "y": 3226,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -3779,7 +3652,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "105afec5-4722-4a5a-8b6d-8920bc7853eb",
@@ -3790,8 +3664,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 8700,
-            "y": 926,
+            "x": 3172,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -3860,7 +3734,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_3ebbbb"
       },
       {
         "uuid": "e9c61b9e-b227-436f-af34-dc96f587751e",
@@ -3871,8 +3746,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3600,
-            "y": 3319,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -3912,7 +3787,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "07f2a1c2-6660-4e49-8241-3b1744086d1a",
@@ -3923,8 +3799,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 7500,
-            "y": 2448,
+            "x": 4024,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -3993,7 +3869,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_15c89c"
       },
       {
         "uuid": "5e6bf1f2-e28e-4bda-a494-9b2a0648ecac",
@@ -4004,8 +3881,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6600,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -4054,7 +3931,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "09c0fbd1-93a6-4da8-b728-baf36e7c09ec",
@@ -4065,8 +3943,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2700,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -4115,7 +3993,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "e662b61e-f2fa-43bc-9b2a-c2b317497f93",
@@ -4126,8 +4005,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -5400,
-            "y": 3040,
+            "x": 48,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -4195,7 +4074,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_81ee99"
       },
       {
         "uuid": "da23c814-277e-4e24-89b9-154e11bb6b60",
@@ -4206,8 +4086,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 900,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -4249,7 +4129,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "b0946f04-85e1-40a4-80d3-b3d67349313c",
@@ -4260,8 +4141,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 0,
-            "y": 3412,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -4301,7 +4182,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "76d98eb7-04ca-49c1-872b-9b88a398fc79",
@@ -4312,8 +4194,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3900,
-            "y": 1298,
+            "x": 616,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -4353,7 +4235,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_4729a7"
       },
       {
         "uuid": "aa785112-3648-47fa-a4e5-fdf4d5ffe8f3",
@@ -4364,8 +4247,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1200,
-            "y": 3226,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -4401,7 +4284,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "65d6a0a8-d26a-4162-bcf2-cdd3fc7da25e",
@@ -4412,8 +4296,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1200,
-            "y": 3040,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -4453,7 +4337,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "0c5e7409-73fa-4274-943c-6d39b46fc805",
@@ -4464,8 +4349,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6300,
-            "y": 2448,
+            "x": 4308,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -4505,7 +4390,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_01c853"
       },
       {
         "uuid": "d21d7e73-b37d-4cdf-a020-f0cb3af06f66",
@@ -4516,8 +4402,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6000,
-            "y": 2820,
+            "x": 4308,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -4557,7 +4443,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_01c853"
       },
       {
         "uuid": "7f6e94e1-1bde-4f75-8a1d-58fd3e4cbea4",
@@ -4568,8 +4455,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 600,
-            "y": 3226,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -4611,52 +4498,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
-      },
-      {
-        "uuid": "df04fcb9-23e2-45ce-a8e7-8828dc0a3186",
-        "parent_uuid": "523051b1-a51f-4bc6-98f8-5ddbd8b4e265",
-        "name": "从9320到堆栈三次取枪头",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": -5700,
-            "y": 926,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {},
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "ece46779-1894-49e9-a49c-535111eec7c0",
@@ -4667,8 +4510,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5400,
-            "y": 2448,
+            "x": 4592,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -4737,7 +4580,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_f9cdfd"
       },
       {
         "uuid": "473378df-cb8e-4dd6-a3cc-2271cf529a06",
@@ -4748,8 +4592,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -5700,
-            "y": 1856,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -4789,7 +4633,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_473378"
       },
       {
         "uuid": "15c89c1d-a748-42c7-8ecb-bdf6ebd110e9",
@@ -4800,8 +4645,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 7800,
-            "y": 2448,
+            "x": 4024,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -4843,7 +4688,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_15c89c"
       },
       {
         "uuid": "fcc18112-4339-4315-8f26-d7da728cdc67",
@@ -4854,8 +4700,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -2400,
-            "y": 3040,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -4897,7 +4743,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "3ebbbbf4-bb67-4c5c-81be-61591e462d32",
@@ -4908,8 +4755,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 8400,
-            "y": 926,
+            "x": 3172,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -4995,7 +4842,8 @@
         "lab_node_type": "Device",
         "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
         "template_name": "titration_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_3ebbbb"
       },
       {
         "uuid": "4e852e39-b5ae-46ed-85b6-21a44f4e9db5",
@@ -5006,8 +4854,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2700,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5047,7 +4895,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "ed314513-a601-4019-937d-dfdcc3ca9c25",
@@ -5058,8 +4907,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 9600,
-            "y": 1112,
+            "x": 3456,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5120,8 +4969,6 @@
           ],
           "touch_tip": false,
           "is_96_well": true,
-          "source_slots": 3,
-          "target_slots": 10,
           "use_channels": [],
           "liquid_height": [],
           "asp_flow_rates": [
@@ -5130,7 +4977,6 @@
           "dis_flow_rates": [
             100
           ],
-          "tip_rack_slots": 12,
           "post_air_volume": [],
           "dispensing_method": [],
           "blow_out_air_volume": [
@@ -5148,7 +4994,8 @@
         "lab_node_type": "Device",
         "template_uuid": "b1f8991e-9f06-4abf-ad40-38406c5e5b0a",
         "template_name": "transfer_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_ed3145"
       },
       {
         "uuid": "c7ff5c4a-4673-45ff-a92f-dd8d124519ca",
@@ -5159,8 +5006,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 7200,
-            "y": 1112,
+            "x": 2320,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5211,8 +5058,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2100,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5281,7 +5128,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "0535cc4d-7cae-413d-bddb-9ec2a97e4004",
@@ -5292,8 +5140,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3000,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5342,7 +5190,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "1362c516-1945-4580-b1b4-6c67b0a79055",
@@ -5353,8 +5202,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 900,
-            "y": 3226,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -5423,7 +5272,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "9d3a94ff-0ce1-4eb7-ba99-4337023e593e",
@@ -5434,8 +5284,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -2700,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5477,7 +5327,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "46038444-3c56-4444-bba6-8798dc7718db",
@@ -5488,8 +5339,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 7500,
-            "y": 1298,
+            "x": 2604,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5540,8 +5391,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1500,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5589,7 +5440,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "055d4b6a-0b26-4c1f-9ffb-2a16e1fcef87",
@@ -5600,8 +5452,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -5400,
-            "y": 1112,
+            "x": 48,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5641,7 +5493,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_473378"
       },
       {
         "uuid": "c3f8d295-5aef-4358-9c94-369ef72c57a1",
@@ -5652,8 +5505,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -2100,
-            "y": 1112,
+            "x": 1468,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5704,8 +5557,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1800,
-            "y": 1112,
+            "x": 1752,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5756,8 +5609,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3000,
-            "y": 3040,
+            "x": 900,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -5808,8 +5661,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -2700,
-            "y": 3040,
+            "x": 1184,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -5856,8 +5709,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 600,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5926,7 +5779,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "10b2cb4a-8733-4021-9bc6-1ceaf4e327ed",
@@ -5937,8 +5791,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5100,
-            "y": 2448,
+            "x": 4592,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -5974,7 +5828,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_f9cdfd"
       },
       {
         "uuid": "cb0e3523-1c70-4d9f-9074-2b90551767d9",
@@ -5985,8 +5840,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 9600,
-            "y": 2634,
+            "x": 3456,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -6022,7 +5877,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_ed3145"
       },
       {
         "uuid": "0bbfef89-6d0a-4c05-83cc-17a53412812a",
@@ -6033,8 +5889,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -2100,
-            "y": 3040,
+            "x": 1468,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -6103,7 +5959,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_fcc181"
       },
       {
         "uuid": "ecd5653b-6f0b-487a-87a6-883689459374",
@@ -6114,8 +5971,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -4200,
-            "y": 3040,
+            "x": 332,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -6203,7 +6060,8 @@
         "lab_node_type": "Device",
         "template_uuid": "3cadca7f-7563-4be9-936a-2884661f84b7",
         "template_name": "titration_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b3afdc"
       },
       {
         "uuid": "5ea9a4b4-d539-4616-b345-d18f46615e6b",
@@ -6214,8 +6072,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 900,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -6264,7 +6122,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "c4312bf8-6308-4e9d-964c-abf18cc256ea",
@@ -6275,8 +6134,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3900,
-            "y": 3133,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -6316,7 +6175,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "5b7a2bff-d461-4c97-bc01-b9050671adcc",
@@ -6327,8 +6187,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2100,
-            "y": 3412,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -6368,7 +6228,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "bac3ceec-03a8-4f87-b3c5-5f70019c4378",
@@ -6379,8 +6240,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -900,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -6429,7 +6290,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "4bd30c5d-4cc3-4bc4-b35b-396883f83a48",
@@ -6440,8 +6302,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6900,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -6489,7 +6351,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "678da8d3-da60-497d-bdc7-823518369eec",
@@ -6500,8 +6363,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6300,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -6550,7 +6413,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "8af7f34f-65d2-429f-a618-69f3c529f8b1",
@@ -6561,8 +6425,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3000,
-            "y": 926,
+            "x": 900,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -6623,8 +6487,6 @@
           ],
           "touch_tip": false,
           "is_96_well": true,
-          "source_slots": 14,
-          "target_slots": 10,
           "use_channels": [],
           "liquid_height": [],
           "asp_flow_rates": [
@@ -6633,7 +6495,6 @@
           "dis_flow_rates": [
             100
           ],
-          "tip_rack_slots": 11,
           "post_air_volume": [],
           "dispensing_method": [],
           "blow_out_air_volume": [
@@ -6651,7 +6512,8 @@
         "lab_node_type": "Device",
         "template_uuid": "b1f8991e-9f06-4abf-ad40-38406c5e5b0a",
         "template_name": "transfer_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_4aa3d6"
       },
       {
         "uuid": "a4dc3ba9-f94d-450e-9aa3-b3312fb8a00d",
@@ -6662,8 +6524,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -5400,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -6703,7 +6565,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "40f80248-6348-4eb1-82b2-93b4b655a4f7",
@@ -6714,8 +6577,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -5100,
-            "y": 2634,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -6755,7 +6618,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "9bac4e9b-f132-4d3e-884f-8bdf6779833d",
@@ -6766,8 +6630,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4500,
-            "y": 2448,
+            "x": 4592,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -6828,8 +6692,6 @@
           ],
           "touch_tip": false,
           "is_96_well": true,
-          "source_slots": 14,
-          "target_slots": 10,
           "use_channels": [],
           "liquid_height": [],
           "asp_flow_rates": [
@@ -6838,7 +6700,6 @@
           "dis_flow_rates": [
             100
           ],
-          "tip_rack_slots": 11,
           "post_air_volume": [],
           "dispensing_method": [],
           "blow_out_air_volume": [
@@ -6856,7 +6717,8 @@
         "lab_node_type": "Device",
         "template_uuid": "b1f8991e-9f06-4abf-ad40-38406c5e5b0a",
         "template_name": "transfer_liquid",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_f9cdfd"
       },
       {
         "uuid": "e1fb16af-cdb9-452f-909b-f9cfeb919d68",
@@ -6867,8 +6729,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4800,
-            "y": 3133,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -6904,7 +6766,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "f039e530-03cb-4c67-9694-205685aafdc8",
@@ -6915,8 +6778,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5100,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -6965,7 +6828,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "0f222a15-b89b-4bf4-be29-479c9298dfc0",
@@ -6976,8 +6840,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4800,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7026,7 +6890,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "608fa595-a942-429b-b78d-30f436795070",
@@ -7037,8 +6902,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1800,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7087,7 +6952,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "48376f07-7b5c-4dcb-8ed7-c3394ce13dc7",
@@ -7098,8 +6964,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 8700,
-            "y": 2634,
+            "x": 3456,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7135,7 +7001,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_ed3145"
       },
       {
         "uuid": "408b1996-3197-4285-8a84-cb9d65215fe3",
@@ -7146,8 +7013,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 9300,
-            "y": 2448,
+            "x": 3456,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7189,7 +7056,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_ed3145"
       },
       {
         "uuid": "c2f8b30a-92b3-4dce-a1ec-268d1a6b2b3b",
@@ -7200,8 +7068,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 8100,
-            "y": 2634,
+            "x": 3740,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7241,7 +7109,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_489ed6"
       },
       {
         "uuid": "489ed6ab-73f9-44e0-8ada-94d275821bd1",
@@ -7252,8 +7121,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 8400,
-            "y": 2820,
+            "x": 3740,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7293,7 +7162,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_489ed6"
       },
       {
         "uuid": "f1384802-8f34-4e5d-b31e-470d529426fe",
@@ -7304,8 +7174,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 7200,
-            "y": 3133,
+            "x": 2604,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -7352,8 +7222,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2100,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7402,7 +7272,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "bd56e00f-c615-4581-b57a-1c7f312ddbda",
@@ -7413,8 +7284,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -300,
-            "y": 2634,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7454,7 +7325,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "869b50eb-b4aa-4156-81f8-7df9d9f57b28",
@@ -7465,8 +7337,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2400,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7515,7 +7387,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "1cf929cd-3ca1-4ee7-a38b-9a6d8e1ff502",
@@ -7526,8 +7399,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5100,
-            "y": 3319,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -7567,7 +7440,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "8a3f52a7-6333-4566-b6dd-57cfa95b354d",
@@ -7578,8 +7452,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6300,
-            "y": 3133,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -7615,7 +7489,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "894ef3df-c243-4995-ab37-46486b26bc18",
@@ -7626,8 +7501,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 2400,
-            "y": 3226,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -7667,7 +7542,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "280dc040-d99b-4d32-8e1a-5306da2a7ded",
@@ -7678,8 +7554,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4800,
-            "y": 2448,
+            "x": 4592,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7721,7 +7597,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_f9cdfd"
       },
       {
         "uuid": "c06c93ac-8dec-4b8e-bed1-05f2803ed5f9",
@@ -7732,8 +7609,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4200,
-            "y": 3133,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -7775,7 +7652,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5b7a2b"
       },
       {
         "uuid": "542b7e32-8546-4472-a52f-bad07761097c",
@@ -7786,8 +7664,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3000,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7856,7 +7734,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "596a2afa-d7aa-4053-ad3f-768c80cf41fe",
@@ -7867,8 +7746,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 300,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7904,52 +7783,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
-      },
-      {
-        "uuid": "df1285b7-c551-4c4f-bdee-124f140a268b",
-        "parent_uuid": "",
-        "name": "从堆栈到9320三次放枪头",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": -5700,
-            "y": 1112,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {},
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "6548e9d3-2861-4858-9b72-0af3ed1a7007",
@@ -7960,8 +7795,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3300,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -7997,7 +7832,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "6f5007a7-af57-4b21-a047-0dea37f60547",
@@ -8008,8 +7844,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 600,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8058,7 +7894,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "a41feb99-7b61-45b0-9916-e2d84a4002b5",
@@ -8069,8 +7906,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3900,
-            "y": 2634,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8110,7 +7947,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "5da2028a-1223-42f5-b1f3-79e1d253abdc",
@@ -8121,8 +7959,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -600,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8162,7 +8000,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "27d8df28-2119-4591-84a5-d64614fea19a",
@@ -8173,8 +8012,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -4200,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8216,7 +8055,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "35195ba9-ebce-42d2-ad24-a398bb5b5694",
@@ -8227,8 +8067,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -2700,
-            "y": 926,
+            "x": 900,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8264,7 +8104,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_4aa3d6"
       },
       {
         "uuid": "f9cdfdcb-e1d6-424f-bdb9-2c3d5ac38f12",
@@ -8275,8 +8116,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5700,
-            "y": 2448,
+            "x": 4592,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8318,7 +8159,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_f9cdfd"
       },
       {
         "uuid": "57007e39-74e2-407c-a853-3025239975ab",
@@ -8329,8 +8171,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -5700,
-            "y": 2448,
+            "x": 5444,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8383,8 +8225,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 7200,
-            "y": 2634,
+            "x": 4024,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8420,7 +8262,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_15c89c"
       },
       {
         "uuid": "81ee9925-02af-4c5d-b878-72a90945ef92",
@@ -8431,8 +8274,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -5700,
-            "y": 3040,
+            "x": 48,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -8500,7 +8343,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d91cb9b6-c85f-4982-945c-2c5cd1297da1",
         "template_name": "move_plate",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_81ee99"
       },
       {
         "uuid": "ac64c9fa-8e2a-4efb-9f22-895c650e4ea1",
@@ -8511,8 +8355,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -600,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8561,7 +8405,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "f74b4aef-25e5-4410-99db-863660c898eb",
@@ -8572,8 +8417,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -1800,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8609,7 +8454,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "4729a791-31d6-454d-ae56-db85cb1ab432",
@@ -8620,8 +8466,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -4200,
-            "y": 1112,
+            "x": 616,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8661,7 +8507,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_4729a7"
       },
       {
         "uuid": "e595065d-27ad-4b90-a2b3-c05ad5541220",
@@ -8672,8 +8519,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -4500,
-            "y": 1112,
+            "x": 332,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8709,7 +8556,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9ee366"
       },
       {
         "uuid": "440db233-4dd8-4745-a024-7da75b7f9986",
@@ -8720,8 +8568,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 6000,
-            "y": 1298,
+            "x": 2036,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8770,7 +8618,8 @@
         "lab_node_type": "Device",
         "template_uuid": "c7c5eb46-b3d5-404f-a24a-8639f894013d",
         "template_name": "auto-execute_command",
-        "resource_name": "gn_solid_weighing"
+        "resource_name": "gn_solid_weighing",
+        "_foldGroup": "fg44_20d727"
       },
       {
         "uuid": "4aa3d6f2-7718-4c58-8b92-94ab9a4b60b4",
@@ -8781,8 +8630,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3600,
-            "y": 926,
+            "x": 900,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8824,52 +8673,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
-      },
-      {
-        "uuid": "3ce20a26-58ec-4a0b-97bb-f2b491f4e327",
-        "parent_uuid": "",
-        "name": "震荡加样测试",
-        "type": "Group",
-        "icon": "",
-        "pose": {
-          "layout": "x-y",
-          "position": {
-            "x": -5700,
-            "y": 1298,
-            "z": 0
-          },
-          "position_3d": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "size": {
-            "width": 0,
-            "height": 0,
-            "depth": 0
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "extra": null,
-          "cross_section_type": "rectangle"
-        },
-        "param": {},
-        "footer": "",
-        "disabled": false,
-        "minimized": false,
-        "lab_node_type": "Device",
-        "template_uuid": "",
-        "template_name": "",
-        "resource_name": ""
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_4aa3d6"
       },
       {
         "uuid": "b3afdc91-97b9-4096-889d-390f8ccdd2b2",
@@ -8880,8 +8685,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -5100,
-            "y": 3040,
+            "x": 332,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -8921,7 +8726,8 @@
         "lab_node_type": "Device",
         "template_uuid": "16a27598-6607-4cad-b6d4-a8573b3d2f54",
         "template_name": "auto-shaking_incubation_action",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_b3afdc"
       },
       {
         "uuid": "9ee36691-7e18-402f-9342-6d7e72ee2d1e",
@@ -8932,8 +8738,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -5100,
-            "y": 926,
+            "x": 332,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -8975,7 +8781,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_9ee366"
       },
       {
         "uuid": "ee05cc71-141e-4139-aa7e-23076239a4f5",
@@ -8986,8 +8793,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 1800,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -9023,7 +8830,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "1a16e48e-b6e6-4878-a70e-abfc922debd9",
@@ -9034,8 +8842,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 3900,
-            "y": 2448,
+            "x": 4876,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -9077,7 +8885,8 @@
         "lab_node_type": "Device",
         "template_uuid": "cc5476e6-7c2e-40f7-878f-c7903ba16a3b",
         "template_name": "auto-create_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_1a16e4"
       },
       {
         "uuid": "d7369a32-218b-4f0e-915b-912b70b2fec0",
@@ -9088,8 +8897,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 4200,
-            "y": 2448,
+            "x": 4592,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -9125,7 +8934,8 @@
         "lab_node_type": "Device",
         "template_uuid": "d10989c8-6f47-4328-bec1-bfe911c6dfc1",
         "template_name": "auto-run_protocol",
-        "resource_name": "liquid_handler.prcxi"
+        "resource_name": "liquid_handler.prcxi",
+        "_foldGroup": "fg44_f9cdfd"
       },
       {
         "uuid": "f8d1ede2-c85a-4440-9c2c-b1908cbc8e29",
@@ -9136,8 +8946,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": -3600,
-            "y": 2448,
+            "x": 5160,
+            "y": 48,
             "z": 0
           },
           "position_3d": {
@@ -9177,7 +8987,8 @@
         "lab_node_type": "Device",
         "template_uuid": "39450241-0ccb-4017-9a05-e042fce66c77",
         "template_name": "pick",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5da202"
       },
       {
         "uuid": "20ba7a53-603a-4abd-a70a-50d8268e49ec",
@@ -9188,8 +8999,8 @@
         "pose": {
           "layout": "x-y",
           "position": {
-            "x": 5400,
-            "y": 3319,
+            "x": 1752,
+            "y": 328,
             "z": 0
           },
           "position_3d": {
@@ -9229,7 +9040,8 @@
         "lab_node_type": "Device",
         "template_uuid": "5cd348b5-31d1-4ffc-841d-18672f6d26ed",
         "template_name": "place",
-        "resource_name": "gn_robotic_arm"
+        "resource_name": "gn_robotic_arm",
+        "_foldGroup": "fg44_5b7a2b"
       }
     ],
     "edges": [
@@ -10436,5 +10248,14 @@
     ],
     "embeds": [],
     "as_template": true
-  }
+  },
+  "_importGroupNames": [
+    "从堆栈到9320三次放枪头",
+    "从9320到堆栈三次取枪头",
+    "从9320到堆栈三次取枪头",
+    "从9320到堆栈三次取枪头",
+    "从9320到堆栈三次取枪头",
+    "从堆栈到9320三次放枪头",
+    "震荡加样测试"
+  ]
 }

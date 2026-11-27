@@ -1,0 +1,144 @@
+{
+  "target_lab_uuid": "f8f20368-9b34-4404-8272-59ccb657251c",
+  "name": "常规烘箱和真空烘箱压力测试",
+  "data": {
+    "workflow_uuid": "600adc15-ec05-46dc-9da0-7e560cfb56a2",
+    "workflow_name": "常规烘箱和真空烘箱压力测试",
+    "nodes": [
+      {
+        "uuid": "531f96aa-5ff8-4446-84d3-01c4fb75d0fd",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2130,
+            "y": 0,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "temperature": 60,
+          "hours": 2,
+          "minutes": 0,
+          "wait": true,
+          "timeout": 180,
+          "cmd_type": 1
+        },
+        "footer": "",
+        "device_name": "gn_standard_oven",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_standard_oven"
+      },
+      {
+        "uuid": "1d423f66-d649-454f-8d8b-76e460bd3ca9",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 2140,
+            "y": 290,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "temperature_1": 30,
+          "minutes_1": 30,
+          "vacuum_high_1": -89,
+          "vacuum_low_1": -90,
+          "temperature_2": 40,
+          "minutes_2": 30,
+          "vacuum_high_2": -89,
+          "vacuum_low_2": -90,
+          "temperature_3": 50,
+          "minutes_3": 30,
+          "vacuum_high_3": -89,
+          "vacuum_low_3": -90,
+          "temperature_4": 60,
+          "minutes_4": 30,
+          "vacuum_high_4": -89,
+          "vacuum_low_4": -90,
+          "temperature_5": 70,
+          "minutes_5": 33,
+          "vacuum_high_5": -89,
+          "vacuum_low_5": -90,
+          "temperature_6": 50,
+          "minutes_6": 60,
+          "vacuum_high_6": -89,
+          "vacuum_low_6": -90,
+          "wait": true,
+          "timeout": 3600,
+          "segment": "",
+          "temperature": 40,
+          "minutes": 30,
+          "vacuum_high": -89,
+          "vacuum_low": -90,
+          "cmd_type": 1
+        },
+        "footer": "",
+        "device_name": "gn_vacuum_oven",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_vacuum_oven"
+      }
+    ],
+    "edges": [],
+    "embeds": []
+  }
+}

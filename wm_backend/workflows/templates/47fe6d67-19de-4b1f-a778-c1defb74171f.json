@@ -1,0 +1,461 @@
+{
+  "target_lab_uuid": "c8e707d6-6e16-4b2d-98ee-2fe8c01cf58b",
+  "name": "离心机测试11.15",
+  "data": {
+    "workflow_uuid": "47fe6d67-19de-4b1f-a778-c1defb74171f",
+    "workflow_name": "离心机测试11.15",
+    "nodes": [
+      {
+        "uuid": "2e3d28ef-b2a7-4f07-8e00-bed54c9e0cda",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -810,
+            "y": 250,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "y_pos": "",
+          "z_pos": "",
+          "inner_z_pos": "",
+          "rpm": 3800,
+          "time_minutes": 1,
+          "y_speed": "",
+          "z_speed": "",
+          "plate_no": "3",
+          "temperature": 20,
+          "timeout": 1080000,
+          "cmd_type": 6,
+          "time_hours": 0
+        },
+        "footer": "",
+        "device_name": "gn_centrifuge",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge"
+      },
+      {
+        "uuid": "95cdbba8-a098-4984-81c6-c5f815f840e1",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -210,
+            "y": 250,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "y_pos": -2090,
+          "z_pos": 1125,
+          "inner_z_pos": 3610,
+          "rpm": "",
+          "time_minutes": "",
+          "y_speed": 300,
+          "z_speed": 300,
+          "plate_no": "3",
+          "temperature": "",
+          "timeout": 3600,
+          "cmd_type": 7
+        },
+        "footer": "",
+        "device_name": "gn_centrifuge",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge"
+      },
+      {
+        "uuid": "538e8fd8-f01c-4460-834e-03241ba2c304",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 1300,
+            "y": 390,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "y_pos": -2090,
+          "z_pos": 1100,
+          "inner_z_pos": 3580,
+          "rpm": "",
+          "time_minutes": "",
+          "y_speed": "",
+          "z_speed": "",
+          "plate_no": "2",
+          "temperature": "",
+          "timeout": 3600,
+          "cmd_type": 7
+        },
+        "footer": "",
+        "device_name": "gn_centrifuge",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge"
+      },
+      {
+        "uuid": "075c3e1d-0adf-48d8-a8f4-045e62a175a4",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": 110,
+            "y": 250,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "y_pos": "",
+          "z_pos": "",
+          "inner_z_pos": "",
+          "rpm": "",
+          "time_minutes": "",
+          "y_speed": "",
+          "z_speed": "",
+          "plate_no": "",
+          "temperature": "",
+          "timeout": 366666,
+          "cmd_type": 8
+        },
+        "footer": "",
+        "device_name": "gn_centrifuge",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge"
+      },
+      {
+        "uuid": "57a07433-f4a3-4be9-887e-6a00552b6439",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -1390,
+            "y": 250,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "y_pos": "",
+          "z_pos": "",
+          "inner_z_pos": "",
+          "rpm": "",
+          "time_minutes": "",
+          "y_speed": "",
+          "z_speed": "",
+          "plate_no": "",
+          "temperature": "",
+          "timeout": 366666,
+          "cmd_type": 8
+        },
+        "footer": "",
+        "device_name": "gn_centrifuge",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge"
+      },
+      {
+        "uuid": "3dd1f3ea-c505-470f-af7a-fda2f66ae29e",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -500,
+            "y": 250,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "y_pos": "",
+          "z_pos": "",
+          "inner_z_pos": "",
+          "rpm": "",
+          "time_minutes": 0,
+          "y_speed": "",
+          "z_speed": "",
+          "plate_no": "",
+          "temperature": "",
+          "timeout": 336000,
+          "cmd_type": 8
+        },
+        "footer": "",
+        "device_name": "gn_centrifuge",
+        "disabled": false,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge"
+      },
+      {
+        "uuid": "5d9ae3d1-cb91-4b11-b8fa-247faf654fbe",
+        "parent_uuid": "",
+        "name": "auto-execute_command",
+        "type": "ILab",
+        "icon": "",
+        "pose": {
+          "layout": "x-y",
+          "position": {
+            "x": -1110,
+            "y": 250,
+            "z": 0
+          },
+          "position_3d": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "width": 0,
+            "height": 0,
+            "depth": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "extra": null,
+          "cross_section_type": "rectangle"
+        },
+        "param": {
+          "y_pos": -2090,
+          "z_pos": 1125,
+          "inner_z_pos": 3610,
+          "rpm": "",
+          "time_minutes": "",
+          "time_hours": "",
+          "y_speed": 300,
+          "z_speed": 300,
+          "plate_no": "3",
+          "temperature": "",
+          "timeout": 366666,
+          "cmd_type": 5
+        },
+        "footer": "",
+        "device_name": "gn_centrifuge",
+        "disabled": true,
+        "minimized": false,
+        "lab_node_type": "Device",
+        "template_uuid": "",
+        "template_name": "auto-execute_command",
+        "resource_name": "gn_centrifuge"
+      }
+    ],
+    "edges": [
+      {
+        "source_node_uuid": "2e3d28ef-b2a7-4f07-8e00-bed54c9e0cda",
+        "target_node_uuid": "3dd1f3ea-c505-470f-af7a-fda2f66ae29e",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "57a07433-f4a3-4be9-887e-6a00552b6439",
+        "target_node_uuid": "5d9ae3d1-cb91-4b11-b8fa-247faf654fbe",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "5d9ae3d1-cb91-4b11-b8fa-247faf654fbe",
+        "target_node_uuid": "2e3d28ef-b2a7-4f07-8e00-bed54c9e0cda",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "3dd1f3ea-c505-470f-af7a-fda2f66ae29e",
+        "target_node_uuid": "95cdbba8-a098-4984-81c6-c5f815f840e1",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      },
+      {
+        "source_node_uuid": "95cdbba8-a098-4984-81c6-c5f815f840e1",
+        "target_node_uuid": "075c3e1d-0adf-48d8-a8f4-045e62a175a4",
+        "source_handle_key": "ready",
+        "source_handle_io": "source",
+        "target_handle_key": "ready",
+        "target_handle_io": "target"
+      }
+    ],
+    "embeds": []
+  }
+}
