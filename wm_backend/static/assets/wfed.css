@@ -748,21 +748,27 @@ body.page-wfed.libnarrow #wfed-lib.pts-open .lib-rail{ opacity:0; }
 .wfnode .port-fan.in{ left:-4px; }
 /* 已展开折叠组的首节点：右上角「折叠本组」角标 */
 .wfnode .wfnode-fold{
-  position:absolute; right:8px; top:-22px; height:20px; padding:0 8px;
+  position:absolute; right:8px; top:-40px; height:20px; padding:0 8px;
   border:1px solid #c7d2e0; border-radius:10px; background:#fff; color:#475569;
   font-size:10.5px; line-height:18px; cursor:pointer; z-index:10;
   box-shadow:0 2px 6px rgba(15,23,42,.12); max-width:calc(100% - 16px);
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
 .wfnode .wfnode-fold:hover{ background:#eef2f8; color:#0f172a; border-color:#94a3b8; }
-/* Shift 长按删除态：画布加提示色边框 */
+/* Shift 长按批量态：默认切换启用/禁用，Shift+Alt 为删除 */
 #wfed-canvas-wrap.shift-mode{ cursor:crosshair; }
 #wfed-canvas-wrap.shift-mode::after{
-  content:'批量删除：划过节点标红，松开 Shift 确认';
+  content:'批量切换：划过节点后松开 Shift → 全部禁用/启用（Shift+Alt 划删）';
   position:absolute; left:50%; top:12px; transform:translateX(-50%);
-  background:#fef2f2; color:#b91c1c; border:1px solid #fecaca;
+  background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;
   font-size:12px; padding:5px 12px; border-radius:999px; z-index:60; pointer-events:none;
 }
+#wfed-canvas-wrap.shift-mode-del::after{
+  content:'批量删除：划过节点标红，松开 Shift 确认（Ctrl+Z 可撤销）';
+  background:#fef2f2; color:#b91c1c; border-color:#fecaca;
+}
+.wfnode.shift-toggle{ outline:2px solid #2563eb !important; outline-offset:2px;
+  box-shadow:0 0 0 3px rgba(37,99,235,.18) !important; }
 .wfnode.shift-kill{ outline:2px solid #ef4444; outline-offset:2px; background:#fee2e2 !important; }
 #wfed-canvas-wrap.pan-mode{ cursor:grab; }
 .wfnode .plabel{ position:absolute; font-size:9px; color:#b6c0cf; white-space:nowrap; pointer-events:none; }

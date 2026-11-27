@@ -130,6 +130,7 @@ RESOURCES: List[Dict[str, Any]] = [
     {"name": "PRCXI_1250uL_Tips2",           "uuid": "e7df077f-ec56-48e6-a7af-9fabf569c418",
      "aliasUuid": ["695548f2-3e97-4913-a2c5-e19b3b07cac9"]},
     {"name": "PRCXI_1250uL_Tips3",           "uuid": "bf3f445a-839e-4e20-8dd8-40aa5a147807"},
+    {"name": "PRCXI_nest_1_waste",           "uuid": "c5e5a15b-5e05-4a5e-9e5e-000000000005"},
 ]
 RES_BY_NAME = {r["name"]: r for r in RESOURCES}
 
@@ -137,6 +138,7 @@ RES_BY_NAME = {r["name"]: r for r in RESOURCES}
 KIND_RULES = [
     (re.compile(r"_Tips\d*$", re.I),        "tip",      "枪头盒"),
     (re.compile(r"troughplate\d*$", re.I),  "trough",   "整板储液槽"),
+    (re.compile(r"_waste$", re.I),          "waste",    "废液槽"),
     (re.compile(r"DeepWell_shake$", re.I),  "shake",    "震荡加样模块"),
     (re.compile(r"DeepWell", re.I),         "deepWell", "96 孔深孔板"),
     (re.compile(r"wellplate$", re.I),       "reader",   "96 孔板（酶标/检测板）"),
@@ -181,6 +183,7 @@ _OCC_EVIDENCE: Dict[int, List[Any]] = {
 _SEMANTIC_OVERRIDE: Dict[int, str] = {
     3: "PRCXI_96_DeepWell_shake",        # 震荡加样模块
     4: "PRCXI_BioER_96_wellplate",       # 酶标板
+    5: "PRCXI_nest_1_waste",             # 废液槽：仅作为移液/滴注的排出目标
 }
 
 
@@ -295,6 +298,8 @@ def action_roles(action: str) -> List[Dict[str, Any]]:
     a = (action or "").strip()
     # transfer / move 共用同一套板位语义（与 move_plate 可选类别对齐）
     _deck_accept = ["trough", "deepWell", "reader", "shake", "tip", "transfer", "spare", "sonic"]
+    # T5 废液槽只允许作为排出目标，不作为来源或枪头
+    _target_accept = list(_deck_accept) + ["waste"]
     if a in ("transfer_liquid", "titration_liquid"):
         return [
             {"key": "source", "label": "来源 source", "param": "sources",
@@ -303,8 +308,8 @@ def action_roles(action: str) -> List[Dict[str, Any]]:
              "hint": "吸取液体的板位（与 move_plate 台面一致；T9/T13 空位不覆盖）"},
             {"key": "target", "label": "目标 target", "param": "targets",
              "value": "resource", "multi": True, "max": 8,
-             "accept": list(_deck_accept),
-             "hint": "排出液体的板位（与 move_plate 台面一致；T9/T13 空位不覆盖）"},
+             "accept": _target_accept,
+             "hint": "排出液体的板位（含 T5 废液槽；T9/T13 空位不覆盖）"},
             {"key": "tips", "label": "枪头 tips", "param": "tip_racks",
              "value": "resource", "multi": True, "max": 4,
              "accept": ["tip"],

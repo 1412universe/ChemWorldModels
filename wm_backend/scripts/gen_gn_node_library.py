@@ -175,12 +175,13 @@ PRCXI_PARAM_META = {
 
 # PRCXI 动作 → 板位角色（编辑器据此渲染 4×4 板位点选器；顺序即 UI 顺序）
 _PRCXI_DECK_ACCEPT = ['trough', 'deepWell', 'reader', 'shake', 'tip', 'transfer', 'spare', 'sonic']
+_PRCXI_TARGET_ACCEPT = _PRCXI_DECK_ACCEPT + ['waste']
 PRCXI_DECK_ROLES = {
     'transfer_liquid': [
         dict(key='source', label='来源 source', param='sources',   value='resource',
              accept=list(_PRCXI_DECK_ACCEPT), multi=True),
         dict(key='target', label='目标 target', param='targets',   value='resource',
-             accept=list(_PRCXI_DECK_ACCEPT), multi=True),
+             accept=list(_PRCXI_TARGET_ACCEPT), multi=True),
         dict(key='tips',   label='枪头 tips',  param='tip_racks', value='resource',
              accept=['tip'], multi=True),
     ],
@@ -188,7 +189,7 @@ PRCXI_DECK_ROLES = {
         dict(key='source', label='来源 source', param='sources',   value='resource',
              accept=list(_PRCXI_DECK_ACCEPT), multi=True),
         dict(key='target', label='目标 target', param='targets',   value='resource',
-             accept=list(_PRCXI_DECK_ACCEPT), multi=True),
+             accept=list(_PRCXI_TARGET_ACCEPT), multi=True),
         dict(key='tips',   label='枪头 tips',  param='tip_racks', value='resource',
              accept=['tip'], multi=True),
     ],

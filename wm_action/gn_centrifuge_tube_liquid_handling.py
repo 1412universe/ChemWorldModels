@@ -355,6 +355,7 @@ class CentrifugeTubeLiquidHandlingDevice(GNStationClient):
         timeout: float = 180.0,
     ) -> dict:
         """通用入口：写参 → CmdType → CmdTrig → 等 CompleteFB。"""
+        time.sleep(3.0)
         if ultrasound_stop:
             return self.ultrasound_stop()
         if timeout is None or float(timeout) <= 0:

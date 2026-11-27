@@ -797,6 +797,12 @@ class PrcxiDevice:
                 "PRCXI run_protocol：无打开的协议会话，也没有可加载的方案名")
         # else: 缓冲空 + 显式方案名 → Load 真机已有方案（重跑）
 
+        # 步骤估时经常只有一两百秒，短协议会被提前判超时。运行等待至少 3000 秒。
+        to = max(float(to or 0), 3000.0)
+
+        # 上一份刚结束就下发，真机不接 Start。先等 10 秒再 Load/Start。
+        time.sleep(10.0)
+
         # Start 空成功（返回 true 但步骤一直 State=0）常见于机台未停干净 / 未复位。
         # 对齐 V04 Demo：Load 前先清错并 Stop，Start 后确认步骤真正进入执行。
         self._prepare_for_start()

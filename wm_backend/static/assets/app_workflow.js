@@ -841,21 +841,136 @@
     if (!on) { expandGroup(gid); return; }
     pushUndo();
     g.collapsed = true;
-    layoutReading();
-    renderNodes(); updatePositions(); frameReading(); afterViewChange();
+    layoutVisibleReading();
+    renderNodes(); updatePositions(); afterViewChange();
   }
 
-  /** 展开一组：成员按先后插回阅读顺序，整条线重新折行 */
+  var FOLD_GAP = 88;
+  var FOLD_ROW_H = 200;
+  var EXPAND_PER_ROW = 25;
+
+  /** 折叠卡片以外、还能被挤开的卡片：看得见的节点，以及仍收着的组卡片。 */
+  function forEachShiftable(skip, fn) {
+    var hidden = {};
+    var f = foldState();
+    Object.keys(f).forEach(function (gid) {
+      var g = f[gid];
+      if (!g || !g.collapsed || !g.uuids || g.uuids.length < 2) return;
+      g.uuids.forEach(function (u) { hidden[u] = 1; });
+      fn({
+        pos: function () { return groupPos(g); },
+        set: function (x, y) { g.x = x; g.y = y; }
+      });
+    });
+    (state.wf.data.nodes || []).forEach(function (n) {
+      if (!n || !n.uuid || n.type === 'Group') return;
+      if (skip[n.uuid] || hidden[n.uuid]) return;
+      fn({
+        pos: function () { return nodeXY(n); },
+        set: function (x, y) { setNodeXY(n, x, y); delete n._foldHome; }
+      });
+    });
+  }
+
+  /**
+   * 成员留在折叠卡片这一行，按顺序居中铺开。
+   * 只把同一行左右的卡片往两边让，上下行不动，也不另起一行。
+   */
+  function openGroupAtFold(g) {
+    if (!g || !g.uuids || g.uuids.length < 2) {
+      if (g) g.collapsed = false;
+      return;
+    }
+    var anchor = groupPos(g);
+    var ax = anchor.x, ay = anchor.y;
+    var ids = orderGroupUuids(g);
+    var nodes = [];
+    ids.forEach(function (u) {
+      var n = findNode(u);
+      if (n) nodes.push(n);
+    });
+    if (!nodes.length) { g.collapsed = false; return; }
+    var step = NODE_W + FOLD_GAP;
+    var originX = ax - ((nodes.length - 1) * step) / 2;
+    nodes.forEach(function (n, i) {
+      setNodeXY(n, originX + i * step, ay);
+      delete n._foldHome;
+    });
+    g.collapsed = false;
+    g.x = originX;
+    g.y = ay;
+    var extendLeft = ax - originX;
+    var extendRight = (originX + (nodes.length - 1) * step) - ax;
+    if (extendLeft < 1 && extendRight < 1) return;
+    var skip = {};
+    ids.forEach(function (u) { skip[u] = 1; });
+    var cardCx = ax + NODE_W / 2;
+    var band = FOLD_ROW_H * 0.45;
+    var moves = [];
+    forEachShiftable(skip, function (item) {
+      var p = item.pos();
+      if (Math.abs(p.y - ay) > band) return;
+      var cx = p.x + NODE_W / 2;
+      var nx = p.x;
+      if (cx < cardCx - 1) nx = p.x - extendLeft;
+      else if (cx > cardCx + 1) nx = p.x + extendRight;
+      if (nx !== p.x) moves.push({ item: item, x: nx, y: p.y });
+    });
+    moves.forEach(function (m) { m.item.set(m.x, m.y); });
+  }
+
+  /** 展开一组：成员排在折叠卡片这一行，同一行左右的卡片往两边让。 */
   function expandGroup(gid) {
     var g = foldState()[gid];
     if (!g || !g.uuids || g.uuids.length < 2) return;
     pushUndo();
-    orderGroupUuids(g);
-    g.collapsed = false;
-    layoutReading();
-    renderNodes(); updatePositions();
-    setTimeout(frameReading, 30);
+    openGroupAtFold(g);
+    state.reading = readingUnits();
+    renderNodes();
+    updatePositions();
     afterViewChange();
+  }
+
+  function nodeXY(n) {
+    var p = (n && n.pose && n.pose.position) || {};
+    return { x: Number(p.x) || 0, y: Number(p.y) || 0 };
+  }
+
+  function setNodeXY(n, x, y) {
+    if (!n.pose) n.pose = {};
+    if (!n.pose.position) n.pose.position = { x: 0, y: 0, z: 0 };
+    n.pose.position.x = x;
+    n.pose.position.y = y;
+  }
+
+  /** 同一行里后一张的左边必须落在前一张右边缘和端口之外。已经留够空隙的不动。 */
+  function clearCardOverlaps(g) {
+    var row = [];
+    (g.uuids || []).forEach(function (u, ord) {
+      var n = findNode(u);
+      if (!n) return;
+      var el = canvas.querySelector('[data-uuid="' + u + '"]');
+      var p = nodeXY(n);
+      row.push({
+        n: n, ord: ord, x: p.x, y: p.y,
+        w: (el && el.offsetWidth) || NODE_W
+      });
+    });
+    row.sort(function (a, b) { return a.x - b.x || a.ord - b.ord; });
+    var PAD = 64;
+    for (var i = 1; i < row.length; i++) {
+      var prev = row[i - 1];
+      var cur = row[i];
+      if (Math.abs(cur.y - prev.y) > 80) continue;
+      var minX = prev.x + Math.max(prev.w, NODE_W) + PAD;
+      if (cur.x + 0.5 >= minX) continue;
+      var dx = minX - cur.x;
+      for (var k = i; k < row.length; k++) {
+        if (Math.abs(row[k].y - cur.y) > 80) continue;
+        row[k].x += dx;
+        setNodeXY(row[k].n, row[k].x, row[k].y);
+      }
+    }
   }
 
   /** 折叠态紧凑化：把每个折叠组内的成员坐标聚到组卡片位置，
@@ -879,11 +994,73 @@
     setGroupCollapsed(gid, !g.collapsed);
   }
 
+  /** 全部展开：按阅读顺序排，一行最多 25 个，排满接到下一行行首。 */
+  function layoutExpandedReading() {
+    var seq = readingUnits();
+    state.reading = seq;
+    if (!seq.length) return;
+    var step = NODE_W + FOLD_GAP;
+    var per = Math.min(EXPAND_PER_ROW, seq.length);
+    var originX = 48;
+    var originY = 48;
+    if (state.view && state.view.scale) {
+      originX = (24 - state.view.x) / state.view.scale;
+      originY = (24 - state.view.y) / state.view.scale;
+    }
+    seq.forEach(function (it, i) {
+      if (!it || it.kind !== 'node') return;
+      var n = findNode(it.uuid);
+      if (!n) return;
+      delete n._foldHome;
+      setNodeXY(n, originX + (i % per) * step, originY + Math.floor(i / per) * FOLD_ROW_H);
+    });
+  }
+
   function unfoldAll() {
+    pushUndo();
     var f = foldState();
-    Object.keys(f).forEach(function (k) { f[k].collapsed = false; });
-    layoutFolded();
-    renderNodes(); updatePositions(); frameReading(); afterViewChange();
+    Object.keys(f).forEach(function (k) {
+      var g = f[k];
+      if (!g) return;
+      if (g.uuids && g.uuids.length >= 2) orderGroupUuids(g);
+      g.collapsed = false;
+    });
+    layoutExpandedReading();
+    renderNodes();
+    updatePositions();
+    afterViewChange();
+  }
+
+  /** 折叠后只排看得见的卡片：阅读顺序从左到右，排满折到下一行。不改组内节点坐标。 */
+  function layoutVisibleReading() {
+    var seq = readingUnits();
+    state.reading = seq;
+    if (!seq.length) return;
+    var gap = 88;
+    var step = NODE_W + gap;
+    var rowH = 200;
+    var per = Math.min(10, seq.length);
+    var originX = 48;
+    var originY = 48;
+    if (state.view && state.view.scale) {
+      originX = (24 - state.view.x) / state.view.scale;
+      originY = (24 - state.view.y) / state.view.scale;
+    }
+    seq.forEach(function (it, i) {
+      var x = originX + (i % per) * step;
+      var y = originY + Math.floor(i / per) * rowH;
+      if (it.kind === 'group') {
+        var g = foldState()[it.gid];
+        if (!g) return;
+        g.x = x;
+        g.y = y;
+        return;
+      }
+      var n = findNode(it.uuid);
+      if (!n) return;
+      if (!n._foldHome) n._foldHome = nodeXY(n);
+      setNodeXY(n, x, y);
+    });
   }
 
   /** 按执行先后排成一条序列。折叠组只占一个位置，展开后的步骤按先后插在原处。 */
@@ -968,7 +1145,7 @@
     var seq = readingUnits();
     state.reading = seq;
     if (!seq.length) return 0;
-    var gap = 48;
+    var gap = 88;
     var step = NODE_W + gap;
     var rowH = 280;
     var cr = wrap.getBoundingClientRect();
@@ -1017,8 +1194,8 @@
       var g = f[k];
       if (g.uuids && g.uuids.length >= 2) { g.collapsed = true; n++; }
     });
-    layoutFolded();                 // 折叠后按阅读顺序重排成一行
-    renderNodes(); updatePositions(); frameReading();
+    layoutVisibleReading();
+    renderNodes(); updatePositions();
     if (n) note('ok', '已折叠', n + ' 个同设备连续段被收起，点击卡片可展开。', 3600);
     afterViewChange();
   }
@@ -3409,10 +3586,10 @@
         });
         if (typeof refreshBatchBar === 'function') refreshBatchBar();
       }
-      if (touchMode === 'shiftkill' && shiftKill.on) {
+      if (touchMode === 'shiftkill' && shiftMark.on) {
         var el3 = document.elementFromPoint(cx, cy);
         var nd2 = el3 && el3.closest ? el3.closest('.wfnode') : null;
-        if (nd2) { shiftKill.ids[nd2.dataset.uuid] = 1; paintShiftKill(); }
+        if (nd2) markNode(nd2.dataset.uuid);
       }
       if (state.ghost) ghostMove(cx, cy);
     }
@@ -3461,8 +3638,9 @@
       if (state.dragMul) { finishEmbedDrag(); state.dragMul = null; drawGuides([]); }
       if (touchMode === 'shiftkill') {
         touchMode = null;
-        if (shiftKill.on) runShiftKill();
+        if (shiftMark.on) runShiftKill();
         wrap.classList.remove('shift-mode');
+        wrap.classList.remove('shift-mode-del');
       }
       if (state.groupDrag) { state.groupDrag = null; afterChange(); }
       if (state.pan) state.pan = null;
@@ -3506,10 +3684,11 @@
       var portEl = tgt.classList && tgt.classList.contains('port') ? tgt : null;
       var node = tgt.closest ? tgt.closest('.wfnode') : null;
 
-      // Shift + 节点 = 进入/继续批量删除态（长按 Shift 已进入时，点一下也能追加标记）
+      // Shift + 节点 = 批量切换禁用/启用；Shift+Alt + 节点 = 批量删除
       if (ev.shiftKey && node) {
-        if (!shiftKill.on) armShiftKill([node.dataset.uuid]);
-        else { shiftKill.ids[node.dataset.uuid] = 1; paintShiftKill(); }
+        var wantMode = ev.altKey ? 'delete' : 'toggle';
+        if (!shiftMark.on) armShiftKill([node.dataset.uuid], wantMode);
+        else markNode(node.dataset.uuid);
         return 'shiftkill';
       }
 
@@ -3858,38 +4037,73 @@
     };
 
     // ============================================================
-    // Shift 长按划删：按住 Shift 划过节点 → 标红，松开 Shift 确认删除
+    // Shift + 鼠标划过：批量切换「禁用 / 启用」
+    //   松开后：标记节点原本都启用 → 全部禁用；否则全部启用。
+    //   Shift + Alt 划过仍是批量删除。
     // ============================================================
-    var shiftKill = { on: false, ids: {} };
+    var shiftMark = { on: false, ids: {}, mode: 'toggle' };
 
-    function paintShiftKill() {
+    function paintShiftMark() {
+      var del = shiftMark.mode === 'delete';
       Array.prototype.forEach.call(canvas.querySelectorAll('.wfnode'), function (d) {
-        d.classList.toggle('shift-kill', !!shiftKill.ids[d.dataset.uuid]);
+        var hit = !!shiftMark.ids[d.dataset.uuid];
+        d.classList.toggle('shift-kill', hit && del);
+        d.classList.toggle('shift-toggle', hit && !del);
       });
+    }
+
+    function applyShiftToggle(ids) {
+      var nodes = ids.map(findNode).filter(function (n) { return n && n.type !== 'Group'; });
+      if (!nodes.length) return;
+      var allEnabled = nodes.every(function (n) { return !n.disabled; });
+      pushUndo();
+      nodes.forEach(function (n) { n.disabled = allEnabled; });
+      renderNodes(); showProps(); afterChange();
+      note('ok', allEnabled ? '已批量禁用' : '已批量启用',
+        nodes.length + ' 个节点（Ctrl+Z 可撤销）', 2800);
     }
 
     function runShiftKill() {
-      var ids = Object.keys(shiftKill.ids);
-      shiftKill.on = false;
-      shiftKill.ids = {};
-      paintShiftKill();
+      var ids = Object.keys(shiftMark.ids);
+      var mode = shiftMark.mode;
+      shiftMark.on = false;
+      shiftMark.ids = {};
+      shiftMark.mode = 'toggle';
+      paintShiftMark();
       if (!ids.length) return;
-      pushUndo();
-      var kill = {};
-      ids.forEach(function (i) { kill[i] = 1; });
-      state.wf.data.nodes = state.wf.data.nodes.filter(function (x) { return !kill[x.uuid]; });
-      state.wf.data.edges = state.wf.data.edges.filter(function (e) {
-        return !kill[e.source_node_uuid] && !kill[e.target_node_uuid];
-      });
-      state.selectedIds = {}; state.selected = null;
-      renderNodes(); showProps(); updateStats(); afterChange();
-      note('ok', '已删除', ids.length + ' 个节点（Ctrl+Z 可撤销）', 3200);
+      if (mode === 'delete') {
+        pushUndo();
+        var kill = {};
+        ids.forEach(function (i) { kill[i] = 1; });
+        state.wf.data.nodes = state.wf.data.nodes.filter(function (x) { return !kill[x.uuid]; });
+        state.wf.data.edges = state.wf.data.edges.filter(function (e) {
+          return !kill[e.source_node_uuid] && !kill[e.target_node_uuid];
+        });
+        state.selectedIds = {}; state.selected = null;
+        renderNodes(); showProps(); updateStats(); afterChange();
+        note('ok', '已删除', ids.length + ' 个节点（Ctrl+Z 可撤销）', 3200);
+        return;
+      }
+      applyShiftToggle(ids);
     }
 
-    // Shift 的两种用法：
-    //   · 长按 Shift（约 450ms）→ 进入「批量删除」态，之后划过/点过的节点标红，松开 Shift 或点空白确认删除
-    //   · Shift + 在节点上按下  → 立刻进入同一删除态（兼容老习惯）
-    //   · Shift + 在空白处拖动  → 框选多选（不删）
+    function armShiftKill(seed, mode) {
+      shiftMark.on = true;
+      shiftMark.ids = {};
+      shiftMark.mode = mode === 'delete' ? 'delete' : 'toggle';
+      (seed || []).forEach(function (u) { shiftMark.ids[u] = 1; });
+      state.shiftArmed = true;
+      wrap.classList.add('shift-mode');
+      wrap.classList.toggle('shift-mode-del', shiftMark.mode === 'delete');
+      paintShiftMark();
+    }
+
+    function markNode(uuid) {
+      if (!uuid) return;
+      shiftMark.ids[uuid] = 1;
+      paintShiftMark();
+    }
+
     var shiftHoldTimer = null;
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Shift' || shiftHoldTimer) return;
@@ -3897,12 +4111,10 @@
       if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) return;
       shiftHoldTimer = setTimeout(function () {
         shiftHoldTimer = null;
-        // 若此刻鼠标正按着（多半是在拖动框选或拖节点），不进入划删态
         if (mouseDown || state.marquee || state.pan || state.dragMul) return;
-        if (!shiftKill.on) armShiftKill([]);
+        if (!shiftMark.on) armShiftKill([], e.altKey ? 'delete' : 'toggle');
       }, 450);
     });
-    // 鼠标一按下就取消「长按 Shift 划删」的待办：说明用户要的是 Shift+拖动框选
     window.addEventListener('pointerdown', function () {
       if (shiftHoldTimer) { clearTimeout(shiftHoldTimer); shiftHoldTimer = null; }
     }, true);
@@ -3911,33 +4123,27 @@
       if (e.key !== 'Shift') return;
       if (shiftHoldTimer) { clearTimeout(shiftHoldTimer); shiftHoldTimer = null; }
       wrap.classList.remove('shift-mode');
+      wrap.classList.remove('shift-mode-del');
       state.shiftArmed = false;
-      if (shiftKill.on) runShiftKill();
+      if (shiftMark.on) runShiftKill();
     });
 
     window.addEventListener('blur', function () {
       if (shiftHoldTimer) { clearTimeout(shiftHoldTimer); shiftHoldTimer = null; }
-      if (shiftKill.on) { shiftKill.on = false; shiftKill.ids = {}; paintShiftKill(); }
+      if (shiftMark.on) {
+        shiftMark.on = false; shiftMark.ids = {}; shiftMark.mode = 'toggle';
+        paintShiftMark();
+      }
       wrap.classList.remove('shift-mode');
+      wrap.classList.remove('shift-mode-del');
       state.shiftArmed = false;
     });
 
-    /** 进入批量删除态；seed 为初始标记的节点 */
-    function armShiftKill(seed) {
-      shiftKill.on = true;
-      shiftKill.ids = {};
-      (seed || []).forEach(function (u) { shiftKill.ids[u] = 1; });
-      state.shiftArmed = true;
-      wrap.classList.add('shift-mode');
-      paintShiftKill();
-    }
-
     canvas.addEventListener('mouseover', function (e) {
-      if (!shiftKill.on) return;
+      if (!shiftMark.on) return;
       var nd = e.target.closest ? e.target.closest('.wfnode') : null;
       if (!nd) return;
-      shiftKill.ids[nd.dataset.uuid] = 1;
-      paintShiftKill();
+      markNode(nd.dataset.uuid);
     });
 
     svg.addEventListener('click', function (ev) {
